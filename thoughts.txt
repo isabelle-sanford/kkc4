@@ -2,5 +2,7 @@
 
 re enums: can you have ta null state for them
 
+note - it looks like if I create an instance of a class and then change something in the class, the instance doesn't update
+
 
 - maybe make a Money type or at least some helper funcs back and forth
