@@ -1,4 +1,6 @@
 
 
+re enums: can you have ta null state for them
+
 
 - maybe make a Money type or at least some helper funcs back and forth
