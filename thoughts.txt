@@ -1,8 +1,16 @@
 
 
-re enums: can you have ta null state for them
+re enums: can you have a null state for them? should they be combined with the main class? how do 
 
 note - it looks like if I create an instance of a class and then change something in the class, the instance doesn't update
 
 
 - maybe make a Money type or at least some helper funcs back and forth
+
+- consider having a field for abilities, lodgings, etc, that's just the "operative number" or whatever (so if we wanted to change the mews insanity bonus it'd only have to happen in one place)
+
+simplifications: 
+- ignore Imre 
+- ignore actual ability effects 
+- ignore items 
+- ignore DP 
