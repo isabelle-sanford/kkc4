@@ -75,7 +75,7 @@ def processUnblocked(list):
                     blockWasProcessed = True
                     print(f"{target} was blocked.")
         print(f"{player} was processed.")
-    print("Iteration complete.\n")
+    print("Iteration complete.")
 
     if blockWasProcessed:
         processUnblocked(list)
@@ -83,25 +83,40 @@ def processUnblocked(list):
 # Note: Don't think the recursion end points are correct yet. 
 # --> Want it to recursively call the function until it finds the end of a chain (len(player.blocking) = 0 for player), or finds a duplicate in cyclelist, representing a cycle found.
 # --> Need to ensure it does actually run for each element in player.blocking
-def processCyclicalBlock(player, cyclelist):
-    print("Starting iteration")
-    print(f"Cyclelist: {cycleList}")
-
+def processCyclicalBlock(player, inputList):
+    print("\nStarting iteration")
+    # print(f"inputList: {inputList}")
+    print(f"Analysing {player}...")
     # Add self to the list.
-    cycleList.append(player)
+    inputList.append(player)
 
-    # Checks everyone the current player is trying to block.
-    for target in player.blocking:
-        # If the target hasn't be part of the current recorded cycle yet, recursively call this function with a copy (not reference to) the list of players in the current loop.
-        if target not in cycleList:
-            processCyclicalBlock(target, cyclelist.copy())
-        # Otherwise, the target is already there, so we have a cycle. 
-        else:
-            # From the first occurence of the duplicate to the end of the list, including self, set the "isBlocked" flag on each participant.
-            for i in range(cyclelist.index(target),len(cycleList)):
-                cycleList[i].isBlocked = True
-            print("Iteration terminated (Cycle identified and blocked).")            
-    print("Iteration terminated (End of chain reached).")
+    if len(player.blocking) == 0:
+        print("Iteration terminated (End of chain reached).")
+        str = "["
+        for n in inputList:
+            str += f"{n} -> "
+        print(f"{str} end]")
+    else:
+        # Checks everyone the current player is trying to block.
+        for target in player.blocking:
+            # If target is already blocked, no need to consider it.
+            if (target.isBlocked):
+                continue
+            # If the target hasn't be part of the current recorded cycle yet, recursively call this function with a copy (not reference to) the list of players in the current loop.
+            if (target not in inputList):
+                processCyclicalBlock(target, inputList.copy())
+                print(f"...{player} recursion finished.")
+            # Otherwise, the target is already there, so we have a cycle. 
+            else:
+                # From the first occurence of the duplicate to the end of the list, including self, set the "isBlocked" flag on each participant.
+                str = "["
+                for i in range(inputList.index(target),len(inputList)):
+                    inputList[i].isBlocked = True
+                    str += f"{inputList[i]} -> "
+                print("Iteration terminated (Cycle identified and blocked).")
+                print(f"{str} {target}]")
+                            
+    
 
 
 
@@ -116,6 +131,9 @@ p2 = Player("B")
 p3 = Player("C")
 p4 = Player("D")
 p5 = Player("E")
+p6 = Player("F")
+p7 = Player("G")
+p8 = Player("H")
 
 # I = Simple loop
 # p1.blocking.append(p2)
@@ -130,21 +148,63 @@ p5 = Player("E")
 # p4.blocking.append(p1)
 
 # IV = Multiple loops
+# p1.blocking.append(p2)
+# p2.blocking.append(p3)
+# p3.blocking.append(p1)
+# p3.blocking.append(p4)
+# p4.blocking.append(p1)
+
+# V = Lots more nested loops
+# p1.blocking.append(p2)
+# p1.blocking.append(p5)
+# p2.blocking.append(p3)
+# p3.blocking.append(p4)
+# p4.blocking.append(p5)
+# p4.blocking.append(p2)
+# p5.blocking.append(p6)
+# p5.blocking.append(p1)
+# p6.blocking.append(p7)
+# p7.blocking.append(p3)
+# p7.blocking.append(p1)
+
+# VI = V, but external successful block on F.
+# p1.blocking.append(p2)
+# p1.blocking.append(p5)
+# p2.blocking.append(p3)
+# p3.blocking.append(p4)
+# p4.blocking.append(p5)
+# p4.blocking.append(p2)
+# p5.blocking.append(p6)
+# p5.blocking.append(p1)
+# p6.blocking.append(p7)
+# p7.blocking.append(p3)
+# p7.blocking.append(p1)
+# p8.blocking.append(p6)
+
+# VII = IV but with E breaking one of the loops, while A also forms secondary loop through C, plus an extra chain.
 p1.blocking.append(p2)
+p1.blocking.append(p3)
 p2.blocking.append(p3)
 p3.blocking.append(p1)
 p3.blocking.append(p4)
 p4.blocking.append(p1)
+p5.blocking.append(p2)
+p6.blocking.append(p7)
+p7.blocking.append(p8)
 
-playerlist = [p1, p2, p3, p4, p5]
+
+
+playerlist = [p1, p2, p3, p4, p5, p6, p7, p8]
 
 # First, process any blocks that are uncontested.
 # -> Any player who is not a target of a block, who has their own block action will succeed in taking the block action, so can be processed (taking into account protects).
 # -> The blocks already processed may mean that other players will now no longer be targetted by a block, so the process can happen iteratively.
 # -> Do this by each time populating each player with a list of anyone targetting them with a block, and then applying the blocks of any player with an empty "blockedBy" list. 
 # --> On subsequent passes, players already blocked (isBlocked = True) will not have their block targets added to "blockedBy" lists.
-
+print("Applying initial unblocked chains...")
 processUnblocked(playerlist)
+print("...Done.\n")
+
 
 # Next, what is left over should be made up of paths that terminate, or cycles that loop back on themselves. 
 # -> Any cycle will result in any participants having all actions blocked.
@@ -156,15 +216,16 @@ processUnblocked(playerlist)
 # ---> Be careful of how the list of players in consideration is passed - has to be a copy of the list, not a reference to the list - each new call should have a new copy of the list with its own name added.
 
 # Don't need to consider already blocked players in this process
-cycleList = []
+cyclicalList = []
 for player in playerlist:
     if not(player.isBlocked):
-        cycleList.append(player)
+        cyclicalList.append(player)
 
 print("Starting search for cycles...")
-for player in cycleList:
-    processCyclicalBlock(player, [])
-print("Search complete.")
+for player in cyclicalList:
+    if not(player.isBlocked):
+        processCyclicalBlock(player, [])
+print("Search complete.\n")
 
 # Finally, need to find the start of any chains: these will be the remaining instances of players with empty "blockedBy" lists after resolving any chains.
 # -> Don't forget to consider redirects...
