@@ -7,6 +7,9 @@ class Player:
         # Flag for whether they have been successfully blocked.
         self.isBlocked = False
 
+        # Flag to ensure proper blocking behaviour of all identified cycles.
+        self.inCycle = False
+
         # Stored input list of who they are blocking, as Player references
         self.blocking = []
 
@@ -32,8 +35,11 @@ class Player:
                 outstr += f"{n} "
         
         outstr += "\nBlocked by: "
-        for n in self.blockedBy:
-            outstr += f"{n} "
+        if self.inCycle:
+            outstr += "Cycle"
+        else:
+            for n in self.blockedBy:
+                outstr += f"{n} "
         
         print(outstr)
     
@@ -111,7 +117,7 @@ def processCyclicalBlock(player, inputList):
                 # From the first occurence of the duplicate to the end of the list, including self, set the "isBlocked" flag on each participant.
                 str = "["
                 for i in range(inputList.index(target),len(inputList)):
-                    inputList[i].isBlocked = True
+                    inputList[i].inCycle = True
                     str += f"{inputList[i]} -> "
                 print("Iteration terminated (Cycle identified and blocked).")
                 print(f"{str} {target}]")
@@ -215,19 +221,19 @@ print("...Done.\n")
 # ---> Will result in applying the "isBlocked" flag multiple times, but should be exhausive, ensure all loops are found if there are multiple loops.
 # ---> Be careful of how the list of players in consideration is passed - has to be a copy of the list, not a reference to the list - each new call should have a new copy of the list with its own name added.
 
-# Don't need to consider already blocked players in this process
-cyclicalList = []
-for player in playerlist:
-    if not(player.isBlocked):
-        cyclicalList.append(player)
-
+# Sets a "inCycle" flag for any node in a cycle.
 print("Starting search for cycles...")
-for player in cyclicalList:
-    if not(player.isBlocked):
-        processCyclicalBlock(player, [])
+for player in playerlist:
+    processCyclicalBlock(player, [])
+
+# Converts all "inCycle" flags to "isBlocked" being set True.
+for player in playerlist:
+    if player.inCycle:
+        player.isBlocked = True
 print("Search complete.\n")
 
 # Finally, need to find the start of any chains: these will be the remaining instances of players with empty "blockedBy" lists after resolving any chains.
+processUnblocked(playerlist)
 # -> Don't forget to consider redirects...
 
 
