@@ -1,21 +1,19 @@
 # Player class recieves a list of player references
-
 class Player:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name: str):
+        self.name: str = name
 
         # Flag for whether they have been successfully blocked.
-        self.isBlocked = False
+        self.isBlocked: bool = False
 
         # Flag to ensure proper blocking behaviour of all identified cycles.
-        self.inCycle = False
+        self.inCycle: bool = False
 
         # Stored input list of who they are blocking, as Player references
-        self.blocking = []
+        self.blocking: Player = []
 
         # Working list of players that blocking them, as Player references
-        self.blockedBy = []
-        
+        self.blockedBy: Player = []
 
     def __str__(self):
         return self.name
@@ -23,7 +21,7 @@ class Player:
     # Prints Player state. 
     # - Only displays who they attempted to block if not blocked.
     def print(self):
-        outstr = self.name
+        outstr: str = self.name
         if self.isBlocked:
             outstr += " is blocked."
         else:
@@ -51,7 +49,7 @@ class Player:
 
     # Clears the "blockedBy" list.
     def clearBlockedBy(self):
-        self.blockedBy = []
+        self.blockedBy: Player = []
 
 # Functions for each step of the process (see explanations below):
 
@@ -61,7 +59,7 @@ def processUnblocked(list):
 
     # If any blocks are processed, we need to rerun the check to see if it results in any new players with no one attempting to block them.
     # If this is True, then this function needs to be called again, otherwise this first step can finish.
-    blockWasProcessed = False
+    blockWasProcessed: bool = False
 
     # If this is not the first call of the function, players may have preexisting blocks listed in their "BlockedBy" field. These need to be cleared.
     for player in list:
