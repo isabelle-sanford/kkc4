@@ -76,7 +76,7 @@ class Player:
             self.DP += total
 
     def assignEP(self, field, total = 1):
-        self.EP.values[int(field)-1] += total
+        self.EP.values[field-1] += total
         # if field == FieldName.LINGUISTICS:
         #     self.EP.Linguistics += total
         # elif field == FieldName.ARITHMETICS:
