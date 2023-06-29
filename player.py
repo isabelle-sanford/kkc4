@@ -1,3 +1,17 @@
+from enum import IntEnum
+
+class FieldName(IntEnum):
+    LINGUISTICS = 1
+    ARITHMETICS = 2
+    RHETORICLOGIC = 3
+    ARCHIVES = 4
+    SYMPATHY = 5
+    PHYSICKING = 6
+    ALCHEMY = 7
+    ARTIFICERY = 8
+    NAMING = 9
+    GENERAL = 10  # ? 0? 
+
 class Player:
     def __init__(self, name: str):
         self.name: str = name
@@ -30,6 +44,7 @@ class Player:
 
         self.expelled: bool = False
 
+        self.EP: Fields = Fields()
 
     
     def __str__(self) -> str:
@@ -59,6 +74,28 @@ class Player:
 
     def assignDP(self, total = 1):
             self.DP += total
+
+    def assignEP(self, field, total = 1):
+        self.EP.values[int(field)-1] += total
+        # if field == FieldName.LINGUISTICS:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.ARITHMETICS:
+        #     self.EP.Arithmetics += total
+        # elif field == FieldName.RHETORICLOGIC:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.ARCHIVES:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.SYMPATHY:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.PHYSICKING:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.ALCHEMY:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.ARTIFICERY:
+        #     self.EP.Linguistics += total
+        # elif field == FieldName.NAMING:
+        #     self.EP.Linguistics += total
+
 
 
     
@@ -112,3 +149,26 @@ class Action:
                         # print(f"{self.player} blocked {self.target}'s {a.type} action.")
                         return
                 # print("No relevant actions found.")
+
+
+class Fields:
+    def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, archives = 0, sympathy = 0, physicking = 0, alchemy = 0, artificery = 0, naming = 0) -> None:
+        self.Linguistics = linguistics
+        self.Arithmetics = arithemtics
+        self.RhetoricAndLogic = rhetoric
+        self.Archives = archives
+        self.Sympathy = sympathy
+        self.Physicking = physicking
+        self.Alchemy = alchemy
+        self.Artificery = artificery
+        self.Naming = naming
+
+        self.values = [self.Linguistics, self.Arithmetics, self.RhetoricAndLogic, self.Archives, self.Sympathy, self.Physicking, self.Alchemy, self.Artificery, self.Naming]
+        
+    def __str__(self) -> str:
+        out = f"| Lin | Ari | R&L | Arc | Sym | Phy | ALc | Art | Nam |\n|"
+        for v in self.values:
+            out += f"{v: >3}  |"
+        return out
+    
+
