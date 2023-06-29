@@ -1,34 +1,38 @@
-from player import Player, Action
+from player import Player, FieldName
 import random
 
 ### ==== Classes ==== ###       
 class Weightings:
+    totalTiers = 0
+    tierWeights = []
+    outcomes = ["Charges Dropped", "Undignified Mischief", "Reckless Use", "Conduct Unbecoming", "Expulsion"]
+
     def __init__(self, minDPRange, chargesDropped, undignifiedMischief, recklessUse, conductUnbecoming, expulsion) -> None:
+        self.tierLevel = self.totalTiers
+        Weightings.totalTiers += 1
+
         self.minDP = minDPRange
 
         self.result = [chargesDropped, undignifiedMischief, recklessUse, conductUnbecoming, expulsion]
+        
+        # The sum of all percetages is 100, so starting with first weight and adding the next weight to the previous each time gives the max value for the range 
         for i in range(1, 5):
-            self.result[i] = self.result[i] + self.result[i-1]
-
-        self.outcome = ["Charges Dropped", "Undignified Mischief", "Reckless Use", "Conduct Unbecoming", "Expulsion"]
-        # self.MaxDPRange = minDPRange
-        # self.ChargesDropped = chargesDropped
-        # self.UndignifiedMischief = undignifiedMischief
-        # self.RecklessUse = recklessUse
-        # self.ConductUnbecoming = conductUnbecoming
-        # self.Expulsion = expulsion
-
-        # out = ""
-        # for i in self.result:
-        #     out += f"{i}, "
-        # print(out)
+            self.result[i] = self.result[i-1] + self.result[i]
+        Weightings.tierWeights.append(self)
 
     def __str__(self) -> str:
-        out = ""
-        out.join(map(str,self.result))
-        return out
+        if self.tierLevel == 0:
+            maxRange = "->"
+        else:
+            maxRange = f"{Weightings.tierWeights[self.tierLevel-1].minDP - 1: <2}"
+        val = ""
+        for i in range(0, 4):
+            val += f"{self.result[i]: >3}, "
+        val += f"{self.result[4]: >3}"
+        return f"Tier {self.tierLevel} ({self.minDP: >2}-{maxRange} DP) [{val}]"
 
 class Charges:
+
     # Sets up the punishments for the DP ranges
     # First number is the minimum DP for that tier of punishment
     # Other numbers are the percent chance of the different punishments:
@@ -39,16 +43,15 @@ class Charges:
     # - Conduct Unbecoming a Member of the Arcanum (expulsion)
     # What is returned is a 5 element array(list), with the max d100 rolls corresponding to the weights
     def __init__(self) -> None:
-        self.PunishmentTiers: list[Weightings] =  []
-        self.PunishmentTiers.append(Weightings(20,  0,   0,  0,  0, 100))
-        self.PunishmentTiers.append(Weightings(19,  0,   0,  0, 10,  90))
-        self.PunishmentTiers.append(Weightings(17,  0,   0,  0, 20,  80))
-        self.PunishmentTiers.append(Weightings(15,  0,   5,  5, 25,  65))
-        self.PunishmentTiers.append(Weightings(13,  0,  10, 20, 40,  30))
-        self.PunishmentTiers.append(Weightings(11,  0,  20, 20, 50,  10))
-        self.PunishmentTiers.append(Weightings(8,  20,  30, 30,  0,   0))       
-        self.PunishmentTiers.append(Weightings(5,  60,  30, 10,  0,   0))
-        self.PunishmentTiers.append(Weightings(0,   0,   0,  0,  0,   0))
+        Weightings(20,  0,   0,  0,  0, 100)
+        Weightings(19,  0,   0,  0, 10,  90)
+        Weightings(17,  0,   0,  0, 20,  80)
+        Weightings(15,  0,   5,  5, 25,  65)
+        Weightings(13,  0,  10, 20, 40,  30)
+        Weightings(11,  0,  20, 20, 50,  10)
+        Weightings(8,  20,  30, 30, 20,   0)
+        Weightings(5,  60,  30, 10,  0,   0)
+        Weightings(0,   0,   0,  0,  0,   0)
     
     # Rolls a d100, finds which tier to compare the result with based on the players DP.
     # The punishment tier arrays has the max roll corresponding to the given punishment of that column.
@@ -59,12 +62,12 @@ class Charges:
         print(f"\n{target} has {target.DP} DP, and got a result of {randomResult}.")
 
         # Checks each tier to find the relevant band for the target's DP
-        for t in self.PunishmentTiers:
+        for t in Weightings.tierWeights:
             if (p.DP >= t.minDP):
                 # Checks each possible outcome to find the one corresponding to the rolled result
                 for i in range(len(t.result)):
                     if randomResult <= t.result[i]:
-                        self.assignOutcome(p,t.outcome[i])
+                        self.assignOutcome(p,t.outcomes[i])
                         return
 
     # Consequences are not actually implemented yet, but the appropriate if statements are called based on the DP result.                    
@@ -104,6 +107,17 @@ class Test:
                 p2.ImportComplaint(p4)
                 p3.ImportComplaint(p4)
                 p5.ImportComplaint(p6)
+                p6.ImportComplaint(p4)
+                p6.ImportComplaint(p4)
+                p6.ImportComplaint(p4)
+                p6.ImportComplaint(p4)
+                p7.ImportComplaint(p4)
+                p7.ImportComplaint(p4)
+                p8.ImportComplaint(p4)
+                p8.ImportComplaint(p4)
+
+                p4.assignEP(FieldName.ALCHEMY,3)
+                p4.assignEP(FieldName.NAMING,2) 
 
                 return [p1, p2, p3, p4, p5, p6, p7, p8]
 
@@ -149,6 +163,8 @@ for p in atPony:
     if count > 1:
         complaints.remove(p)
 
+# Need to take into account what field the Masters are when assigning DP, so that existing EP can reduce DP
+
 # For all NPC masters
 for i in range(9 - len(pcMaster)):
     for count in range(5):
@@ -165,3 +181,9 @@ for p in allPlayers:
 charges = Charges()
 for p in onHorns:
     charges.determinePunishment(p)
+
+
+# for i in Weightings.tierWeights:
+#     print(i)
+
+
