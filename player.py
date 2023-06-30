@@ -20,6 +20,11 @@ class Player:
 
         self.lodging = "On the streets"
 
+        self.expelled: bool = False
+
+        self.EP: Fields = Fields()
+
+
         # Stored input list of who they are blocking, as Player references
         self.actions: list[Action] = []
 
@@ -40,12 +45,10 @@ class Player:
         self.DP: int = 0
         
         # For Masters:
+        self.MasterOf: FieldName = None
         self.assignedDP: list[Player] = []
 
-        self.expelled: bool = False
-
-        self.EP: Fields = Fields()
-
+        
     
     def __str__(self) -> str:
         return self.name
@@ -72,32 +75,18 @@ class Player:
     def ImportComplaint(self, target):
         self.complaints.append(target)
 
-    def assignDP(self, total = 1):
-            self.DP += total
+    def assignDP(self, total = 1, masterOf:FieldName = None):
+            if masterOf is not None:
+                print(f"Master {masterOf.name} assigning DP to {self.name}, with {self.EP.values[masterOf]} EP in {masterOf.name}")
+                self.EP.values[masterOf] -= total
+                if self.EP.values[masterOf] < 0:
+                    self.DP -= self.EP.values[masterOf]
+                    self.EP.values[masterOf] = 0
+            else:
+                self.DP += total
 
     def assignEP(self, field, total = 1):
         self.EP.values[field-1] += total
-        # if field == FieldName.LINGUISTICS:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.ARITHMETICS:
-        #     self.EP.Arithmetics += total
-        # elif field == FieldName.RHETORICLOGIC:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.ARCHIVES:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.SYMPATHY:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.PHYSICKING:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.ALCHEMY:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.ARTIFICERY:
-        #     self.EP.Linguistics += total
-        # elif field == FieldName.NAMING:
-        #     self.EP.Linguistics += total
-
-
-
     
 
 class Action:
@@ -153,17 +142,18 @@ class Action:
 
 class Fields:
     def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, archives = 0, sympathy = 0, physicking = 0, alchemy = 0, artificery = 0, naming = 0) -> None:
-        self.Linguistics = linguistics
-        self.Arithmetics = arithemtics
-        self.RhetoricAndLogic = rhetoric
-        self.Archives = archives
-        self.Sympathy = sympathy
-        self.Physicking = physicking
-        self.Alchemy = alchemy
-        self.Artificery = artificery
-        self.Naming = naming
+        # self.Linguistics = linguistics
+        # self.Arithmetics = arithemtics
+        # self.RhetoricAndLogic = rhetoric
+        # self.Archives = archives
+        # self.Sympathy = sympathy
+        # self.Physicking = physicking
+        # self.Alchemy = alchemy
+        # self.Artificery = artificery
+        # self.Naming = naming
 
-        self.values = [self.Linguistics, self.Arithmetics, self.RhetoricAndLogic, self.Archives, self.Sympathy, self.Physicking, self.Alchemy, self.Artificery, self.Naming]
+        # self.values = [self.Linguistics, self.Arithmetics, self.RhetoricAndLogic, self.Archives, self.Sympathy, self.Physicking, self.Alchemy, self.Artificery, self.Naming]
+        self.values = [linguistics, arithemtics, rhetoric, archives, sympathy, physicking, alchemy, artificery, naming]
         
     def __str__(self) -> str:
         out = f"| Lin | Ari | R&L | Arc | Sym | Phy | ALc | Art | Nam |\n|"

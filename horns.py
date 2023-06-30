@@ -115,6 +115,8 @@ class Test:
                 p7.ImportComplaint(p4)
                 p8.ImportComplaint(p4)
                 p8.ImportComplaint(p4)
+                p8.MasterOf = FieldName.LINGUISTICS
+                p7.MasterOf = FieldName.NAMING
 
                 p4.assignEP(FieldName.ALCHEMY,3)
                 p4.assignEP(FieldName.NAMING,2) 
@@ -153,11 +155,11 @@ for p in allPlayers:
 # For PC masters
 for m in pcMaster:
     for d in m.assignedDP:
-        d.assignDP()
+        d.assignDP(masterOf=m.MasterOf)
 
 # Deal with Golden Pony buff
 for p in atPony:
-    count =complaints.count(p)
+    count = complaints.count(p)
     if count > 0:
         complaints.remove(p)
     if count > 1:
@@ -166,9 +168,15 @@ for p in atPony:
 # Need to take into account what field the Masters are when assigning DP, so that existing EP can reduce DP
 
 # For all NPC masters
-for i in range(9 - len(pcMaster)):
+NPCMasterFields = []
+for i in range(1,9):
+    NPCMasterFields.append(FieldName(i))
+for p in pcMaster:
+    NPCMasterFields.pop(p.MasterOf)
+
+for f in NPCMasterFields:
     for count in range(5):
-        complaints[random.randrange(len(complaints))].assignDP()
+        complaints[random.randrange(len(complaints))].assignDP(masterOf=f)
 
 # Adds DP from complaints
 for p in allPlayers:
