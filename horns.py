@@ -63,11 +63,11 @@ class Charges:
 
         # Checks each tier to find the relevant band for the target's DP
         for t in Weightings.tierWeights:
-            if (p.DP >= t.minDP):
+            if (target.DP >= t.minDP):
                 # Checks each possible outcome to find the one corresponding to the rolled result
                 for i in range(len(t.result)):
                     if randomResult <= t.result[i]:
-                        self.assignOutcome(p,t.outcomes[i])
+                        self.assignOutcome(target,t.outcomes[i])
                         return
 
     # Consequences are not actually implemented yet, but the appropriate if statements are called based on the DP result.                    
@@ -125,73 +125,87 @@ class Test:
 
 
 ### ==== Runtime Code ==== ###
-allPlayers: list[Player] = Test().StartTest(1)
 
-complaints: list[Player] = []
-pcMaster: list[Player] = []
-atPony: list[Player] = []
+def RunBlocks(self, playerList: list[Player] = None):
+        if playerList is not None:
+            allPlayers: list[Player] = playerList
+        else:
+            allPlayers: list[Player] = Test().StartTest(7)
+class Horns:
+    def __init__(self) -> None:
+        pass
 
-onHorns: set[Player] = set()
+    def RunHorns(self, playerList: list[Player] = None):
+        allPlayers: list[Player] = Test().StartTest(1)
+        if playerList is not None:
+            allPlayers = playerList
 
+        complaints: list[Player] = []
+        pcMaster: list[Player] = []
+        atPony: list[Player] = []
 
-for p in allPlayers:
-    # Gets list of any players at the pony
-    # Could be imported from elsewhere?
-    if p.lodging == "The Golden Pony":
-        atPony.append(p)
-
-    # Gets list of Masters
-    # Could be imported from elsewhere?
-    if p.rank == "Master":
-        pcMaster.append(p)
-
-    for c in p.complaints:
-        # generates complaints list for NPC Master DP distribution
-        complaints.append(c)
-
-        # Notify all players of complaints received.
-        c.complaintsReceived.append(p)
-
-# For PC masters
-for m in pcMaster:
-    for d in m.assignedDP:
-        d.assignDP(masterOf=m.MasterOf)
-
-# Deal with Golden Pony buff
-for p in atPony:
-    count = complaints.count(p)
-    if count > 0:
-        complaints.remove(p)
-    if count > 1:
-        complaints.remove(p)
-
-# Need to take into account what field the Masters are when assigning DP, so that existing EP can reduce DP
-
-# For all NPC masters
-NPCMasterFields = []
-for i in range(1,9):
-    NPCMasterFields.append(FieldName(i))
-for p in pcMaster:
-    NPCMasterFields.pop(p.MasterOf)
-
-for f in NPCMasterFields:
-    for count in range(5):
-        complaints[random.randrange(len(complaints))].assignDP(masterOf=f)
-
-# Adds DP from complaints
-for p in allPlayers:
-    p.assignDP(len(p.complaintsReceived)//2)
-    
-    # OnHorns either if recieved any complaint, or PC Master assigned DP to you.
-    if (len(p.complaintsReceived) > 0) or (p.DP > 0):
-        onHorns.add(p)
-
-charges = Charges()
-for p in onHorns:
-    charges.determinePunishment(p)
+        onHorns: set[Player] = set()
 
 
-# for i in Weightings.tierWeights:
-#     print(i)
+        for p in allPlayers:
+            # Gets list of any players at the pony
+            # Could be imported from elsewhere?
+            if p.lodging == "The Golden Pony":
+                atPony.append(p)
+
+            # Gets list of Masters
+            # Could be imported from elsewhere?
+            if p.rank == "Master":
+                pcMaster.append(p)
+
+            for c in p.complaints:
+                # generates complaints list for NPC Master DP distribution
+                complaints.append(c)
+
+                # Notify all players of complaints received.
+                if playerList is None:
+                    c.complaintsReceived.append(p)
+
+        # For PC masters
+        for m in pcMaster:
+            for d in m.assignedDP:
+                d.assignDP(masterOf=m.MasterOf)
+
+        # Deal with Golden Pony buff
+        for p in atPony:
+            count = complaints.count(p)
+            if count > 0:
+                complaints.remove(p)
+            if count > 1:
+                complaints.remove(p)
+
+        # Need to take into account what field the Masters are when assigning DP, so that existing EP can reduce DP
+
+        # For all NPC masters
+        NPCMasterFields = []
+        for i in range(1,9):
+            NPCMasterFields.append(FieldName(i))
+        for p in pcMaster:
+            NPCMasterFields.pop(p.MasterOf)
+
+        for f in NPCMasterFields:
+            for count in range(5):
+                complaints[random.randrange(len(complaints))].assignDP(masterOf=f)
+
+        # Adds DP from complaints
+        for p in allPlayers:
+            p.assignDP(len(p.complaintsReceived)//2)
+            
+            # OnHorns either if recieved any complaint, or PC Master assigned DP to you.
+            if (len(p.complaintsReceived) > 0) or (p.DP > 0):
+                onHorns.add(p)
+
+        charges = Charges()
+        for p in onHorns:
+            charges.determinePunishment(p)
+
+
+        # for i in Weightings.tierWeights:
+        #     print(i)
 
 

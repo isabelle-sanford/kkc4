@@ -224,42 +224,50 @@ def processRedirectBlocks(actionList: list[Action]):
 # 4. Process block/redirect loops
 # 5. Process remaining redirects/blocks (order should not matter)
 
-allPlayers: list[Player] = Test().StartTest(7)
-allActions: list[Action] = generateActionList(allPlayers)
-allBlocks: list[Action] = generateBlockList(allActions)
+class Block:
+    def __init__(self) -> None:
+        pass
 
-print(''.join(map(str,allBlocks)))
+    def RunBlocks(self, playerList: list[Player] = None):
+        allPlayers: list[Player] = Test().StartTest(7)
+        if playerList is not None:
+            allPlayers = playerList
+            
+        allActions: list[Action] = generateActionList(allPlayers)
+        allBlocks: list[Action] = generateBlockList(allActions)
 
-
-# 1. Check for redirects & blocks targetting each other.
-
-# processRedirectBlocks(allActions)
-
-# 2. Check for redirect/block chains
-
-
-
-# 3. Process unblocked/redireted blocks and unblocked/redirected redirects
+        print(''.join(map(str,allBlocks)))
 
 
-processUnblocked(allBlocks)
+        # 1. Check for redirects & blocks targetting each other.
+
+        # processRedirectBlocks(allActions)
+
+        # 2. Check for redirect/block chains
 
 
-# 4. Process block/redirect loops
 
-for a in allBlocks:
-    processCyclicalBlock(a,[])
-
-for a in allActions:
-    if a.inBlockCycle:
-        a.blocked = True
-
-# 5. Process remaining redirects/blocks
-
-processUnblocked(allBlocks)
+        # 3. Process unblocked/redireted blocks and unblocked/redirected redirects
 
 
-for p in allPlayers:
-    print(f"{p.name}: isBlocked = {p.isBlocked}")
-    for a in p.actions:
-            print(f" - {a.name}: isBlocked = {a.blocked}")
+        processUnblocked(allBlocks)
+
+
+        # 4. Process block/redirect loops
+
+        for a in allBlocks:
+            processCyclicalBlock(a,[])
+
+        for a in allActions:
+            if a.inBlockCycle:
+                a.blocked = True
+
+        # 5. Process remaining redirects/blocks
+
+        processUnblocked(allBlocks)
+
+
+        for p in allPlayers:
+            print(f"{p.name}: isBlocked = {p.isBlocked}")
+            for a in p.actions:
+                    print(f" - {a.name}: isBlocked = {a.blocked}")
