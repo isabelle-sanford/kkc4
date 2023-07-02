@@ -1,4 +1,5 @@
-from player import Player, FieldName
+from player import Player, FieldName, Lodging, Rank
+from test import Test
 import random
 
 ### ==== Classes ==== ###       
@@ -32,7 +33,6 @@ class Weightings:
         return f"Tier {self.tierLevel} ({self.minDP: >2}-{maxRange} DP) [{val}]"
 
 class Charges:
-
     # Sets up the punishments for the DP ranges
     # First number is the minimum DP for that tier of punishment
     # Other numbers are the percent chance of the different punishments:
@@ -59,84 +59,87 @@ class Charges:
     # Uses the index found to set the result by passing the matching string in outcome as the argument of assignOutcome.
     def determinePunishment(self, target: Player):
         randomResult = random.randrange(1, 100)
-        print(f"\n{target} has {target.DP} DP, and got a result of {randomResult}.")
+        print(f"\n{target.info.name} has {target.status.DP} DP, and got a result of {randomResult}.")
 
         # Checks each tier to find the relevant band for the target's DP
         for t in Weightings.tierWeights:
-            if (target.DP >= t.minDP):
+            if (target.status.DP >= t.minDP):
                 # Checks each possible outcome to find the one corresponding to the rolled result
                 for i in range(len(t.result)):
                     if randomResult <= t.result[i]:
-                        self.assignOutcome(target,t.outcomes[i])
+                        self.assignOutcome(target,Weightings.outcomes[i])
                         return
 
     # Consequences are not actually implemented yet, but the appropriate if statements are called based on the DP result.                    
     def assignOutcome(self, target: Player, outcome: str):
         if outcome == "Charges Dropped":
-            print(f"All charges on {target} were dropped.")
+            print(f"All charges on {target.info.name} were dropped.")
         elif outcome == "Undignified Mischief":
-            print(f"{target} punished with formal apology.")
+            print(f"{target.info.name} punished with formal apology.")
         elif outcome == "Reckless Use":
-            print(f"{target} charged with Reckless Use of Sympathy and will be punished with 1 lashing.")
+            print(f"{target.info.name} charged with Reckless Use of Sympathy and will be punished with 1 lashing.")
         elif outcome == "Conduct Unbecoming":
-            print(f"{target} charged with Conduct Unbecoming a Member of the Arcanum and will be punished with 3 lashings.")
+            print(f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be punished with 3 lashings.")
         elif outcome == "Expulsion":
-            target.expelled = True
-            print(f"{target} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
+            target.status.is_expelled = True
+            print(f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
         else:
             print(f"Error. Outcome provided was '{outcome}'.")
 
-class Test:
-    def __init__(self) -> None:
-        pass
-
-    def StartTest(self, i: int) -> list[Player]:
-        if i == 1:
-                p1 = Player("A")
-                p2 = Player("B")
-                p3 = Player("C")
-                p4 = Player("D")
-                p5 = Player("E")
-                p6 = Player("F")
-                p7 = Player("G")
-                p8 = Player("H")
-
-                p1.ImportComplaint(p2)
-                p1.ImportComplaint(p2)
-                p2.ImportComplaint(p1)
-                p2.ImportComplaint(p4)
-                p3.ImportComplaint(p4)
-                p5.ImportComplaint(p6)
-                p6.ImportComplaint(p4)
-                p6.ImportComplaint(p4)
-                p6.ImportComplaint(p4)
-                p6.ImportComplaint(p4)
-                p7.ImportComplaint(p4)
-                p7.ImportComplaint(p4)
-                p8.ImportComplaint(p4)
-                p8.ImportComplaint(p4)
-                p8.MasterOf = FieldName.LINGUISTICS
-                p7.MasterOf = FieldName.NAMING
-
-                p4.assignEP(FieldName.ALCHEMY,3)
-                p4.assignEP(FieldName.NAMING,2) 
-
-                return [p1, p2, p3, p4, p5, p6, p7, p8]
-
-
 ### ==== Runtime Code ==== ###
 
-def RunBlocks(self, playerList: list[Player] = None):
-        if playerList is not None:
-            allPlayers: list[Player] = playerList
-        else:
-            allPlayers: list[Player] = Test().StartTest(7)
 class Horns:
     def __init__(self) -> None:
         pass
 
+    def RunComplaints(self, playerList: list[Player] = None):
+        print("RunComplaints()...")
+        allPlayers: list[Player] = []
+        if playerList is not None:
+             allPlayers = playerList
+
+        
+        # Extra complaints lodged, and complaint manipulation needs to be processed somewhere.
+        
+        # Extra complaints (means if blocked, don't have to remove them.)
+        for p in allPlayers:
+            for c in p.choice.actions:
+                if c.type == "complaint" and not c.blocked:
+                    if c.name == "Proficient in Hyperbole":
+                        if c.target is not None:
+                            p.choice.complaints.append(c.target)
+                        if c.target2 is not None:
+                            p.choice.complaints.append(c.target2)
+                    elif c.name == "Argumentum Ad Nauseam":
+                        c.target.status.complaintsBlocked = True
+                    elif c.name == "Persuasive Arguments":
+                        # Does this require 3 potential targets?
+                        pass
+        
+
+        for p in allPlayers:
+            for c in p.choice.complaints:
+                # Notify all players of complaints received.
+                c.status.complaintsReceived.append(p)
+
+        for p in allPlayers:
+            if len(p.status.complaintsReceived) > 0:
+                out = f"{p.info.name} ({len(p.status.complaintsReceived)}): "
+                for c in p.status.complaintsReceived:
+                    out += f"{c.info.name}, "
+                out = out[:-2]
+                print(out)
+                
+
+        # What do complaints do? Horns already takes the votes placed and notifies all players of who voted on them, which can be used in the tuition step. Extra votes should have been pulled from db. Blocks needs to run at some point to ensure blocks are removed. 
+        # Possibly this class generates the vote counts?
+        # Could move the notification of votes to this class. This class would need to happen after blocks though.
+        print("RunComplaints()... Done!")
+             
+
     def RunHorns(self, playerList: list[Player] = None):
-        allPlayers: list[Player] = Test().StartTest(1)
+        print("RunHorns()...")
+        allPlayers: list[Player] = []
         if playerList is not None:
             allPlayers = playerList
 
@@ -150,26 +153,26 @@ class Horns:
         for p in allPlayers:
             # Gets list of any players at the pony
             # Could be imported from elsewhere?
-            if p.lodging == "The Golden Pony":
+            if p.status.lodging == Lodging.GoldenPony:
                 atPony.append(p)
 
             # Gets list of Masters
             # Could be imported from elsewhere?
-            if p.rank == "Master":
+            if p.status.rank == Rank.MASTER:
                 pcMaster.append(p)
 
-            for c in p.complaints:
+            for c in p.choice.complaints:
                 # generates complaints list for NPC Master DP distribution
                 complaints.append(c)
 
                 # Notify all players of complaints received.
                 if playerList is None:
-                    c.complaintsReceived.append(p)
+                    c.status.complaintsReceived.append(p)
 
         # For PC masters
         for m in pcMaster:
-            for d in m.assignedDP:
-                d.assignDP(masterOf=m.MasterOf)
+            for d in m.choice.assignedDP:
+                d.assignDP(masterOf=m.status.MasterOf)
 
         # Deal with Golden Pony buff
         for p in atPony:
@@ -186,18 +189,19 @@ class Horns:
         for i in range(1,9):
             NPCMasterFields.append(FieldName(i))
         for p in pcMaster:
-            NPCMasterFields.pop(p.MasterOf)
+            NPCMasterFields.pop(p.status.MasterOf)
 
         for f in NPCMasterFields:
             for count in range(5):
-                complaints[random.randrange(len(complaints))].assignDP(masterOf=f)
+                if (len(complaints) > 0):
+                    complaints[random.randrange(len(complaints))].assignDP(masterOf=f)
 
         # Adds DP from complaints
         for p in allPlayers:
-            p.assignDP(len(p.complaintsReceived)//2)
+            p.assignDP(len(p.status.complaintsReceived)//2)
             
             # OnHorns either if recieved any complaint, or PC Master assigned DP to you.
-            if (len(p.complaintsReceived) > 0) or (p.DP > 0):
+            if (len(p.status.complaintsReceived) > 0) or (p.status.DP > 0):
                 onHorns.add(p)
 
         charges = Charges()
@@ -207,5 +211,6 @@ class Horns:
 
         # for i in Weightings.tierWeights:
         #     print(i)
+        print("RunHorns()... Done!")
 
 

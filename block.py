@@ -1,137 +1,10 @@
 from player import Player, Action
 
-class Test:
-    def __init__(self) -> None:
-        pass
-    def StartTest(self, i: int) -> list[Player]:
-        if i == 1:
-            p1 = Player("A")
-            p2 = Player("B")
-            p3 = Player("C")
-            p4 = Player("D")
-
-            p1.BlockOne(p2,"Block")
-            p2.BlockAll(p3)
-            p3.BlockOne(p1, "Block")
-            p3.BlockOne(p4, "Block")
-            p4.RedirectAction(p1,p1,"Redirect")
-
-            return [p1, p2, p3, p4]
-        # elif i == 2:
-        #     p1 = Player("A")
-        #     p2 = Player("B")
-        #     p3 = Player("C")
-        #     p4 = Player("D")
-        #     p5 = Player("E")
-        #     p6 = Player("F")
-        #     p7 = Player("G")
-        #     p8 = Player("H")
-
-        #     p1.BlockOne(p2,"Block")
-        #     p2.BlockAll(p3)
-        #     p3.BlockOne(p1, "Block")
-        #     p3.BlockOne(p4, "Block")
-
-        #     return [p1, p2, p3, p4, p5, p6, p7, p8]
-        elif i == 3:
-            p1 = Player("A")
-            p2 = Player("B")
-            p3 = Player("C")
-            p4 = Player("D")
-
-            p1.BlockOne(p2,"Block")
-            p2.BlockAll(p3)
-            p3.BlockOne(p1, "Block")
-            p4.BlockOne(p1, "Block")
-
-            return [p1, p2, p3, p4]
-        elif i == 4:
-            p1 = Player("A")
-            p2 = Player("B")
-            p3 = Player("C")
-            p4 = Player("D")
-
-            p1.BlockOne(p2,"Block")
-            p2.BlockAll(p3)
-            p3.BlockOne(p1, "Block")
-            p3.BlockOne(p4, "Block")
-            p4.BlockAll(p1)
-
-            return [p1, p2, p3, p4]
-        elif i == 5:
-            p1 = Player("A")
-            p2 = Player("B")
-            p3 = Player("C")
-            p4 = Player("D")
-            p5 = Player("E")
-            p6 = Player("F")
-            p7 = Player("G")
-            p8 = Player("H")
-
-            p1.BlockOne(p2,"Block")
-            p1.BlockAll(p5)
-            p2.BlockAll(p3)
-            p3.BlockOne(p4, "Block")
-            p4.BlockAll(p5)
-            p4.BlockAll(p2)
-            p5.BlockOne(p1, "Block")
-            p6.BlockOne(p7, "Block")
-            p7.BlockOne(p3, "Block")
-            p7.BlockAll(p1)
-
-            return [p1, p2, p3, p4, p5, p6, p7, p8]
-        elif i == 6:
-            p1 = Player("A")
-            p2 = Player("B")
-            p3 = Player("C")
-            p4 = Player("D")
-            p5 = Player("E")
-            p6 = Player("F")
-            p7 = Player("G")
-            p8 = Player("H")
-
-            p1.BlockOne(p2,"Block")
-            p1.BlockAll(p5)
-            p2.BlockAll(p3)
-            p3.BlockOne(p4, "Block")
-            p4.BlockAll(p5)
-            p4.BlockAll(p2)
-            p5.BlockOne(p1, "Block")
-            p6.BlockOne(p7, "Block")
-            p7.BlockOne(p3, "Block")
-            p7.BlockAll(p1)
-            p8.BlockOne(p6, "Block")
-
-            return [p1, p2, p3, p4, p5, p6, p7, p8]
-        elif i == 7:
-            p1 = Player("A")
-            p2 = Player("B")
-            p3 = Player("C")
-            p4 = Player("D")
-            p5 = Player("E")
-            p6 = Player("F")
-            p7 = Player("G")
-            p8 = Player("H")
-
-            p1.BlockOne(p2,"Block")
-            p1.BlockAll(p3)
-            p2.BlockAll(p3)
-            p3.BlockOne(p1, "Block")
-            p3.BlockOne(p4, "Block")
-            p4.BlockAll(p1)
-            p5.BlockOne(p2, "Block")
-            p6.BlockOne(p7, "Block")
-            p7.BlockAll(p8)
-
-            return [p1, p2, p3, p4, p5, p6, p7, p8]
-        else:
-            print("Not a valid test!")
-
 ### ==== Functions ==== ###
 def generateActionList(playerList: list[Player]) -> list[Action]:
     actionList: list[Action] = []
     for p in playerList:
-        for a in p.actions:
+        for a in p.choice.actions:
             actionList.append(a)
     return actionList
 
@@ -157,15 +30,15 @@ def processUnblocked(blockList: list[Action], count = 0):
         # Ignoring players who have been blocked, if the player isn't being blocked, apply their blocks.
         if not(action.blocked) and len(action.blockedBy) == 0:
             if action.type == "Block All":
-                print(f"Blocking all {action.target}'s actions.")
-                for a in action.target.actions:
+                print(f"Blocking all {action.target.info.name}'s actions.")
+                for a in action.target.choice.actions:
                     if a.blocked == False:
                         a.blocked = True
                         gameStateChanged = True
             elif action.type == "Block One":
                 a = action.target.FindAction("Block") # Technically different to how the BlockedBy flag is set by with SetBlockedBy()
                 if a is not None:
-                    print(f"Blocking {action.target}'s Block action.")
+                    print(f"Blocking {action.target.info.name}'s Block action.")
                     if a.blocked == False:
                         a.blocked = True
                         a.blockedBy = action.player # Don't know if this will have been already set...
@@ -182,7 +55,7 @@ def processCyclicalBlock(action: Action, sequence: list[Action]):
         print("[End of Chain]")
         str = "["
         for n in sequence:
-            str += f"{n.player} -> "
+            str += f"{n.player.info.name} -> "
         print(f"{str} end]")
     else:
         for attack in action.blockedByAction:
@@ -196,7 +69,7 @@ def processCyclicalBlock(action: Action, sequence: list[Action]):
                 str = "["
                 for i in range(sequence.index(attack),len(sequence)):
                     sequence[i].inBlockCycle = True
-                    str += f"{sequence[i]} -> "
+                    str += f"{sequence[i].player.info.name} -> "
                 print("Iteration terminated (Cycle identified and blocked).")
                 print(f"{str} {attack}]")
 
@@ -204,7 +77,7 @@ def processRedirectBlocks(actionList: list[Action]):
     for a in actionList:
         if a.type.find("Redirect") > -1:
             # Do we need to specify Redirect Block specifically?
-            for b in a.target.actions:
+            for b in a.target.choice.actions:
                 if (b.type.find("Block") > -1) and (b.target == a.player):
                         # Redirect the block now.
                         b.redirected = True
@@ -229,7 +102,8 @@ class Block:
         pass
 
     def RunBlocks(self, playerList: list[Player] = None):
-        allPlayers: list[Player] = Test().StartTest(7)
+        print("RunBlocks()...")
+        allPlayers: list[Player] = [] # Test().StartTest(7)
         if playerList is not None:
             allPlayers = playerList
             
@@ -268,6 +142,8 @@ class Block:
 
 
         for p in allPlayers:
-            print(f"{p.name}: isBlocked = {p.isBlocked}")
-            for a in p.actions:
+            print(f"{p.info.name}: isBlocked = {p.status.isBlocked}")
+            for a in p.choice.actions:
                     print(f" - {a.name}: isBlocked = {a.blocked}")
+
+        print("RunBlocks()... Done!")

@@ -1,13 +1,12 @@
 from test import Test
 from player import Player
 from block import Block
-from complaints import Complaints
 from horns import Horns
     
-allPlayers: list[Player] = Test().StartTest(1)
+allPlayers: list[Player] = Test().StartTest(8)
 
-Block().RunBlocks()
-Complaints().RunComplaints(allPlayers)
+Block().RunBlocks(allPlayers)
+Horns().RunComplaints(allPlayers)
 Horns().RunHorns(allPlayers)
 # RunStandardActions()
 # RunImre()
