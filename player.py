@@ -1,5 +1,5 @@
-from enum import Enum, IntEnum
 import random
+from enum import Enum, IntEnum
 
 class Rank(IntEnum):
     NONE = 0 #?
@@ -80,7 +80,8 @@ class Background(Enum):
 
 
 class PlayerStatic:
-    def __init__(self, name:str , rp_name:str, is_evil:bool, social_class:Background):
+    def __init__(self, name:str , rp_name:str, is_evil:bool, 
+                 social_class:Background):
         # ? id? 
         self.name: str = name 
         self.rp_name: str = rp_name
@@ -94,9 +95,12 @@ class PlayerStatic:
         return ret
 
 
-class EP:
-    def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, archives = 0, sympathy = 0, physicking = 0, alchemy = 0, artificery = 0, naming = 0) -> None:
-        self.values = [linguistics, arithemtics, rhetoric, archives, sympathy, physicking, alchemy, artificery, naming]
+class ep:
+    def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, 
+                 archives = 0, sympathy = 0, physicking = 0, alchemy = 0,
+                   artificery = 0, naming = 0) -> None:
+        self.values = [linguistics, arithemtics, rhetoric, archives, sympathy,
+                        physicking, alchemy, artificery, naming]
         
     def __str__(self) -> str:
         out = f"| Lin | Ari | R&L | Arc | Sym | Phy | ALc | Art | Nam |\n|"
@@ -109,7 +113,8 @@ class PlayerStatus:
 
     # input from GM distribution 
     def __init__(
-        self, player_static, current_lodging, musical_stat, inventory, current_funds
+        self, player_static, current_lodging, musical_stat, inventory, 
+        current_funds
     ):
         self.info = player_static # Do we need this here?
         self.available_EP = 5
@@ -121,9 +126,9 @@ class PlayerStatus:
         self.musical_stat = musical_stat
         self.inventory: list[Item] = [inventory] # questionable
 
-        self.EP: EP = EP() 
+        self.EP: ep = ep() 
         self.elevations = []
-        self.MasterOf: FieldName = None # 4th elevation is equivalent I guess?
+        self.master_of: FieldName = None # 4th elevation is equivalent I guess?
 
         self.is_alive = True 
         self.is_sane = True
@@ -131,31 +136,31 @@ class PlayerStatus:
         self.is_enrolled = True 
         self.in_Imre = False
 
-        self.complaintsBlocked = False # Set when target of Argumentum Ad Nauseam.
+        self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
 
         # IMRE
-        self.IMRE_EOLIAN_Auditioned: bool = False
+        self.IMRE_EOLIAN_auditioned: bool = False
         
-        self.IMRE_GILES_Defaulted: bool = False
-        self.IMRE_GILES_AmountOwed: float = 0.0
-        self.IMRE_DEVI_Defaulted: bool = False
-        self.IMRE_DEVI_AmountOwed: float = 0.0
-        self.IMRE_DEVI_Collateral: list[Item] = []
+        self.IMRE_GILES_defaulted: bool = False
+        self.IMRE_GILES_amount_owed: float = 0.0
+        self.IMRE_DEVI_defaulted: bool = False
+        self.IMRE_DEVI_amount_owed: float = 0.0
+        self.IMRE_DEVI_collateral: list[Item] = []
 
         self.IMRE_BLACKMARKET_ContractLog: list[Item] = []
 
         # Working Vars
         # List of complaints recieved
-        self.complaintsReceived: list[Player] = []
+        self.complaints_received: list[Player] = []
 
         # Total DP
         self.DP: int = 0
 
         # Flag for whether they have been successfully blocked.
-        self.isBlocked: bool = False
+        self.is_blocked: bool = False
 
         # Working list of players that blocking them, as Player references
-        self.blockedBy: list[Player] = []
+        self.blocked_by: list[Player] = []
 
 
 
@@ -180,34 +185,34 @@ class PlayerChoices:
         # Stored input list of who they are blocking, as Player references
         self.actions: list[Action] = []
 
-        self.assignedDP: list[Player] = []
+        self.assigned_DP: list[Player] = []
 
         # IMRE
-        self.IMRE_EOLIAN_Audition: bool = False
-        self.IMRE_EOLIAN_Practice: bool = False
+        self.IMRE_EOLIAN_audition: bool = False
+        self.IMRE_EOLIAN_practice: bool = False
 
-        self.IMRE_DEVI_AcquireLoan: bool = False
-        self.IMRE_DEVI_GiveCollateral: list[Item] = []
-        self.IMRE_DEVI_LoanAmount: float =  0.0
+        self.IMRE_DEVI_acquire_loan: bool = False
+        self.IMRE_DEVI_give_collateral: list[Item] = []
+        self.IMRE_DEVI_loan_amount: float =  0.0
         # Do you actively choose to pay the loan or is it direct debit?
 
-        self.IMRE_GILES_AcquireLoan: bool = False
-        self.IMRE_GILES_LoanAmount: float =  0.0
+        self.IMRE_GILES_acquire_loan: bool = False
+        self.IMRE_GILES_loan_amount: float =  0.0
 
-        self.IMRE_LOADEDDICE_PlacedBet: bool = False
-        self.IMRE_LOADEDDICE_BetAmount: float = 0.0
-        self.IMRE_LOADEDDICE_Numbers: list[int] = []
+        self.IMRE_LOADEDDICE_placed_bet: bool = False
+        self.IMRE_LOADEDDICE_bet_amount: float = 0.0
+        self.IMRE_LOADEDDICE_numbers: list[int] = []
 
-        self.IMRE_APOTHECARY_Nahlrout: int = 0
-        self.IMRE_APOTHECARY_Couriers: list[str] = []
-        self.IMRE_APOTHECARY_Bloodless: int = 0
-        self.IMRE_APOTHECARY_Gram: int = 0
+        self.IMRE_APOTHECARY_nahlrout: int = 0
+        self.IMRE_APOTHECARY_couriers: list[str] = []
+        self.IMRE_APOTHECARY_bloodless: int = 0
+        self.IMRE_APOTHECARY_gram: int = 0
 
-        self.IMRE_BLACKMARKET_Mommet: list[Player] = [] # or list[Item]
-        self.IMRE_BLACKMARKET_Bodyguard: int = 0
-        self.IMRE_BLACKMARKET_Assassin: list[Player] = []
-        self.IMRE_BLACKMARKET_TakeContract: list[Item] = []
-        self.IMRE_BLACKMARKET_PlaceContract: list[Item] = []
+        self.IMRE_BLACKMARKET_mommet: list[Player] = [] # or list[Item]
+        self.IMRE_BLACKMARKET_bodyguard: int = 0
+        self.IMRE_BLACKMARKET_assassin: list[Player] = []
+        self.IMRE_BLACKMARKET_take_contract: list[Item] = []
+        self.IMRE_BLACKMARKET_place_contract: list[Item] = []
 
 
 
@@ -244,7 +249,7 @@ class PlayerChoices:
     # def __str__(self):
     #     # this is probably not ideal :p
     #     line1 = f"Player: {self.info.name}  Month: {self.month}\n"
-    #     line2 = f"EP filed: {[s.name for s in self.EP_filed]}\n" # ! fix later
+    #     line2 = f"ep filed: {[s.name for s in self.EP_filed]}\n" # ! fix later
     #     line3 = f"Going to Imre next month: {self.imre_next}\n"
         
     #     return line1 + line2 + line3
@@ -267,90 +272,92 @@ class Player:
         self.info: PlayerStatic = player_static 
         self.choice: PlayerChoices = player_choices
 
-    def TakeAction(self, action):
+    def take_action(self, action):
         self.choice.actions.append(action)
         # Do checks to make sure the action is valid?
     
-    def BlockAll(self, target):
-        self.TakeAction(Action("Mommet", self,"Block All",target))
+    def block_all(self, target):
+        self.take_action(Action("Mommet", self,"Block All",target))
     
-    def BlockOne(self, target, actionType: str):
-        self.TakeAction(Action("Tenaculum", self,"Block One", target, actionType=actionType))
+    def block_one(self, target, action_type: str):
+        self.take_action(Action("Tenaculum", self,"Block One", target, action_type=action_type))
     
-    def RedirectAction(self, fromTarget, toTarget, actionType: str):
-        self.TakeAction(Action("Law of Contraposition", self, "RedirectAction", fromTarget, toTarget, actionType))
+    def redirect_action(self, from_target, to_target, action_type: str):
+        self.take_action(Action("Law of Contraposition", self, "redirect_action", from_target, to_target, action_type))
 
-    def FindAction(self, type: str):
+    def find_action(self, type: str):
         for a in self.choice.actions:
             if a.type.find(type) > -1:
                 return a
         return None  
     
-    def ImportComplaint(self, target):
+    def import_complaint(self, target):
         self.choice.complaints.append(target)
 
-    def assignDP(self, total = 1, masterOf:FieldName = None):
-            if masterOf is not None:
-                print(f"Master {masterOf.name} assigning DP to {self.info.name}, with {self.status.EP.values[masterOf]} EP in {masterOf.name}")
-                self.status.EP.values[masterOf] -= total
-                if self.status.EP.values[masterOf] < 0:
-                    self.status.DP -= self.status.EP.values[masterOf]
-                    self.status.EP.values[masterOf] = 0
+    def assign_DP(self, total = 1, master_of:FieldName = None):
+            if master_of is not None:
+                print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.values[master_of]} ep in {master_of.name}")
+                self.status.EP.values[master_of] -= total
+                if self.status.EP.values[master_of] < 0:
+                    self.status.DP -= self.status.EP.values[master_of]
+                    self.status.EP.values[master_of] = 0
             else:
                 self.status.DP += total
 
-    def assignEP(self, field, total = 1):
+    def assign_EP(self, field, total = 1):
         self.status.EP.values[field-1] += total
 
 
 # a = Player()
 
 class Action:
-    def __init__(self, iName: str, iPlayer: Player, iType, iTarget: Player, iTarget2: Player = None, actionType: str = None):
-        self.name: str = iName # Action name
-        self.player: Player = iPlayer # Player taking the action
-        self.type: str = iType # Type of action: Block, Redirect, Kill, etc.
-        self.targetActionType: str = actionType
-        self.target: Player = iTarget
-        self.target2: Player = iTarget2
+    def __init__(self, name: str, player: Player, type, target: Player,
+                  target_two: Player = None, action_type: str = None):
+        self.name: str = name # Action name
+        self.player: Player = player # Player taking the action
+        self.type: str = type # Type of action: Block, Redirect, Kill, etc.
+        self.target_action_type: str = action_type
+        self.target: Player = target
+        self.target_two: Player = target_two
 
         self.blocked: bool = False
         self.redirected: bool = False
-        self.redirectTarget: Player
+        self.redirect_target: Player
 
         # Working variables to process cycles and chains
-        self.blockedBy: list[Player] = []
-        self.blockedByAction: list[Action] = []
-        self.inBlockCycle: bool = False
+        self.blocked_by: list[Player] = []
+        self.blocked_by_action: list[Action] = []
+        self.in_block_cycle: bool = False
     
     def __str__(self) -> str:
         return f"{self.player.info.name}: {self.name} "
     
-    def clearBlockedBy(self):
-        self.blockedBy: list[Player] = []
-        self.blockedByAction: list[Action] = []
-        # clear the blockedBy flag on players?
+    def clear_blocked_by(self):
+        self.blocked_by: list[Player] = []
+        self.blocked_by_action: list[Action] = []
+        # clear the blocked_by flag on players?
 
-    def setBlockedBy(self):
+    def set_blocked_by(self):
         if not self.blocked:    
             if self.type.find("Block") < 0:
                 # print("Not a block action.")
                 return
             
-            # Dunno if we just set the player flag, set the player and all action flags, or just the action flags.
+            # Dunno if we just set the player flag, set the player and
+            #  all action flags, or just the action flags.
             if self.type == "Block All":
-                self.target.status.blockedBy.append(self.player)
+                self.target.status.blocked_by.append(self.player)
                 # print(f"{self.player} blocks all {self.target}'s actions")
                 for a in self.target.choice.actions:
-                    a.blockedBy.append(self.player)
-                    a.blockedByAction.append(a)
+                    a.blocked_by.append(self.player)
+                    a.blocked_by_action.append(a)
                     # print(f"-- {a.name} blocked.")
 
             elif self.type == "Block One":
                 for a in self.target.choice.actions:
-                    if a.type.find(self.targetActionType) >= 0:
-                        a.blockedBy.append(self.player)
-                        a.blockedByAction.append(a)
+                    if a.type.find(self.target_action_type) >= 0:
+                        a.blocked_by.append(self.player)
+                        a.blocked_by_action.append(a)
                         # print(f"{self.player} blocked {self.target}'s {a.type} action.")
                         return
                 # print("No relevant actions found.")

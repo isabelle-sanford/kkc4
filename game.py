@@ -3,11 +3,11 @@ from player import Player
 from block import Block
 from horns import Horns
     
-allPlayers: list[Player] = Test().StartTest(8)
+all_players: list[Player] = Test().start_test(1)
 
-Block().RunBlocks(allPlayers)
-Horns().RunComplaints(allPlayers)
-Horns().RunHorns(allPlayers)
+Block().run_blocks(all_players)
+Horns().run_complaints(all_players)
+Horns().run_horns(all_players)
 # RunStandardActions()
 # RunImre()
 # RunAttacks()
