@@ -4,7 +4,12 @@ from test import Test
 
 ### ==== Classes ==== ###
 
-
+# Stores the maximum roll for each punishment on the horns, based on player DP
+# as a list of Weightings objects as a static class variable.
+# The constructor takes the percentages as displayed on the rules doc
+# and converts them into "roll this number or less" equivalents
+# so that by checking if the rolled result is less than the value, starting
+# small, the correct probabilities are applied to each punishment.
 class Weightings:
     total_tiers = 0
     tier_weights = []
@@ -20,7 +25,9 @@ class Weightings:
         self.result = [charges_dropped, undignified_mischief,
                        reckless_use, conduct_unbecoming, expulsion]
 
-        # The sum of all percetages is 100, so starting with first weight and adding the next weight to the previous each time gives the max value for the range
+        # The sum of all percetages is 100, so starting with first 
+        # weight and adding the next weight to the previous each time 
+        # gives the max value for the range
         for i in range(1, 5):
             self.result[i] = self.result[i-1] + self.result[i]
         Weightings.tier_weights.append(self)
@@ -77,7 +84,9 @@ class Charges:
                         self.assign_outcome(target, Weightings.outcomes[i])
                         return
 
-    # Consequences are not actually implemented yet, but the appropriate if statements are called based on the DP result.
+    # Consequences are not actually implemented yet, but the appropriate if
+    #  statements are called based on the DP result.
+    # Apply Nahlrout at this point?
     def assign_outcome(self, target: Player, outcome: str):
         if outcome == "Charges Dropped":
             print(f"All charges on {target.info.name} were dropped.")
@@ -138,9 +147,14 @@ class Horns:
                 out = out[:-2]
                 print(out)
 
-        # What do complaints do? Horns already takes the votes placed and notifies all players of who voted on them, which can be used in the tuition step. Extra votes should have been pulled from db. Blocks needs to run at some point to ensure blocks are removed.
-        # Possibly this class generates the vote counts?
-        # Could move the notification of votes to this class. This class would need to happen after blocks though.
+        # What do complaints do? 
+        # Horns already takes the votes placed and notifies all players of who 
+        # voted on them, which can be used in the tuition step. 
+        # Extra votes should have been pulled from db. 
+        # Blocks needs to run at some point to ensure blocks are removed.
+        #    Possibly this class generates the vote counts?
+        # Could move the notification of votes to this class. 
+        #   This class would need to happen after blocks though.
         print("run_complaints()... Done!")
 
     def run_horns(self, player_list: list[Player] = None):
@@ -174,11 +188,6 @@ class Horns:
                 if player_list is None:
                     c.status.complaints_received.append(p)
 
-        # For PC masters
-        for m in pc_masters:
-            for d in m.choice.assigned_DP:
-                d.assign_DP(master_of=m.status.master_of)
-
         # Deal with Golden Pony buff
         for p in at_pony:
             count = complaints.count(p)
@@ -187,7 +196,13 @@ class Horns:
             if count > 1:
                 complaints.remove(p)
 
-        # Need to take into account what field the Masters are when assigning DP, so that existing EP can reduce DP
+        # By passing assign_DP the field of the Master assigning DP,
+        #  it handles offsetting the DP gain with related EP.
+        
+        # For PC masters
+        for m in pc_masters:
+            for d in m.choice.assigned_DP:
+                d.assign_DP(master_of=m.status.master_of)   
 
         # For all NPC masters
         npc_master_fields = []
