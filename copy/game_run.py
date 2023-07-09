@@ -174,5 +174,13 @@ for voter in range(len(complaints)): # i guess
     choice = CHOICESM1[voter]
     voter.complaints = complaints[voter]
 
+# todo get info abt post nums etc
+
+# todo input said info (into choices? or statuses? idk)
+
+# todo save all choices / statuses to SQL  // make copies
+
+# RUN MONTH 1
+
 
 
