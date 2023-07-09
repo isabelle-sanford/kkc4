@@ -26,7 +26,16 @@ ability questions:
 - 
 
 
+todo: have fieldStatus contain list of potential masters, in order of time that it happened
+
+
 going to want to get the 2 targets from PiH from the complaints page, NOT from dropdown from player 
 
 Qs FOR WILSON:
-- Persuasive arguments: do you move both your target's votes to the same person? Can you pick to two different people? You can't force them if they have 1/no complaints to vote, right? 
+- Persuasive arguments: do you move both your target's votes to the same person? Can you pick to two different people? You can't force them if they have 1/no complaints to vote, right? If they're using Proficient in Hyperbole do all four votes get moved?
+- Does using EP to remove IP come before or after elevations? Assuming before, and NPC masters get list with appropriately reduced # of EP. Can PC masters still elevate if you just used all your EP in that field to offset? 
+- If you roleblock someone trying for their Pipes, do they not try for them? More generally if you roleblock someone in Imre, what can or can't they still do? 
+- What exactly does Ward tell you?
+- Can you file EP and then use it to decrease IP instantly / that same turn?
+- When Masters are roleblocked, can they still elevate / assign DP? 
+- if you use persuasive a

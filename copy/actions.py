@@ -12,7 +12,7 @@ class ActionType(Enum):
     LawOfContraposition = 7 # 2 players
     ProficientInHyperbole = 8 # none / 2 players
     ArgumentumAdNauseam = 9 # player 
-    PersuaisveArguments = 10 # 2 players 
+    PersuasiveArguments = 10 # 2 players 
     FaeLore = 11 # player
     OmenRecognition = 12 # event (???)
     SchoolRecords = 13 # player 
@@ -149,7 +149,7 @@ class Action:
                 if complaint.target == self.target_two:
                     complaint.blocked = True
                     return
-        elif self.type == ActionType.PersuaisveArguments:
+        elif self.type == ActionType.PersuasiveArguments:
             # Do I need 3 targets here?
             pass
 
