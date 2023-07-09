@@ -1,18 +1,16 @@
-import random
-from objects import Background, Rank, FieldName, Item, ItemType, Action, ActionType,Lodging
+from enum import Enum
+import random 
 
-class EP:
-    def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, 
-                 archives = 0, sympathy = 0, physicking = 0, alchemy = 0,
-                   artificery = 0, naming = 0) -> None:
-        self.values = [linguistics, arithemtics, rhetoric, archives, sympathy,
-                        physicking, alchemy, artificery, naming]
-        
-    def __str__(self) -> str:
-        out = f"| Lin | Ari | R&L | Arc | Sym | Phy | ALc | Art | Nam |\n|"
-        for v in self.values:
-            out += f"{v: >3}  |"
-        return out
+from statics import Background, Lodging
+from actions import ActionType, Action
+from field import Rank, FieldName
+from items import ItemType, Item
+
+class BaseStat(Enum):
+    MUSIC = 1
+    ESSAY = 2
+    ART = 3
+
 
 class PlayerStatic:
     def __init__(self, name:str , rp_name:str, is_evil:bool, 
@@ -22,26 +20,51 @@ class PlayerStatic:
         self.rp_name: str = rp_name
         self.is_evil: bool = is_evil # or could be skindancer
         self.social_class: Background = social_class
+        # ! base stat? 
     
     def __str__(self):
         ret = f"Player: {self.name} ({self.rp_name}) - {self.social_class} - "
         ret += "Skindancer" if self.is_evil else "Student"
         ret += "\n"
         return ret
+    
+class EP:
+    def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, 
+                 archives = 0, sympathy = 0, physicking = 0, alchemy = 0,
+                   artificery = 0, naming = 0) -> None:
+        
+        # todo: figure out where this is used and remove, probably?
+        self.values = [linguistics, arithemtics, rhetoric, archives, sympathy,
+                        physicking, alchemy, artificery, naming]
+        # self.linguistics = linguistics
+        # self.arithemtics = arithemtics
+        # self.rhetoric = rhetoric 
+        # self.archives = archives
+        # self.sympathy = sympathy
+        # self.physicking = physicking
+        # self.alchemy = alchemy 
+        # self.artificery = artificery
+        # self.naming = naming 
+        
+    def __str__(self) -> str:
+        out = f"| Lin | Ari | R&L | Arc | Sym | Phy | Alc | Art | Nam |\n|"
+        for v in self.values:
+            out += f"{v: >3}  |"
+        return out
 
 class PlayerStatus:
 
     # input from GM distribution 
     def __init__(
-        self, player_static, current_lodging, musical_stat, inventory, 
-        current_funds
+        self, player_static, current_lodging, musical_stat, inventory
+        #current_funds
     ):
         self.info = player_static # Do we need this here?
         self.available_EP = 5
         self.rank = Rank.NONE
 
-        self.lodging = current_lodging
-        self.money = current_funds 
+        self.lodging: Lodging = current_lodging
+        self.money = player_static.social_class.initial_funds 
 
         self.musical_stat = musical_stat
         self.inventory: list[Item] = [inventory] # questionable
@@ -81,16 +104,16 @@ class PlayerStatus:
 
         # Working list of players that blocking them, as Player references
         self.blocked_by: list[Player] = []
-
-
+    
+    # TODO string / print func 
 
 class PlayerChoices:
     # basically a record of what things a player wants to do this turn
     # and funcs returning false if the player can't do those things
     # choices are actually processed and integrated to the overall game separately 
     
-    def __init__(self):
-
+    def __init__(self, playerstatic):
+        self.player_static = playerstatic
         # if self.player.available_EP > 0:
         #     self.EP_filed = [FieldName.GENERAL] * self.player.available_EP # ?? ew
         
@@ -105,6 +128,7 @@ class PlayerChoices:
         # Stored input list of who they are blocking, as Player references
         self.actions: list[Action] = []
 
+        # if master 
         self.assigned_DP: list[Player] = []
 
         # IMRE
@@ -179,7 +203,6 @@ class PlayerChoices:
         # give_contract / take_contract (need a "taken_contracts" attribute probs)
         # loaded dice nums 
         # devi/giles loan 
-
 
 class Player:
 
@@ -259,7 +282,6 @@ class Player:
     def assign_EP(self, field, total = 1):
         self.status.EP.values[field-1] += total
 
-
 class PlayerRandom:
     def __init__(self) -> None:
         pass
@@ -270,6 +292,3 @@ class PlayerRandom:
         choice = PlayerChoices()
 
         return Player(static,status,choice)
-    
-
-    

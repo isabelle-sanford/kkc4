@@ -14,3 +14,13 @@ simplifications:
 - ignore actual ability effects 
 - ignore items 
 - ignore DP 
+
+
+need using-item actions 
+
+ability questions: 
+- is redirect a negative action
+- proficient_in_hyperbole probs shouldn't have targets? 
+- argumentum_ad_nauseam is probs negative, same with persuasive_arguments
+- fae lore is active, is NOT an additional effect on a separate action; not sure what its target is tho 
+- 
