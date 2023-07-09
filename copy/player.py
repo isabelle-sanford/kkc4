@@ -14,8 +14,9 @@ class BaseStat(Enum):
 
 class PlayerStatic:
     def __init__(self, name:str , rp_name:str, is_evil:bool, 
-                 social_class:Background):
-        # ? id? 
+                 social_class:Background, id:int = 0):
+        # ? id?  TODO
+        self.id = id
         self.name: str = name 
         self.rp_name: str = rp_name
         self.is_evil: bool = is_evil # or could be skindancer
@@ -122,7 +123,7 @@ class PlayerChoices:
 
         self.imre_next = False # should check if in imre lodging 
 
-        # List of complaints made
+        # List of complaints made (NOT including PiH)
         self.complaints: list[Player] = []
 
         # Stored input list of who they are blocking, as Player references
@@ -158,6 +159,12 @@ class PlayerChoices:
         self.IMRE_BLACKMARKET_take_contract: list[Item] = []
         self.IMRE_BLACKMARKET_place_contract: list[Item] = []
  
+    def __str__(self) -> str:
+        # TODO
+
+        ret = f"{self.player_static.name}: complaints {self.complaints}"
+
+        return ret
 
     # def take_action
 
@@ -210,6 +217,7 @@ class Player:
         self.status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
         self.choice: PlayerChoices = player_choices
+        self.id: int = player_static.id
 
     def take_action(self, action: Action):
 
@@ -237,7 +245,7 @@ class Player:
                 count += 1
         return count
     
-    def get_items(self, item_type: ItemType) -> list[Item]:
+    def get_items(self, item_type: ItemType) -> "list[Item]":
         list = []
         if self.holds(item_type) > 0:
             for item in self.status.inventory:

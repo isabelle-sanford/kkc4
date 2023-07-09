@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-
+from player import Player
 
 
 class Rank(Enum):
@@ -68,6 +68,20 @@ class FieldInfo:
         self.level2_AP = level2_AP
         self.level3_AP = level3_AP
         self.master_AP = master_AP
+
+class FieldStatus:
+    def __init__(self, field: FieldName, info: FieldInfo):
+        self.name = field
+        self.info = info
+        self.EP = [] # dict? or just full on list? 
+        self.master: Player = None
+        self.month = 1
+        self.elevating = None 
+        self.elevatedOnce = [] # since it's not actually rank? 
+        self.elevatedTwice = []
+        self.elevatedThrice = []
+    
+
 
 mysterious_bulletins = Ability(
     "Hand Delivery", FieldName.LINGUISTICS, Rank.ELIR, True, False, False, False, False

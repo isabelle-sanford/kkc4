@@ -74,8 +74,9 @@ PLAYERSTATICS = []
 PLAYERSTATUSES = []
 # 0 Kas, 1 El, 2 Hael, 3 Wilson, 4 Devo
 
-for i in INPUTS:
+for id, i in INPUTS:
     p = PlayerStatic(i.player_name, i.player_rpname, i.is_evil, i.background)
+    p.id = id
     PLAYERSTATICS.append(p)
 
     inventory = []
