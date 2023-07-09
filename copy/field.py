@@ -71,7 +71,7 @@ class FieldInfo:
 
 class FieldStatus:
     def __init__(self, field: FieldName, info: FieldInfo):
-        self.name = field
+        self.name = field # hmm
         self.info = info
         self.EP = [] # dict? or just full on list? 
         self.master: Player = None

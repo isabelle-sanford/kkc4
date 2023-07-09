@@ -1,0 +1,407 @@
+{% extends 'index.html' %} {% block body %}
+
+<!-- 
+  Bootstrap docs: https://getbootstrap.com/docs
+-->
+<div class="container pt-2" style="font-family: Luminari">
+  <div class="row">
+    <div class="col-9 player center">
+      <h1 style="text-align: center">{{ player.info.name }}</h1>
+    </div>
+    <div class="col-2 cycle">
+      <h4 style="text-align: center">Term []</h4>
+      <h4 style="text-align: center">Month []</h4>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-9 info">
+      <p>
+        You are a {{ player.info.social_class.fullname }}
+        <strong>
+          {% if player.info.is_evil %}Skindancer {% else %}Student {% endif %}
+        </strong>
+        currently [status at University]. You have [number] of elevation(s) in
+        [field]. You are staying in {{player.status.lodging.fullname}}.<br />
+        Your stipend is {{ player.info.social_class.stipend }} talents and your
+        tuition this term was [].
+      </p>
+      <p>[performance flavor text]</p>
+      <p>
+        <a href="{{ url_for('rules') }}">Rules</a>
+      </p>
+    </div>
+    <div class="col-2">[countdown]</div>
+  </div>
+
+  {% if player.info.is_evil %}
+  <div class="row">
+    <div class="col-12 mt-2">
+      <fieldset>
+        <legend align="center" style="color: red">Skindancers</legend>
+        <div class="row">
+          <div class="col-6">
+            <span>[Access the doc here!]</span>
+          </div>
+          <div class="col-6">
+            <span>Current Sabotage Target: []</span>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-6 mt-2">
+      <fieldset>
+        <legend align="center">Inventory</legend>
+        <div>
+          <p>You have [] talents, [] jots, and [] drabs.</p>
+          <p>You have [] items.</p>
+          <p>You have [] debts.</p>
+          <p>You have [] contracts</p>
+        </div>
+      </fieldset>
+    </div>
+    <form class="col-6">
+      <div>
+        <fieldset class="mt-2">
+          <legend align="center">Next Term</legend>
+          <div class="input-group">
+            <span
+              class="input-group-text"
+              style="background-color: #f7c1f1; color: #7b086e"
+              >Lodging:</span
+            >
+            <select class="form-select" id="Lodging" name="Lodging">
+              <option value="Streets">On the Streets</option>
+              <!-- TODO underthing iff broke out -->
+              <option value="Underthing">The Underthing</option>
+              <option value="Mews">The Mews</option>
+              <option value="Anker's">Anker's</option>
+              <option value="King's-Drab">The King's Drab</option>
+              <option value="Golden-Pony">The Golden Pony</option>
+              <option value="Windy-Tower">The Windy Tower</option>
+              <option value="Horse-and-Four">The Horse and Four</option>
+              <option value="Spindle-and-Draft">The Spindle and Draft</option>
+              <option value="grey-man" style="color: #c30b7f">
+                The Grey Man
+              </option>
+              <option value="pearl-of-imre" style="color: #c30b7f">
+                The Pearl of Imre
+              </option>
+            </select>
+          </div>
+          <div class="col-md-12">
+            {% if not player.status.is_expelled % }
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="nextterm"
+                id="enroll"
+                value="enroll"
+              />
+              <label class="form-check-label" for="enroll">
+                Enroll at University
+              </label>
+            </div>
+            {% endif %}
+            <!-- TODO -->
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="nextterm"
+                id="imre"
+                value="imre"
+              />
+              <label class="form-check-label" for="imre"> Go to Imre </label>
+            </div>
+          </div>
+          <div class="col-12 my-3">
+            <button
+              type="submit"
+              class="btn submit"
+              id="submitNextTerm"
+              name="submitNextTerm"
+            >
+              Submit
+            </button>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+    <form class="col-6 mt-2">
+      <div>
+        <fieldset class="fieldset-uni">
+          <legend align="center" class="legend-uni">Actions</legend>
+          <div class="input-group">
+            <span class="input-group-text actions">General</span>
+            <select class="form-select" id="action1" name="action1">
+              <option value="Sabotage">Sabotage</option>
+              <option value="Create">Create</option>
+            </select>
+            <select class="form-select" id="target1" name="target1">
+              <option value="Stink">Stink</option>
+              <option value="Elbereth">Elbereth</option>
+              <option value="Wilson">Wilson</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text actions">Action 2</span>
+            <select class="form-select" id="action2" name="action2">
+              <option value="Create">Create</option>
+            </select>
+            <select class="form-select" id="target2" name="target2">
+              <option value="tenaculum">Tenaculum</option>
+              <option value="firestop">Firestop</option>
+              <option value="bone-tar">Bone-tar</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text actions">Action 3</span>
+            <select class="form-select" id="action3" name="action3">
+              <option value="Sabotage">Fae Lore</option>
+              <option value="Create">Banned Books</option>
+            </select>
+            <select class="form-select" id="target3" name="target3">
+              <option value="Stink">Stink</option>
+              <option value="Elbereth">Elbereth</option>
+              <option value="Wilson">Wilson</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <span class="input-group-text actions">Action 4</span>
+            <select class="form-select" id="action4" name="action4">
+              <option value="Sabotage">Wind</option>
+              <option value="Create">Fire</option>
+            </select>
+            <textarea
+              class="form-control"
+              style="margin-right: 10px"
+            ></textarea>
+          </div>
+          <div class="col-12 my-3">
+            <button
+              type="submit"
+              class="btn submit"
+              id="submitAction"
+              name="submitAction"
+            >
+              Submit Actions
+            </button>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+    <form class="col-6 pt-2">
+      <div>
+        <fieldset class="fieldset-uni">
+          <legend align="center" class="legend-uni">Elevation Points</legend>
+          <div class="row">
+            <div class="col-5">
+              <div class="input-group">
+                <select class="form-select" id="fieldep1" name="field1">
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Arithmetics">Arithmetics</option>
+                  <option value="RhetoricLogic">Rhetoric/Logic</option>
+                  <option value="Archives">Archives</option>
+                  <option value="Sympathy">Sympathy</option>
+                  <option value="Physicking">Phsysicking</option>
+                  <option value="Alchemy">Alchemy</option>
+                  <option value="Artificery">Artificery</option>
+                  <option value="Naming">Naming</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <select class="form-select" id="fieldep2" name="field2">
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Arithmetics">Arithmetics</option>
+                  <option value="RhetoricLogic">Rhetoric/Logic</option>
+                  <option value="Archives">Archives</option>
+                  <option value="Sympathy">Sympathy</option>
+                  <option value="Physicking">Phsysicking</option>
+                  <option value="Alchemy">Alchemy</option>
+                  <option value="Artificery">Artificery</option>
+                  <option value="Naming">Naming</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <select class="form-select" id="fieldep3" name="field3">
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Arithmetics">Arithmetics</option>
+                  <option value="RhetoricLogic">Rhetoric/Logic</option>
+                  <option value="Archives">Archives</option>
+                  <option value="Sympathy">Sympathy</option>
+                  <option value="Physicking">Phsysicking</option>
+                  <option value="Alchemy">Alchemy</option>
+                  <option value="Artificery">Artificery</option>
+                  <option value="Naming">Naming</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <select class="form-select" id="fieldep4" name="field4">
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Arithmetics">Arithmetics</option>
+                  <option value="RhetoricLogic">Rhetoric/Logic</option>
+                  <option value="Archives">Archives</option>
+                  <option value="Sympathy">Sympathy</option>
+                  <option value="Physicking">Phsysicking</option>
+                  <option value="Alchemy">Alchemy</option>
+                  <option value="Artificery">Artificery</option>
+                  <option value="Naming">Naming</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <select class="form-select" id="fieldep5" name="field5">
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Arithmetics">Arithmetics</option>
+                  <option value="RhetoricLogic">Rhetoric/Logic</option>
+                  <option value="Archives">Archives</option>
+                  <option value="Sympathy">Sympathy</option>
+                  <option value="Physicking">Phsysicking</option>
+                  <option value="Alchemy">Alchemy</option>
+                  <option value="Artificery">Artificery</option>
+                  <option value="Naming">Naming</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <select class="form-select" id="fieldep6" name="field6">
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Arithmetics">Arithmetics</option>
+                  <option value="RhetoricLogic">Rhetoric/Logic</option>
+                  <option value="Archives">Archives</option>
+                  <option value="Sympathy">Sympathy</option>
+                  <option value="Physicking">Phsysicking</option>
+                  <option value="Alchemy">Alchemy</option>
+                  <option value="Artificery">Artificery</option>
+                  <option value="Naming">Naming</option>
+                </select>
+              </div>
+              <div class="col-12 my-3">
+                <button
+                  type="submit"
+                  class="btn submit"
+                  id="submitEP"
+                  name="submitEP"
+                >
+                  Submit EP
+                </button>
+              </div>
+            </div>
+            <div class="col-7">
+              <span
+                >You currently have EP in: <br />
+                [fields]<br />
+                <br />
+              </span>
+              <span style="text-decoration: underline"
+                ><strong>Insanity Reduction</strong></span
+              >
+              <textarea class="form-control me-2"></textarea>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-12 mt-2">
+      <fieldset class="fieldset-uni">
+        <legend align="center" class="legend-uni">Elevations</legend>
+        <div>
+          <p>
+            On T1M1, you were elevated in R/L and have access to the following
+            abilities:
+          </p>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+
+  {% if player.status.master_of is not None %}
+  <!-- TODO -->
+  <form class="row">
+    <div class="col-12 pt-2">
+      <fieldset class="fieldset-uni">
+        <legend align="center" class="legend-uni">Masters</legend>
+        <div class="row">
+          <div class="col-3">
+            <span>Players with EP:</span>
+          </div>
+          <div class="col-3">
+            <span>Elevate:</span>
+            <select class="form-select" id="target1" name="target1">
+              <option value="Stink">Stink</option>
+              <option value="Elbereth">Elbereth</option>
+              <option value="Wilson">Wilson</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <span style="font-weight: bold">Discipline Points</span>
+            <div class="input-group">
+              <select class="form-select" id="dp1" name="dp1">
+                <option value="Burnt">Burnt</option>
+                <option value="Hael">Hael</option>
+                <option value="Fifth">Fifth Scholar</option>
+                <option value="Araris">Araris</option>
+                <option value="StrikerEZ">StrikerEZ</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <select class="form-select" id="dp1" name="dp1">
+                <option value="Burnt">Burnt</option>
+                <option value="Hael">Hael</option>
+                <option value="Fifth">Fifth Scholar</option>
+                <option value="Araris">Araris</option>
+                <option value="StrikerEZ">StrikerEZ</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <select class="form-select" id="dp1" name="dp1">
+                <option value="Burnt">Burnt</option>
+                <option value="Hael">Hael</option>
+                <option value="Fifth">Fifth Scholar</option>
+                <option value="Araris">Araris</option>
+                <option value="StrikerEZ">StrikerEZ</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <select class="form-select" id="dp1" name="dp1">
+                <option value="Burnt">Burnt</option>
+                <option value="Hael">Hael</option>
+                <option value="Fifth">Fifth Scholar</option>
+                <option value="Araris">Araris</option>
+                <option value="StrikerEZ">StrikerEZ</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <select class="form-select" id="dp1" name="dp1">
+                <option value="Burnt">Burnt</option>
+                <option value="Hael">Hael</option>
+                <option value="Fifth">Fifth Scholar</option>
+                <option value="Araris">Araris</option>
+                <option value="StrikerEZ">StrikerEZ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+  {% endif %} {% block imre %} {% endblock %}
+
+  <div class="row">
+    <div class="col-12 my-2">
+      <fieldset>
+        <legend align="center">History</legend>
+        <div>
+          <p>On T1M1, you did [this]</p>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -28,6 +28,7 @@ class Lodging(Enum):
     def __str__(self):
         return f"{self.fullname} ({self.price} talents)"
 
+# TODO some way to account for stipend change for vint/aturan
 class Background(Enum): 
     Vint = 0, "Vintish Nobleman", 20, 30, [Lodging.HorseAndFour, Lodging.SpindleAndDraft]
     Aturan = 1, "Aturan Nobleman", 13.34, 20, [Lodging.WindyTower, Lodging.HorseAndFour]
