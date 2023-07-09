@@ -38,4 +38,4 @@ Qs FOR WILSON:
 - What exactly does Ward tell you?
 - Can you file EP and then use it to decrease IP instantly / that same turn?
 - When Masters are roleblocked, can they still elevate / assign DP? 
-- if you use persuasive a
+- Do we want you to be able to use an item the same turn you buy it? (assuming no)
