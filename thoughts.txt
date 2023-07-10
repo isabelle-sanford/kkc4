@@ -39,3 +39,19 @@ Qs FOR WILSON:
 - Can you file EP and then use it to decrease IP instantly / that same turn?
 - When Masters are roleblocked, can they still elevate / assign DP? 
 - Do we want you to be able to use an item the same turn you buy it? (assuming no)
+
+
+
+- can you be elevated if you're not currently enrolled
+
+OoA stuff 
+- if you reduce your IP with EP do NPC masters pick before or after that happens? what abt PC masters? 
+- should malfeasance protection downgrades work on ankers roleblock / vint homecoming / etc? 
+- should you be able to use an item on the same turn it gets stolen?
+- if someone gets elevated and you use school records on them that turn, do you get to see what their newest elevation is in?
+- medica emergency/malfeasance III
+
+
+flask stuff 
+- make Imre player section a diff page (maybe make all player components diff pages?)
+- are the css files similar / can they be

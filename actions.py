@@ -61,7 +61,12 @@ class Action:
         self.redirected: bool = False
         self.redirect_target = None
 
+        self.successful: bool = True
+
         self.message: str = None
+
+        self.level = None # hmm
+        # IS POSITIVE
 
         # Working variables to process cycles and chains
         self.blocked_by = []

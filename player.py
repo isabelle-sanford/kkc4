@@ -55,48 +55,94 @@ class EP:
 
 class PlayerStatus:
 
+    def __init__(self, player_static):
+        self.info = player_static
+
     # input from GM distribution 
-    def __init__(
-        self, player_static, current_lodging, musical_stat, inventory
+    @classmethod
+    def distro_init(
+        cls, player_static, current_lodging, musical_stat, inventory
         #current_funds
     ):
-        self.info = player_static # Do we need this here?
-        self.available_EP = 5
-        self.rank = Rank.NONE
+        s = PlayerStatus(player_static)
+        s.month = 0
+        s.available_EP = 5
+        s.rank = Rank.NONE
 
-        self.lodging: Lodging = current_lodging
-        self.money = player_static.social_class.initial_funds 
+        s.lodging: Lodging = current_lodging
+        s.money = player_static.social_class.initial_funds 
+        s.stipend = player_static.social_class.stipend
 
-        self.musical_stat = musical_stat
-        self.inventory: list[Item] = [inventory] # questionable
+        s.musical_stat = musical_stat
+        s.inventory: list[Item] = [inventory] # questionable
 
-        self.EP: EP = EP() 
-        self.elevations = []
-        self.master_of: FieldName = None # 4th elevation is equivalent I guess?
+        s.EP: EP = EP() 
+        s.elevations: list[FieldName] = []
+        s.master_of: FieldName = None # 4th elevation is equivalent I guess?
 
-        self.is_alive = True 
-        self.is_sane = True
-        self.is_expelled = False 
-        self.is_enrolled = True 
-        self.in_Imre = False
-
-        self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
+        s.is_alive = True 
+        s.is_sane = True
+        s.is_expelled = False 
+        s.is_enrolled = True 
+        s.in_Imre = False
 
         # IMRE
-        self.IMRE_EOLIAN_auditioned: bool = False
+        # hmmmm - could make own class? 
+        s.IMRE_INFO = {
+            "EOLIAN_auditioned": False,
+            "GILES_defaulted": False,
+            "GILES_amt_owed": 0.0,
+            "DEVI_defaulted": False,
+            "DEVI_collateral": [],
+            "BLACKMARKET_Contractlog": []
+        }
+
+        # s.IMRE_EOLIAN_auditioned: bool = False
         
-        self.IMRE_GILES_defaulted: bool = False
-        self.IMRE_GILES_amount_owed: float = 0.0
-        self.IMRE_DEVI_defaulted: bool = False
-        self.IMRE_DEVI_amount_owed: float = 0.0
-        self.IMRE_DEVI_collateral: list[Item] = []
+        # s.IMRE_GILES_defaulted: bool = False
+        # s.IMRE_GILES_amount_owed: float = 0.0
+        # s.IMRE_DEVI_defaulted: bool = False
+        # s.IMRE_DEVI_amount_owed: float = 0.0
+        # s.IMRE_DEVI_collateral: list[Item] = []
 
-        self.IMRE_BLACKMARKET_ContractLog: list[Item] = []
+        # s.IMRE_BLACKMARKET_ContractLog: list[Item] = []
 
-        # Working Vars
-        # List of complaints recieved
+        return s
+    
+    # TODO string / print func 
+
+    # todo change stipend for vint/aturan
+
+    def __copy__(self):
+        next = PlayerStatus(self.info)
+        next.month = self.month + 1
+        next.available_EP = self.available_EP
+        next.rank = self.rank 
+        next.lodging = self.lodging 
+        next.money = self.money
+        next.stipend = self.stipend
+        next.musical_stat = self.musical_stat
+        next.inventory = self.inventory
+        next.EP = self.EP
+        next.elevations = self.elevations
+        next.master_of = self.master_of
+        next.is_alive = self.is_alive
+        next.is_sane = self.is_sane 
+        next.is_expelled = self.is_expelled
+        next.is_enrolled = self.is_enrolled
+        next.in_Imre = self.in_Imre
+
+        next.IMRE_INFO = self.IMRE_INFO
+
+# working variables for processing turn
+class PlayerProcessing:
+    def __init__(self, player_static, month):
+        self.info = player_static
+        self.month = month
+
+        self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
         self.complaints_received: list[Player] = []
-
+        
         # Total DP
         self.DP: int = 0
 
@@ -105,16 +151,25 @@ class PlayerStatus:
 
         # Working list of players that blocking them, as Player references
         self.blocked_by: list[Player] = []
-    
-    # TODO string / print func 
+
+        self.transfer_neg_actions_to = None
+
+        self.can_file_complaints: bool = True
+
+        self.can_be_targeted: bool = True
+
+        self.protected_from_sabotage = 0
+        self.protected_from_kill = 0
+        self.protects = [] # hmm
 
 class PlayerChoices:
     # basically a record of what things a player wants to do this turn
     # and funcs returning false if the player can't do those things
     # choices are actually processed and integrated to the overall game separately 
     
-    def __init__(self, playerstatic):
+    def __init__(self, playerstatic, month: int = 0):
         self.player_static = playerstatic
+        self.month = month
         # if self.player.available_EP > 0:
         #     self.EP_filed = [FieldName.GENERAL] * self.player.available_EP # ?? ew
         
@@ -213,11 +268,17 @@ class PlayerChoices:
 
 class Player:
 
-    def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices):
+    def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
         self.status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
         self.choice: PlayerChoices = player_choices
         self.id: int = player_static.id
+        self.name: str = player_static.name
+        self.month = player_status.month # hmm
+
+        if player_process is None:
+            player_process = PlayerProcessing(player_static, self.month)
+        self.processing: PlayerProcessing = player_process
 
     def take_action(self, action: Action):
 
