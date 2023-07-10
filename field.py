@@ -174,7 +174,7 @@ law_of_contraposition = Ability(
     False,
     False, #Redirect is not attack/roleblock
     False,
-    True,
+    True, # this is ACTION from specific player
     True,
 )
 proficient_in_hyperbole = Ability(

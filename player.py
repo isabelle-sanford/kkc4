@@ -153,6 +153,7 @@ class PlayerProcessing:
         self.blocked_by: list[Player] = []
 
         self.transfer_neg_actions_to = None
+        
 
         self.can_file_complaints: bool = True
 

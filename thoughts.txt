@@ -33,16 +33,20 @@ going to want to get the 2 targets from PiH from the complaints page, NOT from d
 
 Qs FOR WILSON:
 - Persuasive arguments: do you move both your target's votes to the same person? Can you pick to two different people? You can't force them if they have 1/no complaints to vote, right? If they're using Proficient in Hyperbole do all four votes get moved?
+
+
 - Does using EP to remove IP come before or after elevations? Assuming before, and NPC masters get list with appropriately reduced # of EP. Can PC masters still elevate if you just used all your EP in that field to offset? 
-- If you roleblock someone trying for their Pipes, do they not try for them? More generally if you roleblock someone in Imre, what can or can't they still do? 
+solution: if using EP to reduce IP, which EP is not specified but will prioritize EP in a field in which you're NOT filing that same turn 
+
 - What exactly does Ward tell you?
-- Can you file EP and then use it to decrease IP instantly / that same turn?
-- When Masters are roleblocked, can they still elevate / assign DP? 
+
+- When Masters are roleblocked, can they still elevate / assign DP? - yes unless it's TOTAL
 - Do we want you to be able to use an item the same turn you buy it? (assuming no)
 
 
 
 - can you be elevated if you're not currently enrolled
+- if you're de-elevated from master can you still do master-level actions
 
 OoA stuff 
 - if you reduce your IP with EP do NPC masters pick before or after that happens? what abt PC masters? 
@@ -55,3 +59,9 @@ OoA stuff
 flask stuff 
 - make Imre player section a diff page (maybe make all player components diff pages?)
 - are the css files similar / can they be
+
+
+notes
+- stealing items happens early/first 
+- medica emergency takes place the NEXT turn
+- persuasive arguments changes 1 vote, at random, does not apply to PiH votes
