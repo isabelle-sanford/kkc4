@@ -105,8 +105,8 @@ class Action:
         self.blocked_by_action: list[Action] = []
         self.in_block_cycle: bool = False
 
-    # only handling OTHER-category actions
-    def perform_temp(self, **kwargs):
+    # only handling OTHER-category actions atm
+    def perform(self, **kwargs):
         if self.blocked:
             # log it
             print("blocked")
@@ -337,6 +337,10 @@ class Action:
             case ActionType.UseNahlrout:
                 # AA
                 pass
+            
+            case ActionType.Sabotage:
+                # todo
+                pass
 
 
 
@@ -346,7 +350,7 @@ class Action:
 
 # Everything after this point is untouched from haelbarde branch
 # could be out of date, not sure
-    def perform(self):
+    def perform_prev(self):
         if self.blocked:
             Log.Action(self, LogOutcome.Blocked)
             return

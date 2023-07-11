@@ -15,7 +15,8 @@ class ItemType(Enum):
     GRAM = 9
     TALENTPIPES = 10
     NAHLROUT = 11
-    BODYGUARD = 12
+    BODYGUARD = 12 # hmm
+    MOMMET_3rd = 13
 
 
 class Item:
@@ -29,9 +30,11 @@ class Item:
         self.level: int = level # Can be None
         self.target = target #None except when mommet
 
+        self.half_made: bool = False
+
     @classmethod
     def Generate(cls, type: ItemType, level: int = 0, target = None):
-        if type == ItemType.MOMMET:
+        if type == ItemType.MOMMET: # add sep 3rd level?
             return Item("Mommet", type, 1, False, True, level, target)
         elif type == ItemType.TENACULUM:
             uses = 1

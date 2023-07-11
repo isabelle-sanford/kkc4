@@ -194,6 +194,7 @@ class PlayerProcessing:
         self.can_file_complaints: bool = self.starting_status.can_file_complaints # should also reference status
         self.can_file_EP: bool = self.starting_status.can_file_EP
         self.can_be_targeted: bool = self.starting_status.can_be_targeted
+        # can_elevate? 
 
         # should probably instead process protects with kills, so they happen in appropriate order
         self.protected_from_sabotage = 0
@@ -202,6 +203,8 @@ class PlayerProcessing:
 
         self.items_received: list[Item] = []
         # todo remember to add this ^ to next_status
+
+        self.getting_elevated_in: FieldName = None
 
         self.insanity_bonus = 0 # might want to take something from prev status?
 
@@ -229,6 +232,7 @@ class PlayerChoices:
 
         # if master 
         self.assigned_DP: list[Player] = []
+        self.to_elevate: list[Player] = [] # ordered preference list
 
         # IMRE (check if player is there?)
         # also again maybe change to dict, this is really messy
@@ -332,6 +336,19 @@ class Player:
             count = 4
         return count
 
+    def elevate_in(self, field: FieldName):
+        self.status.elevations.append(field)
+        num_EP = self.status.EP[field]
+        if num_EP < 5:
+            self.status.EP[field] = 0
+        else:
+            self.status.EP[field] -= 5
+        
+        self.status.rank += 1 # todo test 
+        self.status.available_EP -= 1
+
+        # anything else here? 
+
 # everything below here untouched since haelbarde branch
     def take_action(self, action: Action):
 
@@ -391,13 +408,24 @@ class Player:
     def import_complaint(self, target):
         self.choice.complaints.append(target)
 
+    # changed this slightly bc I wasn't clear what it was doing / if it was right
     def assign_DP(self, total = 1, master_of:FieldName = None):
             if master_of is not None:
                 print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.values[master_of]} ep in {master_of.name}")
-                self.status.EP.values[master_of] -= total
-                if self.status.EP.values[master_of] < 0:
-                    self.status.DP -= self.status.EP.values[master_of]
-                    self.status.EP.values[master_of] = 0
+                
+                num_EP = self.status.ep.values[master_of]
+                
+                if num_EP > 0:
+                    diff = num_EP - total
+                    if diff >= 0: # at least as much EP as DP
+                        self.status.EP.values[master_of.name] -= total # or = diff
+                        total = 0
+                    else:
+                        total -= num_EP # or = -diff
+                        self.status.EP.values[master_of] = 0
+                
+                self.status.DP += total
+                
             else:
                 self.status.DP += total
 

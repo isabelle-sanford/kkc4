@@ -76,10 +76,19 @@ class FieldStatus:
         self.EP = {} # dict? or just full on list? (thinking dict atm)
         self.master: Player = None
         self.month = 1
-        self.elevating = None 
-        self.elevatedOnce = [] # since it's not actually rank? 
-        self.elevatedTwice = []
-        self.elevatedThrice = []
+        self.elevating: Player = None 
+        self.elevatedOnce: list[Player] = [] # since it's not actually rank? 
+        self.elevatedTwice: list[Player] = []
+        self.elevatedThrice: list[Player] = []
+        # TODO: list of potential masters
+    
+    def get_EP_list(self):
+        # for NPC master choosing
+        EP_proportional_list = []
+        for p, num in self.EP.items():
+            EP_proportional_list.append([p] * num) # TODO test pls
+        print(f"EP list for {self.name} is {EP_proportional_list}")
+        return EP_proportional_list
     
 
 

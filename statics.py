@@ -15,6 +15,8 @@ class Lodging(Enum):
     PearlOfImre = 9, "The Pearl of Imre", 11
     SpindleAndDraft = 10, "The Spindle and Draft", 12
 
+    # add a destroyed flag? and maybe method? 
+
     def __new__(cls, value, name, cost):
         member = object.__new__(cls)
         member._value_ = value

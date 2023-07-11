@@ -97,8 +97,10 @@ class Charges:
         elif outcome == "Reckless Use":
             print(
                 f"{target.info.name} charged with Reckless Use of Sympathy and will be punished with 1 lashing.")
+            target.status.last_reckless_use = target.status.month #? off by one?
         elif outcome == "Conduct Unbecoming":
             print(f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be punished with 3 lashings.")
+            target.status.last_conduct_unbecoming = target.status.month #?
         elif outcome == "Expulsion":
             target.status.is_expelled = True
             print(
@@ -119,35 +121,33 @@ class Horns:
         if player_list is not None:
             all_players = player_list
         
-        # TODO public vote count (probably)
-        # no - public vote count will show all manip with names moved
+        # Complaint actions - currently under perform, but idk
+        # for p in all_players:
+        #     for c in p.choice.actions:
+        #         if c.name == "Proficient in Hyperbole" and not c.blocked:
+        #             if c.target is not None:
+        #                 p.choice.complaints.append(c.target)
+        #             if c.target_two is not None:
+        #                 p.choice.complaints.append(c.target_two)
+        #         elif c.name == "Argumentum Ad Nauseam" and not c.blocked:
+        #             c.target.status.complaints_blocked = True
+        #         elif c.name == "Persuasive Arguments":
+        #             # todo make sure there aren't 2 ppl doing this at once to diff targets 
+        #             # Does this require 3 potential targets? - no, can't choose which vote to move
+        #             # TODO
+        #             pass
 
-        # Complaint actions 
-        for p in all_players:
-            for c in p.choice.actions:
-                if c.name == "Proficient in Hyperbole" and not c.blocked:
-                    if c.target is not None:
-                        p.choice.complaints.append(c.target)
-                    if c.target_two is not None:
-                        p.choice.complaints.append(c.target_two)
-                elif c.name == "Argumentum Ad Nauseam" and not c.blocked:
-                    c.target.status.complaints_blocked = True
-                elif c.name == "Persuasive Arguments":
-                    # todo make sure there aren't 2 ppl doing this at once to diff targets 
-                    # Does this require 3 potential targets? - no, can't choose which vote to move
-                    # TODO
-                    pass
 
         for p in all_players:
-            for c in p.choice.complaints:
+            for c in p.processing.processed_complaints:
                 # Notify all players of complaints received.
-                c.status.complaints_received.append(p)
+                c.processing.complaints_received.append(p)
 
         for p in all_players:
-            if len(p.status.complaints_received) > 0:
-                out = f"{p.info.name} ({len(p.status.complaints_received)}): "
+            if len(p.processing.complaints_received) > 0:
+                out = f"{p.info.name} ({len(p.processing.complaints_received)}): "
 
-                out += ", ".join([c.info.name for c in p.status.complaints_received])
+                out += ", ".join([c.info.name for c in p.processing.complaints_received])
 
                 print(out)
 
@@ -166,12 +166,12 @@ class Horns:
         all_players: list[Player] = []
         if player_list is not None:
             all_players = player_list
+        # else error?
         all_fields: list[FieldStatus] = [] 
         if field_list is not None:
             all_fields = field_list
 
         complaints: list[Player] = [] # for NPC masters
-        pc_masters: list[Player] = []
         at_pony: list[Player] = []
 
         players_on_the_horns: set[Player] = set()
@@ -182,18 +182,13 @@ class Horns:
             if p.status.lodging == Lodging.GoldenPony:
                 at_pony.append(p)
 
-            # # Gets list of Masters
-            # # Could be imported from elsewhere?
-            # if p.status.rank == Rank.MASTER:
-            #     pc_masters.append(p)
-
-            for c in p.choice.complaints:
+            for c in p.processing.processed_complaints:
                 # generates complaints list for NPC Master DP distribution
                 complaints.append(c)
 
                 # Notify all players of complaints received.
                 if player_list is None:
-                    c.status.complaints_received.append(p)
+                    c.processing.complaints_received.append(p)
 
         # Deal with Golden Pony buff
         for p in at_pony:
@@ -223,7 +218,7 @@ class Horns:
             p.assign_DP(len(p.status.complaints_received)//2)
 
             # OnHorns either if recieved any complaint, or PC Master assigned DP to you.
-            # todo check abt public vote manip
+            # why not just check if DP > 0? 
             if (len(p.status.complaints_received) > 0) or (p.status.DP > 0):
                 players_on_the_horns.add(p)
 
