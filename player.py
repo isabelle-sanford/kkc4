@@ -95,6 +95,9 @@ class PlayerStatus:
         s.can_be_targeted = True # medica emergency (only?)
         # is lashed? 
 
+        s.accessible_abilities: list[ActionType] = []
+        s.known_names = [] # ? (for breakout roll)
+
         # are there any other prev turn effects? 
         # this is the best way I could come up with to have effects into future turns
         s.last_reckless_use = -1 # successful - nahlrout protected doesn't count here
@@ -152,7 +155,7 @@ class PlayerStatus:
 
         next.can_take_actions = True
         next.can_file_complaints = True
-        next.can_file_EP = True
+        next.can_file_EP = True # not if expelled
         next.can_be_targeted = True
 
         next.IMRE_INFO = self.IMRE_INFO
@@ -229,6 +232,8 @@ class PlayerChoices:
 
         # Stored input list of who they are blocking, as Player references
         self.actions: list[Action] = []
+
+        self.filing_EP: list[FieldName] = []
 
         # if master 
         self.assigned_DP: list[Player] = []
@@ -348,6 +353,8 @@ class Player:
         self.status.available_EP -= 1
 
         # anything else here? 
+    # todo go_insane()
+    # todo break_out()
 
 # everything below here untouched since haelbarde branch
     def take_action(self, action: Action):

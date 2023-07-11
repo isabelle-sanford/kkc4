@@ -103,6 +103,7 @@ class Charges:
             target.status.last_conduct_unbecoming = target.status.month #?
         elif outcome == "Expulsion":
             target.status.is_expelled = True
+            target.status.can_file_EP = False
             print(
                 f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
         else:
