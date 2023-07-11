@@ -86,6 +86,19 @@ class PlayerStatus:
         s.is_enrolled = True 
         s.in_Imre = False
 
+        # things the player knows / happend prev turn
+        s.can_take_actions = True 
+        s.can_file_complaints = True 
+        s.can_file_EP = True 
+        s.can_be_targeted = True # medica emergency (only?)
+        # is lashed? 
+
+        # are there any other prev turn effects? 
+        s.last_reckless_use = -1 # successful - nahlrout protected doesn't count here
+        s.last_conduct_unbecoming = -1
+        s.last_volatile_firestop = -1
+        s.last_medica_emergency = -1 # 
+
         # IMRE
         # hmmmm - could make own class? 
         s.IMRE_INFO = {
@@ -120,7 +133,7 @@ class PlayerStatus:
         next.rank = self.rank 
         next.lodging = self.lodging 
         next.money = self.money
-        next.stipend = self.stipend
+        next.stipend = self.stipend # hmm
         next.musical_stat = self.musical_stat
         next.inventory = self.inventory
         next.EP = self.EP
@@ -132,12 +145,22 @@ class PlayerStatus:
         next.is_enrolled = self.is_enrolled
         next.in_Imre = self.in_Imre
 
+        next.can_take_actions = True
+        next.can_file_complaints = True
+        next.can_file_EP = True
+        next.can_be_targeted = True
+
         next.IMRE_INFO = self.IMRE_INFO
+
+        # hmmm
+        # if self.last_reckless_use >= 0 and self.last_reckless_use + 1 >= next.month:
+        #     next.can_take
 
 # working variables for processing turn
 class PlayerProcessing:
-    def __init__(self, player_static, month):
+    def __init__(self, player_static, player_status, month):
         self.info = player_static
+        self.starting_status = player_status
         self.month = month
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
@@ -147,12 +170,16 @@ class PlayerProcessing:
         self.DP: int = 0
 
         # Flag for whether they have been successfully blocked.
-        self.is_blocked: bool = False
+        self.is_blocked: bool = self.starting_status.can_take_actions
+        self.is_lashed: bool = False
 
         # Working list of players that blocking them, as Player references
         self.blocked_by: list[Player] = []
 
-        self.transfer_neg_actions_to = None
+        # malfeasance protection things
+        self.transfer_neg_actions_to = None # master 
+        self.split_neg_actions_between = None # 3rd level
+        self.all_actions_also_affect = None # 1-2
         
 
         self.can_file_complaints: bool = True
@@ -174,8 +201,8 @@ class PlayerChoices:
         # if self.player.available_EP > 0:
         #     self.EP_filed = [FieldName.GENERAL] * self.player.available_EP # ?? ew
         
-        # if self.month % 3 == 0:
-        #     self.next_lodging = streets # ! change to enum val probs
+        if self.month % 3 == 0:
+            self.next_lodging = Lodging.Streets
 
         self.imre_next = False # should check if in imre lodging 
 
@@ -188,7 +215,7 @@ class PlayerChoices:
         # if master 
         self.assigned_DP: list[Player] = []
 
-        # IMRE
+        # IMRE (check if there?)
         self.IMRE_EOLIAN_audition: bool = False
         self.IMRE_EOLIAN_practice: bool = False
 
@@ -221,8 +248,6 @@ class PlayerChoices:
         ret = f"{self.player_static.name}: complaints {self.complaints}"
 
         return ret
-
-    # def take_action
 
     # helper function to add multiple maybe? 
     # def file_EP(self, field, slot): 
@@ -280,6 +305,14 @@ class Player:
         if player_process is None:
             player_process = PlayerProcessing(player_static, self.month)
         self.processing: PlayerProcessing = player_process
+
+        # pass 
+        if not self.status.can_be_targeted:
+            self.processing.can_be_targeted = False 
+        if self.status.is_blocked:
+            self.processing.is_blocked = True
+        if not self.status.can_take_actions:
+            self.processing.can_take_actions = False
 
     def take_action(self, action: Action):
 

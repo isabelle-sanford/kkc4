@@ -19,7 +19,7 @@ class FieldName(IntEnum):
     ALCHEMY = 7
     ARTIFICERY = 8
     NAMING = 9
-    GENERAL = 10  # ?
+    #GENERAL = 10  # ?
 
 
 class Ability:
@@ -73,7 +73,7 @@ class FieldStatus:
     def __init__(self, field: FieldName, info: FieldInfo):
         self.name = field # hmm
         self.info = info
-        self.EP = [] # dict? or just full on list? 
+        self.EP = {} # dict? or just full on list? 
         self.master: Player = None
         self.month = 1
         self.elevating = None 
@@ -482,3 +482,16 @@ naming = FieldInfo(
     FieldName.NAMING,
     FieldName.NAMING,
 )
+
+# not sure where this should go (or if fieldInfo should even be separate)
+ling_status = FieldStatus(FieldName.LINGUISTICS, linguistics)
+arith_status = FieldStatus(FieldName.ARITHMETICS, arithmetics)
+rl_status = FieldStatus(FieldName.RHETORICLOGIC, rhetoriclogic)
+archive_status = FieldStatus(FieldName.ARCHIVES, archives)
+sympathy_status = FieldStatus(FieldName.SYMPATHY, sympathy)
+phys_status = FieldStatus(FieldName.SYMPATHY, sympathy)
+alch_status = FieldStatus(FieldName.ALCHEMY, alchemy)
+artificery_status = FieldStatus(FieldName.ARTIFICERY, artificery)
+naming_status = FieldStatus(FieldName.NAMING, naming)
+
+FIELDS = [ling_status, arith_status, rl_status, archive_status, sympathy_status, phys_status, alch_status, artificery_status, naming_status]
