@@ -75,6 +75,7 @@ class PlayerStatus:
 
         s.musical_stat = musical_stat
         s.inventory: list[Item] = [inventory] # questionable
+        # should bodyguard be in inventory or separate?
 
         s.EP: EP = EP() 
         s.elevations: list[FieldName] = []
@@ -100,6 +101,7 @@ class PlayerStatus:
         s.last_conduct_unbecoming = -1
         s.last_volatile_firestop = -1
         s.last_medica_emergency = -1 # 
+        s.last_in_medica = -1 # for bonetar ig
 
         # IMRE
         # hmmmm - could make own class? 
@@ -161,14 +163,16 @@ class PlayerStatus:
 
 # working variables for processing turn
 class PlayerProcessing:
-    def __init__(self, player_static, player_status, month):
+    def __init__(self, player_static, player_status, player_choices, month):
         self.info = player_static
         self.starting_status = player_status
         self.month = month
+        self.choices = player_choices
         # also want ending_status?
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
         self.complaints_received: list[Player] = []
+        self.processed_complaints = self.choices.complaints # todo should initially set as original complaints
         
         # Total DP
         self.DP: int = 0
@@ -180,20 +184,26 @@ class PlayerProcessing:
         # Working list of players that blocking them, as Player references
         self.blocked_by: list[Player] = []
 
+        self.targeted_by: list[Player] = [] # for ward, pickpocket, ?
+
         # malfeasance protection things
         self.transfer_neg_actions_to = None # master 
         self.split_neg_actions_between = None # 3rd level
         self.all_actions_also_affect = None # 1-2
         
-
-        self.can_file_complaints: bool = True # should also reference status
-
-        self.can_be_targeted: bool = True # reference status
+        self.can_file_complaints: bool = self.starting_status.can_file_complaints # should also reference status
+        self.can_file_EP: bool = self.starting_status.can_file_EP
+        self.can_be_targeted: bool = self.starting_status.can_be_targeted
 
         # should probably instead process protects with kills, so they happen in appropriate order
         self.protected_from_sabotage = 0
         self.protected_from_kill = 0
         self.protects = [] # hmm
+
+        self.items_received: list[Item] = []
+        # todo remember to add this ^ to next_status
+
+        self.insanity_bonus = 0 # might want to take something from prev status?
 
 class PlayerChoices:
     # basically a record of what things a player wants to do this turn
@@ -310,17 +320,17 @@ class Player:
         self.name: str = player_static.name
         self.month = player_status.month # hmm
 
+        # need to remember to make new processing objects per turn
         if player_process is None:
-            player_process = PlayerProcessing(player_static, self.month)
+            player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
         self.processing: PlayerProcessing = player_process
 
-        # tbh pass Status to the Processing object and have it do this bit
-        if not self.status.can_be_targeted:
-            self.processing.can_be_targeted = False 
-        if self.status.is_blocked:
-            self.processing.is_blocked = True
-        if not self.status.can_take_actions:
-            self.processing.can_take_actions = False
+    def levels_in(self, field: FieldName):
+        # error check?
+        count = self.status.elevations.count(field)
+        if self.status.master_of == field:
+            count = 4
+        return count
 
 # everything below here untouched since haelbarde branch
     def take_action(self, action: Action):
