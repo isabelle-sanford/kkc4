@@ -23,6 +23,8 @@ class ActionType(Enum):
     MedicaDetainment = 18
     PsychologicalCounselling = 19
     CheatingDeath = 20
+
+    # what if single CreateItem action type, target is item
     CreateTenaculum = 21 # none
     CreateFirestop = 22 # none
     CreatePlumbob = 23 # none
@@ -31,6 +33,7 @@ class ActionType(Enum):
     CreateBloodless = 26 # none
     CreateThievesLamp = 27 # none
     CreateGram = 28 # none
+    
     UseName = 29 # any 
     UseMommet = 30
     UseTenaculumItem = 31
@@ -48,31 +51,39 @@ class ActionType(Enum):
     # player, action, location, none, field ? 
 
 class Action:
-    def __init__(self, name: str, player, type: ActionType, target,
+    def __init__(self, player, type: ActionType, target,
                   target_two = None, action_type: str = None): # action_type ??
-        self.name: str = name # Action name
         self.player = player # Player taking the action
-        self.type: ActionType = type # Type of action: Block, Redirect, Kill, etc.
-        self.target_action_type: str = action_type # ? 
+        self.type: ActionType = type 
+        # todo: make ActionCategory (Action-Affecting, Offensive, Other)
+        self.target_action_type: str = action_type # ? what's this for?
         self.target = target
+        # maybe something indicating what kind of object the target will be?
         self.target_two = target_two
 
         self.blocked: bool = False
         self.redirected: bool = False
-        self.redirect_target = None
+        self.redirect_target = None # might want original_target
 
-        self.successful: bool = True
+        self.successful: bool = True # result for player
 
         self.message: str = None
 
+        # could have ActionType be more specific instead of this
+        # probs should be an argument though
         self.level = None # hmm
-        # IS POSITIVE
+
+        # IS POSITIVE (for streets purposes)
+        # is negative (for malfeasance protection and maybe other stuff)
 
         # Working variables to process cycles and chains
         self.blocked_by = []
         self.blocked_by_action: list[Action] = []
         self.in_block_cycle: bool = False
 
+
+# Everything after this point is untouched from haelbarde branch
+# could be out of date, not sure
     def perform(self):
         if self.blocked:
             Log.Action(self, LogOutcome.Blocked)

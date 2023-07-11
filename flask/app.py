@@ -1,21 +1,23 @@
-from copy.field import FieldStatus
-from copy.player import Player
+from field import FieldStatus
+from player import Player
 from flask import Flask, render_template
 
 # sql connection goes here
 
 app = Flask(__name__)
 
+# hmm
 fields: "list[FieldStatus]" = []
 players: "list[Player]" = []
 
-living_players = []
+living_players = [] # seems useful, idk
 
 # main public game page
 @app.route("/")
 def index():
     return render_template('index.html')
 
+# not sure if we do this or just random strings
 @app.route("/player")
 def player_login():
     return render_template('player_login.html')

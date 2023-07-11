@@ -73,7 +73,7 @@ class FieldStatus:
     def __init__(self, field: FieldName, info: FieldInfo):
         self.name = field # hmm
         self.info = info
-        self.EP = {} # dict? or just full on list? 
+        self.EP = {} # dict? or just full on list? (thinking dict atm)
         self.master: Player = None
         self.month = 1
         self.elevating = None 

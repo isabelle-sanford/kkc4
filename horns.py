@@ -120,6 +120,7 @@ class Horns:
             all_players = player_list
         
         # TODO public vote count (probably)
+        # no - public vote count will show all manip with names moved
 
         # Complaint actions 
         for p in all_players:
@@ -133,7 +134,7 @@ class Horns:
                     c.target.status.complaints_blocked = True
                 elif c.name == "Persuasive Arguments":
                     # todo make sure there aren't 2 ppl doing this at once to diff targets 
-                    # Does this require 3 potential targets?
+                    # Does this require 3 potential targets? - no, can't choose which vote to move
                     # TODO
                     pass
 

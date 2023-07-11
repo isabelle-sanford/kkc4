@@ -1,4 +1,7 @@
 from enum import Enum
+import random
+
+# untouched since haelbarde, seems fine
 
 class ItemType(Enum):
     MOMMET = 1

@@ -86,7 +86,8 @@ class PlayerStatus:
         s.is_enrolled = True 
         s.in_Imre = False
 
-        # things the player knows / happend prev turn
+        # things the player knows / happened prev turn
+        # so their page can have invalid stuff grayed out or whatever
         s.can_take_actions = True 
         s.can_file_complaints = True 
         s.can_file_EP = True 
@@ -94,6 +95,7 @@ class PlayerStatus:
         # is lashed? 
 
         # are there any other prev turn effects? 
+        # this is the best way I could come up with to have effects into future turns
         s.last_reckless_use = -1 # successful - nahlrout protected doesn't count here
         s.last_conduct_unbecoming = -1
         s.last_volatile_firestop = -1
@@ -126,6 +128,7 @@ class PlayerStatus:
 
     # todo change stipend for vint/aturan
 
+    # this is dumb, there's a deepcopy function
     def __copy__(self):
         next = PlayerStatus(self.info)
         next.month = self.month + 1
@@ -162,6 +165,7 @@ class PlayerProcessing:
         self.info = player_static
         self.starting_status = player_status
         self.month = month
+        # also want ending_status?
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
         self.complaints_received: list[Player] = []
@@ -182,29 +186,30 @@ class PlayerProcessing:
         self.all_actions_also_affect = None # 1-2
         
 
-        self.can_file_complaints: bool = True
+        self.can_file_complaints: bool = True # should also reference status
 
-        self.can_be_targeted: bool = True
+        self.can_be_targeted: bool = True # reference status
 
+        # should probably instead process protects with kills, so they happen in appropriate order
         self.protected_from_sabotage = 0
         self.protected_from_kill = 0
         self.protects = [] # hmm
 
 class PlayerChoices:
     # basically a record of what things a player wants to do this turn
-    # and funcs returning false if the player can't do those things
+    # and funcs returning false if the player can't do those things (?)
     # choices are actually processed and integrated to the overall game separately 
-    
+    # it's essentially just the info submitted from the player's page
+
     def __init__(self, playerstatic, month: int = 0):
         self.player_static = playerstatic
         self.month = month
-        # if self.player.available_EP > 0:
-        #     self.EP_filed = [FieldName.GENERAL] * self.player.available_EP # ?? ew
-        
+        # maybe also status here? 
+
         if self.month % 3 == 0:
             self.next_lodging = Lodging.Streets
 
-        self.imre_next = False # should check if in imre lodging 
+        self.imre_next = False # should check if in imre lodging? 
 
         # List of complaints made (NOT including PiH)
         self.complaints: list[Player] = []
@@ -215,7 +220,8 @@ class PlayerChoices:
         # if master 
         self.assigned_DP: list[Player] = []
 
-        # IMRE (check if there?)
+        # IMRE (check if player is there?)
+        # also again maybe change to dict, this is really messy
         self.IMRE_EOLIAN_audition: bool = False
         self.IMRE_EOLIAN_practice: bool = False
 
@@ -298,7 +304,9 @@ class Player:
         self.status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
         self.choice: PlayerChoices = player_choices
-        self.id: int = player_static.id
+        
+        # sort of irregularly used, but maybe more helpful than passing full Player instances around everywhere
+        self.id: int = player_static.id 
         self.name: str = player_static.name
         self.month = player_status.month # hmm
 
@@ -306,7 +314,7 @@ class Player:
             player_process = PlayerProcessing(player_static, self.month)
         self.processing: PlayerProcessing = player_process
 
-        # pass 
+        # tbh pass Status to the Processing object and have it do this bit
         if not self.status.can_be_targeted:
             self.processing.can_be_targeted = False 
         if self.status.is_blocked:
@@ -314,6 +322,7 @@ class Player:
         if not self.status.can_take_actions:
             self.processing.can_take_actions = False
 
+# everything below here untouched since haelbarde branch
     def take_action(self, action: Action):
 
         self.choice.actions.append(action)

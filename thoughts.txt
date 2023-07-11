@@ -2,57 +2,40 @@
 
 re enums: can you have a null state for them? should they be combined with the main class? how do 
 
-note - it looks like if I create an instance of a class and then change something in the class, the instance doesn't update
-
-
-- maybe make a Money type or at least some helper funcs back and forth
+- webpage is gonna need some random helper funcs for converting money to talents/jots/etc 
 
 - consider having a field for abilities, lodgings, etc, that's just the "operative number" or whatever (so if we wanted to change the mews insanity bonus it'd only have to happen in one place)
 
-simplifications: 
-- ignore Imre 
-- ignore actual ability effects 
-- ignore items 
-- ignore DP 
-
-
-need using-item actions 
 
 ability questions: 
-- is redirect a negative action
-- proficient_in_hyperbole probs shouldn't have targets? 
+- is redirect a negative action (NO)
+- proficient_in_hyperbole probs shouldn't have targets? (I think it does but just not player-side)
 - argumentum_ad_nauseam is probs negative, same with persuasive_arguments
-- fae lore is active, is NOT an additional effect on a separate action; not sure what its target is tho 
-- 
 
 
 todo: have fieldStatus contain list of potential masters, in order of time that it happened
 
 
-going to want to get the 2 targets from PiH from the complaints page, NOT from dropdown from player 
-
 Qs FOR WILSON:
-- Persuasive arguments: do you move both your target's votes to the same person? Can you pick to two different people? You can't force them if they have 1/no complaints to vote, right? If they're using Proficient in Hyperbole do all four votes get moved?
+- Persuasive arguments: You can't force them if they have 1/no complaints to vote, right? 
 
 
-- Does using EP to remove IP come before or after elevations? Assuming before, and NPC masters get list with appropriately reduced # of EP. Can PC masters still elevate if you just used all your EP in that field to offset? 
-solution: if using EP to reduce IP, which EP is not specified but will prioritize EP in a field in which you're NOT filing that same turn 
+- Does using EP to remove IP come before or after elevations? (ELEVATIONS ARE FIRST)
+solution: if using EP to reduce IP, which EP you're using is not specified but will prioritize EP in a field in which you're NOT filing that same turn 
 
-- What exactly does Ward tell you?
+- What exactly does Ward tell you? (actiontype?)
 
-- When Masters are roleblocked, can they still elevate / assign DP? - yes unless it's TOTAL
-- Do we want you to be able to use an item the same turn you buy it? (assuming no)
-
+- When Masters are roleblocked, can they still elevate / assign DP? - yes unless it's TOTAL (and in that case they don't get the tuition bump if they still put in the order and just got blocked from doing it)
+- Do we want you to be able to use an item the same turn you buy/receive it? (no)
 
 
 - can you be elevated if you're not currently enrolled
-- if you're de-elevated from master can you still do master-level actions
+- if you're de-elevated from master can you still do master-level actions (YES)
 
 OoA stuff 
-- if you reduce your IP with EP do NPC masters pick before or after that happens? what abt PC masters? 
-- should malfeasance protection downgrades work on ankers roleblock / vint homecoming / etc? 
-- should you be able to use an item on the same turn it gets stolen?
-- if someone gets elevated and you use school records on them that turn, do you get to see what their newest elevation is in?
+- should malfeasance protection downgrades work on ankers roleblock / vint homecoming / etc? (NO)
+- should you be able to use an item on the same turn it gets stolen? (NO)
+- if someone gets elevated and you use school records on them that turn, do you get to see what their newest elevation is in? (NO)
 - medica emergency/malfeasance III
 
 
@@ -65,3 +48,8 @@ notes
 - stealing items happens early/first 
 - medica emergency takes place the NEXT turn
 - persuasive arguments changes 1 vote, at random, does not apply to PiH votes
+
+
+stuff not in ooa 
+- update # of EP available (during elevating?)
+- update vint/aturan stipends during expulsion
