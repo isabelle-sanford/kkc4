@@ -13,12 +13,12 @@ class Imre:
         for p in Imre.player_list:
             # Practice
             # Is there a limit on this, or can you practice for ever?
-            if p.choice.IMRE_EOLIAN_practice:
+            if p.choices.IMRE_EOLIAN_practice:
                 str = p.status.musical_stat
                 p.status.musical_stat += 0.5
                 print(f"{p.info.name} practiced. [{str} became {p.status.musical_stat}]")
             # Perform
-            elif (p.choice.IMRE_EOLIAN_audition 
+            elif (p.choices.IMRE_EOLIAN_audition 
                     and not p.status.IMRE_EOLIAN_auditioned):
                 
                 p.status.IMRE_EOLIAN_auditioned = True
@@ -44,24 +44,24 @@ class Imre:
         print(len(Imre.player_list))
 
         for p in Imre.player_list:
-            print(f"{p.info.name}: Placed Bet = {p.choice.IMRE_LOADEDDICE_placed_bet}")
-            if p.choice.IMRE_LOADEDDICE_placed_bet:
-                dif = p.status.money - p.choice.IMRE_LOADEDDICE_bet_amount
+            print(f"{p.info.name}: Placed Bet = {p.choices.IMRE_LOADEDDICE_placed_bet}")
+            if p.choices.IMRE_LOADEDDICE_placed_bet:
+                dif = p.status.money - p.choices.IMRE_LOADEDDICE_bet_amount
                 if dif > 0:
-                    p.status.money -= p.choice.IMRE_LOADEDDICE_bet_amount
+                    p.status.money -= p.choices.IMRE_LOADEDDICE_bet_amount
                 else:
                     pass # You're broke and bet money you didn't have.
                 won = False
                 result = random.randrange(1,20)
-                for i in p.choice.IMRE_LOADEDDICE_numbers:
+                for i in p.choices.IMRE_LOADEDDICE_numbers:
                     if i == result:
                         won = True
                 winnings = 0
                 if won:
-                    winnings = (p.choice.IMRE_LOADEDDICE_bet_amount 
-                                       * WinningRatios[len(p.choice.IMRE_LOADEDDICE_numbers)])
+                    winnings = (p.choices.IMRE_LOADEDDICE_bet_amount 
+                                       * WinningRatios[len(p.choices.IMRE_LOADEDDICE_numbers)])
                     p.status.money += winnings
-                print(f"{p.info.name} bet {p.choice.IMRE_LOADEDDICE_bet_amount} on {str(p.choice.IMRE_LOADEDDICE_numbers)[1:-1]} and rolled a {result} (Winnings = {winnings})")
+                print(f"{p.info.name} bet {p.choices.IMRE_LOADEDDICE_bet_amount} on {str(p.choices.IMRE_LOADEDDICE_numbers)[1:-1]} and rolled a {result} (Winnings = {winnings})")
     
 
     # Doesn't consistently check for if people have the money for things. 
@@ -129,17 +129,17 @@ class Imre:
 
         
         for p in Imre.player_list:
-            if p.choice.IMRE_APOTHECARY_nahlrout > 0:
+            if p.choices.IMRE_APOTHECARY_nahlrout > 0:
                 nahlrout_buyers.append(p)
-                for i in range(p.choice.IMRE_APOTHECARY_nahlrout):
+                for i in range(p.choices.IMRE_APOTHECARY_nahlrout):
                     nahlrout_units_requested.append(p)
-            if p.choice.IMRE_APOTHECARY_bloodless > 0:
+            if p.choices.IMRE_APOTHECARY_bloodless > 0:
                 bloodless_buyers.append(p)
-                for i in range(p.choice.IMRE_APOTHECARY_bloodless):
+                for i in range(p.choices.IMRE_APOTHECARY_bloodless):
                     bloodless_units_requested.append(p)
-            if p.choice.IMRE_APOTHECARY_gram > 0:
+            if p.choices.IMRE_APOTHECARY_gram > 0:
                 gram_buyers.append(p)
-                for i in range(p.choice.IMRE_APOTHECARY_gram):
+                for i in range(p.choices.IMRE_APOTHECARY_gram):
                     gram_units_requested.append(p)
         
         ApocatheryRunProcess(nahlrout, nahlrout_buyers, nahlrout_units_requested)

@@ -14,7 +14,7 @@ class BaseStat(Enum):
 
 class PlayerStatic:
     def __init__(self, name:str , rp_name:str, is_evil:bool, 
-                 social_class:Background, id:int = 0):
+                 social_class:Background, id:int = -1):
         # ? id?  TODO
         self.id = id
         self.name: str = name 
@@ -72,6 +72,7 @@ class PlayerStatus:
         s.lodging: Lodging = current_lodging
         s.money = player_static.social_class.initial_funds 
         s.stipend = player_static.social_class.stipend
+        s.current_tuition = 10
 
         s.musical_stat = musical_stat
         s.inventory: list[Item] = [inventory] # questionable
@@ -166,11 +167,11 @@ class PlayerStatus:
 
 # working variables for processing turn
 class PlayerProcessing:
-    def __init__(self, player_static, player_status, player_choices, month):
-        self.info = player_static
-        self.starting_status = player_status
+    def __init__(self, player, month):
+        self.info = player.info
+        self.starting_status = player.status
         self.month = month
-        self.choices = player_choices
+        self.choices = player.choice
         # also want ending_status?
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
@@ -210,6 +211,7 @@ class PlayerProcessing:
         self.getting_elevated_in: FieldName = None
 
         self.insanity_bonus = 0 # might want to take something from prev status?
+        # and check mews
 
 class PlayerChoices:
     # basically a record of what things a player wants to do this turn
@@ -223,9 +225,10 @@ class PlayerChoices:
         # maybe also status here? 
 
         if self.month % 3 == 0:
-            self.next_lodging = Lodging.Streets
+            self.next_lodging: Lodging = Lodging.Streets
 
-        self.imre_next = False # should check if in imre lodging? 
+        self.imre_next = False # should check if in imre lodging?
+        self.enroll_next = True # check expulsion etc 
 
         # List of complaints made (NOT including PiH)
         self.complaints: list[Player] = []
@@ -322,7 +325,9 @@ class Player:
     def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
         self.status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
-        self.choice: PlayerChoices = player_choices
+        self.choices: PlayerChoices = player_choices # renamed this, hopefully it stuck
+
+        # self.past_statuses = [] ? 
         
         # sort of irregularly used, but maybe more helpful than passing full Player instances around everywhere
         self.id: int = player_static.id 
@@ -355,13 +360,17 @@ class Player:
         # anything else here? 
     # todo go_insane()
     # todo break_out()
+    # todo calculate_tuition(gm_input)
+        # remember to check masters, social class, arithmetics
+        # probs have Tuition object that can be updated over turns?
 
-# everything below here untouched since haelbarde branch
+# everything below here untouched since haelbarde branch (except assign_DP)
     def take_action(self, action: Action):
 
-        self.choice.actions.append(action)
+        self.choices.actions.append(action)
         self.status.rank
         # Do checks to make sure the action is valid?
+        # maybe do this in choices?
     
     def add_item(self, item: Item):
         self.status.inventory.append(Item)
@@ -407,13 +416,13 @@ class Player:
         self.take_action(Action("Law of Contraposition", self, "redirect_action", from_target, to_target, action_type))
 
     def find_action(self, type: str):
-        for a in self.choice.actions:
+        for a in self.choices.actions:
             if a.type.find(type) > -1:
                 return a
         return None  
     
-    def import_complaint(self, target):
-        self.choice.complaints.append(target)
+    def import_complaint(self, target): #?
+        self.choices.complaints.append(target)
 
     # changed this slightly bc I wasn't clear what it was doing / if it was right
     def assign_DP(self, total = 1, master_of:FieldName = None):

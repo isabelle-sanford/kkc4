@@ -121,13 +121,13 @@ class Horns:
 
         # Extra complaints (means if blocked, don't have to remove them.)
         for p in all_players:
-            for c in p.choice.actions:
+            for c in p.choices.actions:
                 if c.type == "complaint" and not c.blocked:
                     if c.name == "Proficient in Hyperbole":
                         if c.target is not None:
-                            p.choice.complaints.append(c.target)
+                            p.choices.complaints.append(c.target)
                         if c.target_two is not None:
-                            p.choice.complaints.append(c.target_two)
+                            p.choices.complaints.append(c.target_two)
                     elif c.name == "Argumentum Ad Nauseam":
                         c.target.status.complaints_blocked = True
                     elif c.name == "Persuasive Arguments":
@@ -135,7 +135,7 @@ class Horns:
                         pass
 
         for p in all_players:
-            for c in p.choice.complaints:
+            for c in p.choices.complaints:
                 # Notify all players of complaints received.
                 c.status.complaints_received.append(p)
 
@@ -180,7 +180,7 @@ class Horns:
             if p.status.rank == Rank.MASTER:
                 pc_masters.append(p)
 
-            for c in p.choice.complaints:
+            for c in p.choices.complaints:
                 # generates complaints list for NPC Master DP distribution
                 complaints.append(c)
 
@@ -201,7 +201,7 @@ class Horns:
         
         # For PC masters
         for m in pc_masters:
-            for d in m.choice.assigned_DP:
+            for d in m.choices.assigned_DP:
                 d.assign_DP(master_of=m.status.master_of)   
 
         # For all NPC masters

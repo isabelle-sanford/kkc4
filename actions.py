@@ -73,11 +73,11 @@ class TargetType(Enum):
 
 class Action:
     def __init__(self, player, type: ActionType, target,
-                  target_two = None, action_type: str = None): # action_type ??
+                  target_two = None): # action_type ??
         self.player = player # Player taking the action
         self.type: ActionType = type 
         # todo: make ActionCategory (Action-Affecting, Offensive, Other)
-        self.target_action_type: str = action_type # ? what's this for?
+        #self.target_action_type: str = action_type # ? what's this for?
         self.target = target
         # maybe something indicating what kind of object the target will be?
         self.target_two = target_two
@@ -97,6 +97,8 @@ class Action:
         # probs should be an argument though
         self.level = None # hmm
 
+        # month?
+
         # IS POSITIVE (for streets purposes)
         # is negative (for malfeasance protection and maybe other stuff)
 
@@ -104,6 +106,7 @@ class Action:
         self.blocked_by = []
         self.blocked_by_action: list[Action] = []
         self.in_block_cycle: bool = False
+        self.block_reasoning = "" # for GM results
 
     # only handling OTHER-category actions atm
     def perform(self, **kwargs):
@@ -350,7 +353,7 @@ class Action:
 
 # Everything after this point is untouched from haelbarde branch
 # could be out of date, not sure
-    def perform_prev(self):
+    def perform_old(self):
         if self.blocked:
             Log.Action(self, LogOutcome.Blocked)
             return

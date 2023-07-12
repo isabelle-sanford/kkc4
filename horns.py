@@ -104,6 +104,7 @@ class Charges:
         elif outcome == "Expulsion":
             target.status.is_expelled = True
             target.status.can_file_EP = False
+            # TODO adjust vint/aturan stipends
             print(
                 f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
         else:
@@ -205,7 +206,7 @@ class Horns:
         # assign DP from masters (PC and NPC)
         for field in all_fields:
             if field.master is not None: # pc master
-                for d in field.master.choice.assigned_DP:
+                for d in field.master.choices.assigned_DP:
                     # todo understand
                     d.assign_DP(master_of=field.master.status.master_of)
             else: # npc master

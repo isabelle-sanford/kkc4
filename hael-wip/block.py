@@ -5,7 +5,7 @@ from objects import Action
 def generate_action_list(player_list: list[Player]) -> list[Action]:
     action_list: list[Action] = []
     for p in player_list:
-        for a in p.choice.actions:
+        for a in p.choices.actions:
             action_list.append(a)
     return action_list
 
@@ -144,7 +144,7 @@ class Block:
 
         for p in all_players:
             print(f"{p.info.name}: is_blocked = {p.status.is_blocked}")
-            for a in p.choice.actions:
+            for a in p.choices.actions:
                     print(f" - {a.name}: is_blocked = {a.blocked}")
 
         print("run_blocks()... Done!")
