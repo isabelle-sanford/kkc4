@@ -1,5 +1,5 @@
 import random
-from objects import Background, Rank, FieldName, Item, ItemType, Action, ActionType,Lodging
+from objects import Rank, FieldName,Lodging, Background, Item, ItemType, Action, ActionType, Ability
 
 class EP:
     def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, 
@@ -47,7 +47,8 @@ class PlayerStatus:
         self.inventory: list[Item] = [inventory] # questionable
 
         self.EP: EP = EP() 
-        self.elevations = []
+        self.elevations: list[FieldName] = []
+        self.abilties: list[Ability] = []
         self.master_of: FieldName = None # 4th elevation is equivalent I guess?
 
         self.is_alive = True 
@@ -100,7 +101,7 @@ class PlayerChoices:
         self.imre_next = False # should check if in imre lodging 
 
         # List of complaints made
-        self.complaints: list[Player] = []
+        self.complaints: list[Action] = []
 
         # Stored input list of who they are blocking, as Player references
         self.actions: list[Action] = []
@@ -194,8 +195,18 @@ class Player:
         self.status.rank
         # Do checks to make sure the action is valid?
     
+    def get_actions(self, action_type: ActionType = None):
+        action_list = []
+        if action_type is not None:
+            for a in self.choice.actions:
+                if a.type == action_type:
+                    action_list.append(a)
+        else:
+            action_list = self.choice.actions.copy()
+        return action_list
+
     def add_item(self, item: Item):
-        self.status.inventory.append(Item)
+        self.status.inventory.append(item)
 
     def holds_item(self, item_type: ItemType) -> bool:
         count = 0
@@ -216,10 +227,17 @@ class Player:
     
     def get_items(self, item_type: ItemType) -> list[Item]:
         list = []
-        if self.holds(item_type) > 0:
+        if self.holds_item(item_type) > 0:
             for item in self.status.inventory:
                 if item.type == item_type:
                     list.append(item)
+        return list
+    
+    def get_destroyable_items(self) -> list[Item]:
+        list = []
+        for i in self.status.inventory:
+            if i.type is not ItemType.GRAM:
+                list.append(i)
         return list
 
     def increase_money(self, amount: float):

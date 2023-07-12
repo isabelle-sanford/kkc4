@@ -1,6 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from player import Player
 import random
 from enum import Enum, IntEnum
 from log import Log, LogOutcome
+
+
+
 
 
 
@@ -96,7 +103,7 @@ class ItemType(Enum):
     BODYGUARD = 12
 
 class Item:
-    def __init__(self, name, type: ItemType, uses, defense, action, level, target= None) -> None:
+    def __init__(self, name, type: ItemType, uses, defense, action, level, target: Player= None, awry = False) -> None:
         self.type: ItemType = type
 
         self.name: str = name
@@ -105,23 +112,38 @@ class Item:
         self.action: bool = action
         self.level: int = level # Can be None
         self.target = target #None except when mommet
+        self.awry = awry
 
     @classmethod
     def Generate(cls, type: ItemType, level: int = 0, target = None):
         if type == ItemType.MOMMET:
             return Item("Mommet", type, 1, False, True, level, target)
         elif type == ItemType.TENACULUM:
+            awry = False
+            result = random.randrange(0,10)
+            if (level == 1 and result < 2) or (level == 2 and result < 1):
+                awry = True
             uses = 1
             if level == 4: uses = 2
-            return Item("Tenaculum", type, uses, False, True, level)
+            return Item("Tenaculum", type, uses, False, True, level, awry=awry)
         elif type == ItemType.FIRESTOP:
+            awry = False
+            result = random.randrange(0,10)
+            if (level == 1 and result < 2) or (level == 2 and result < 1):
+                awry = True
             uses = 1
             if level == 4: uses = 2
-            return Item("Firestop", type, uses, True, False, level)
+            return Item("Firestop", type, uses, True, False, level, awry=awry)
         elif type == ItemType.PLUMBOB:
             return Item("Plumbob", type, 1, False, True, level)
         elif type == ItemType.BONETAR:
-            return Item("Bonetar", type, 1, False, True, level)
+            awry = False
+            result = random.random()
+            if ((level == 1 and result < 0.5) 
+                or (level == 2 and result < 0.25)
+                or (level == 3 and result < 0.10)):
+                awry = True
+            return Item("Bonetar", type, 1, False, True, level, awry=awry)
         elif (type == ItemType.WARD or type == ItemType.BLOODLESS 
               or type == ItemType.THIEVESLAMP or type == ItemType.GRAM):
             if level == 2: uses = random.randrange(1,2)
@@ -142,6 +164,7 @@ class Item:
             return Item("Nahlrout", type, 1, True, True, None)
         elif type == ItemType.BODYGUARD:
             return Item("Bodyguard", type, 2,True,False,None)
+
 
 class ActionType(Enum):
     Complaint = 1
@@ -186,23 +209,28 @@ class ActionType(Enum):
     UseAssassin = 40
 
 class Action:
-    def __init__(self, name: str, player, type: ActionType, target,
-                  target_two = None, action_type: str = None):
+    def __init__(self, name: str, player: Player, type: ActionType, target: Player,
+                  target_two: Player = None, action_type: ActionType = None, target_three: Player = None):
         self.name: str = name # Action name
-        self.player = player # Player taking the action
+        self.player: Player = player # Player taking the action
         self.type: ActionType = type # Type of action: Block, Redirect, Kill, etc.
-        self.target_action_type: str = action_type
-        self.target = target
-        self.target_two = target_two
+        self.target_action_type: ActionType = action_type
+
+        self.target: Player = target
+        self.target_two: Player = target_two
+        self.target_three: Player = target_three
 
         self.blocked: bool = False
         self.redirected: bool = False
-        self.redirect_target = None
+        self.redirect_target: Player = None
 
         self.message: str = None
 
+        self.target_field: FieldName = None
+        self.target_abilty: Ability = None
+
         # Working variables to process cycles and chains
-        self.blocked_by = []
+        self.blocked_by: list[Player] = []
         self.blocked_by_action: list[Action] = []
         self.in_block_cycle: bool = False
 
@@ -279,22 +307,30 @@ class Action:
             pass
         elif self.type == ActionType.ProficientInHyperbole:
             if self.target is not None:
-                self.player.status.complaints.append(self.target)
+                self.player.choice.complaints.append(self.target)
             if self.target_two is not None:
-                self.player.status.complaints.append(self.target_two)
+                self.player.choice.complaints.append(self.target_two)
         elif self.type == ActionType.ArgumentumAdNauseam:
-            for complaint in self.target.status.complaints:
-                if complaint.target == self.target_two:
+            # This should always happen after Proficient in Hyperbole
+            for complaint in self.target.choice.complaints:
+                    complaint.blocked_by.append(self.player)
+                    complaint.blocked_by_action.append(self)
                     complaint.blocked = True
                     return
         elif self.type == ActionType.PersuaisveArguments:
-            # Do I need 3 targets here?
-            pass
+            complaint_changed = False
+            for complaint in self.target.choice.complaints:
+                if complaint.target == self.target_two and not complaint_changed:
+                    complaint_changed = True
+                    complaint.redirected = True
+                    complaint.redirect_target = self.target_three
+                    # May need extra stuff to deal with multiple redirects.
 
         # Archives
         elif self.type == ActionType.FaeLore:
             if self.target.info.is_evil:
-                self.target.status.blocked = True
+                self.target.status.is_blocked = True
+                self.target.status.blocked_by.append(self.player)
         elif self.type == ActionType.OmenRecognition:
             Log.NotifyGM()
         elif self.type == ActionType.SchoolRecords:
@@ -306,6 +342,18 @@ class Action:
                 # Log this
                 # Output to Player PM
         elif self.type == ActionType.BannedBooks:
+            # if studied target field
+            if self.player.status.elevations.count(self.target_field) > 0:
+                self.player.status.abilties.append(self.target_abilty)
+            # If not studied, get random ability
+            else:
+                if self.target_field in [FieldName.LINGUISTICS, FieldName.RHETORICLOGIC]:
+                    # Archives always known, but is there any limit on what Banned Books on Alchemy can get?
+                    ability = random.randrange(1,3)
+                else:
+                    ability = random.randrange(1,4)
+                # Get FieldInfo and then pull the list of abillites from there.
+                self.player.status.abilties.append()
             pass
         
         # Sympathy
@@ -333,8 +381,30 @@ class Action:
         
         # Item Usage
         elif self.type == ActionType.UseTenaculumAction:
-            pass
+            item = self.player.get_items(ItemType.TENACULUM)[0]
+            if item.awry:
+                random_result = random.randrange(0, len(self.target.choice.actions))
+                self.target.choice.actions[random_result].block(self)
+            else:
+                action_list = self.target.get_actions(self.target_action_type)
+                random_result = random.randrange(0,count)
+                action = action_list[random_result]
+                action.block(self)
+            self.player.status.inventory.pop(item)
         elif self.type == ActionType.UseTenaculumItem:
+            item = self.player.get_items(ItemType.TENACULUM)[0]
+            if item.awry:
+                items = self.target.get_destroyable_items()[random_result]
+                random_result = random.randrange(0, len(items))
+                self.target.status.inventory.pop(items[random_result])
+            else:
+                # This needs to find any items of the appropriate selected type, then choose a random one to destroy.
+                items = self.target.get_items(self.ta)
+                random_result = random.randrange(0,len(items))
+                action = action_list[random_result]
+                self.target.status.inventory.pop(items[random_result])
+            self.player.status.inventory.pop(item)
+
             pass
         elif self.type == ActionType.UseFirestop:
             pass
@@ -362,16 +432,19 @@ class Action:
         # Complaint
         elif self.type == ActionType.Complaint:
             if self.target is not None:
-                self.player.status.complaints.append(self.target)
+                self.player.choice.complaints.append(self.target)
             if self.target_two is not None:
-                self.player.status.complaints.append(self.target_two)
+                self.player.choice.complaints.append(self.target_two)
 
         if not action_logged:
             Log.Action(self)
         
 
 
-
+    def block(self, blocking_action: Action):
+        self.blocked = True
+        self.blocked_by.append(blocking_action.player)
+        self.blocked_by_action.append(blocking_action)
     
     def __str__(self) -> str:
         return f"{self.player.info.name}: {self.name} "
@@ -864,3 +937,4 @@ naming = FieldInfo(
     FieldName.NAMING,
     FieldName.NAMING,
 )
+

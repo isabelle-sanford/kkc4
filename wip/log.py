@@ -1,4 +1,3 @@
-from objects import Action
 from enum import Enum
 
 class LogOutcome(Enum):
@@ -14,7 +13,7 @@ class Log:
     def __init__(self) -> None:
         pass
     
-    def Action(action: Action, outcome: LogOutcome = LogOutcome.Success, notify_gm = False):
+    def Action(action, outcome: LogOutcome = LogOutcome.Success, notify_gm = False):
         flag_GM = ""
         if notify_gm:
             flag_GM = "GM Intervention Needed: "
