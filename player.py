@@ -134,44 +134,14 @@ class PlayerStatus:
 
     # todo change stipend for vint/aturan
 
-    # this is dumb, there's a deepcopy function
-    def __copy__(self):
-        next = PlayerStatus(self.info)
-        next.month = self.month + 1
-        next.available_EP = self.available_EP
-        next.rank = self.rank 
-        next.lodging = self.lodging 
-        next.money = self.money
-        next.stipend = self.stipend # hmm
-        next.musical_stat = self.musical_stat
-        next.inventory = self.inventory
-        next.EP = self.EP
-        next.elevations = self.elevations
-        next.master_of = self.master_of
-        next.is_alive = self.is_alive
-        next.is_sane = self.is_sane 
-        next.is_expelled = self.is_expelled
-        next.is_enrolled = self.is_enrolled
-        next.in_Imre = self.in_Imre
-
-        next.can_take_actions = True
-        next.can_file_complaints = True
-        next.can_file_EP = True # not if expelled
-        next.can_be_targeted = True
-
-        next.IMRE_INFO = self.IMRE_INFO
-
-        # hmmm
-        # if self.last_reckless_use >= 0 and self.last_reckless_use + 1 >= next.month:
-        #     next.can_take
 
 # working variables for processing turn
 class PlayerProcessing:
-    def __init__(self, player, month):
-        self.info = player.info
-        self.starting_status = player.status
+    def __init__(self, player_info, player_status, player_choices, month):
+        self.info = player_info
+        self.starting_status = player_status
         self.month = month
-        self.choices = player.choices
+        self.choices = player_choices
         # also want ending_status?
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
@@ -322,9 +292,13 @@ class PlayerChoices:
 
 class Player:
 
+    # start of game constructor 
     def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
         self.status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
+
+        if player_choices is None:
+            player_choices = PlayerChoices(player_static, 0)
         self.choices: PlayerChoices = player_choices # renamed this, hopefully it stuck
 
         # self.past_statuses = [] ? 
@@ -332,11 +306,11 @@ class Player:
         # sort of irregularly used, but maybe more helpful than passing full Player instances around everywhere
         self.id: int = player_static.id 
         self.name: str = player_static.name
-        self.month = player_status.month # hmm
+        self.month = 0 # hmm
 
         # need to remember to make new processing objects per turn
         if player_process is None:
-            player_process = PlayerProcessing(self, self.month)
+            player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
         self.processing: PlayerProcessing = player_process
 
     def levels_in(self, field: FieldName):
