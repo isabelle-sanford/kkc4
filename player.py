@@ -171,7 +171,7 @@ class PlayerProcessing:
         self.info = player.info
         self.starting_status = player.status
         self.month = month
-        self.choices = player.choice
+        self.choices = player.choices
         # also want ending_status?
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
@@ -336,7 +336,7 @@ class Player:
 
         # need to remember to make new processing objects per turn
         if player_process is None:
-            player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
+            player_process = PlayerProcessing(self, self.month)
         self.processing: PlayerProcessing = player_process
 
     def levels_in(self, field: FieldName):
