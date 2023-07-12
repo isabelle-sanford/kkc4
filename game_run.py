@@ -2,6 +2,7 @@
 
 
 import random
+from items import Item
 from outcome import ProcessLog, Result
 from player import Player, PlayerStatic, PlayerStatus, PlayerChoices
 from actions import Action, ActionType

@@ -120,230 +120,230 @@ class Action:
 
         action_logged = False
 
-        match self.type:
+        # match self.type:
 
-            case ActionType.CreateItem:
-                # maybe make helper function for this
-                art_level = self.player.status.elevations.count(FieldName.ARTIFICERY)
-                alc_level = self.player.status.elevations.count(FieldName.ALCHEMY)
+        #     case ActionType.CreateItem:
+        #         # maybe make helper function for this
+        #         art_level = self.player.status.elevations.count(FieldName.ARTIFICERY)
+        #         alc_level = self.player.status.elevations.count(FieldName.ALCHEMY)
 
-                match self.target:
+        #         match self.target:
                     
-                    # Artificery
-                    case ItemType.WARD:
-                        # todo: check that first half is already made
-                        item = Item.Generate(ItemType.WARD, art_level)
-                        self.player.processing.insanity_bonus += 1
-                    case ItemType.BLOODLESS:
-                        item = Item.Generate(ItemType.BLOODLESS, art_level)
-                        self.player.processing.insanity_bonus += 2
-                    case ItemType.THIEVESLAMP:
-                        item = Item.Generate(ItemType.THIEVESLAMP, art_level)
-                        self.player.processing.insanity_bonus += 2
-                    case ItemType.GRAM:
-                        item = Item.Generate(ItemType.GRAM, art_level)
-                        self.player.processing.insanity_bonus += 3
+        #             # Artificery
+        #             case ItemType.WARD:
+        #                 # todo: check that first half is already made
+        #                 item = Item.Generate(ItemType.WARD, art_level)
+        #                 self.player.processing.insanity_bonus += 1
+        #             case ItemType.BLOODLESS:
+        #                 item = Item.Generate(ItemType.BLOODLESS, art_level)
+        #                 self.player.processing.insanity_bonus += 2
+        #             case ItemType.THIEVESLAMP:
+        #                 item = Item.Generate(ItemType.THIEVESLAMP, art_level)
+        #                 self.player.processing.insanity_bonus += 2
+        #             case ItemType.GRAM:
+        #                 item = Item.Generate(ItemType.GRAM, art_level)
+        #                 self.player.processing.insanity_bonus += 3
                     
-                    # Alchemy
-                    case ItemType.TENACULUM:
-                        item = Item.Generate(ItemType.TENACULUM, alc_level)
-                        self.player.processing.insanity_bonus += 1
-                    case ItemType.FIRESTOP:
-                        item = Item.Generate(ItemType.FIRESTOP, alc_level)
-                        self.player.processing.insanity_bonus += 2
-                    case ItemType.PLUMBOB:
-                        item = Item.Generate(ItemType.PLUMBOB, alc_level)
-                        self.player.processing.insanity_bonus += 3
-                    case ItemType.BONETAR:
-                        item = Item.Generate(ItemType.PLUMBOB, alc_level)
-                        self.player.processing.insanity_bonus += 3
+        #             # Alchemy
+        #             case ItemType.TENACULUM:
+        #                 item = Item.Generate(ItemType.TENACULUM, alc_level)
+        #                 self.player.processing.insanity_bonus += 1
+        #             case ItemType.FIRESTOP:
+        #                 item = Item.Generate(ItemType.FIRESTOP, alc_level)
+        #                 self.player.processing.insanity_bonus += 2
+        #             case ItemType.PLUMBOB:
+        #                 item = Item.Generate(ItemType.PLUMBOB, alc_level)
+        #                 self.player.processing.insanity_bonus += 3
+        #             case ItemType.BONETAR:
+        #                 item = Item.Generate(ItemType.PLUMBOB, alc_level)
+        #                 self.player.processing.insanity_bonus += 3
                     
-                    # TODO mommet making 
-                    case ItemType.MOMMET:
-                        # TODO 
-                        print("todo")
-                    case ItemType.MOMMET_3rd:
-                        # TODO
-                        print("todo")
-                    case _:
-                        print("idk")
+        #             # TODO mommet making 
+        #             case ItemType.MOMMET:
+        #                 # TODO 
+        #                 print("todo")
+        #             case ItemType.MOMMET_3rd:
+        #                 # TODO
+        #                 print("todo")
+        #             case _:
+        #                 print("idk")
 
-                self.player.add_item(item)
+        #         self.player.add_item(item)
             
-            # field abilities
+        #     # field abilities
 
-            # LINGUISTICS
-            case ActionType.MysteriousBulletins:
-                # append string to writeup results
-                # todo 
-                pass 
-            case ActionType.BribeTheMessenger:
-                # notify GM abt it
-                # todo 
-                pass #?
-            case ActionType.LinguisticAnalysis:
-                # notify GM to say what result is
-                pass
+        #     # LINGUISTICS
+        #     case ActionType.MysteriousBulletins:
+        #         # append string to writeup results
+        #         # todo 
+        #         pass 
+        #     case ActionType.BribeTheMessenger:
+        #         # notify GM abt it
+        #         # todo 
+        #         pass #?
+        #     case ActionType.LinguisticAnalysis:
+        #         # notify GM to say what result is
+        #         pass
 
-            # ARITHMETICS (pickpocket)
-            case ActionType.Pickpocket:
-                if self.player.status.master_of is not FieldName.ARITHMETICS:
-                    if "player_list" in kwargs:
-                        # TODO
-                        pass
-                    #random Target
-                    pass
-                else:
-                    if self.target.holds_item(ItemType.BODYGUARD):
-                        Log.Action(self, LogOutcome.Failure)
-                        action_logged = True
-                    else:
-                        money = self.target.status.money
-                        proportion = 0.1
-                        levels = player.status.elevations.count(FieldName.ARITHMETICS)
-                        if levels == 2:
-                            proportion = 0.2
-                        elif levels == 3:
-                            proportion = 0.3
-                        self.player.increase_money(money*proportion)
-                        self.target.reduce_money(money*proportion)
+        #     # ARITHMETICS (pickpocket)
+        #     case ActionType.Pickpocket:
+        #         if self.player.status.master_of is not FieldName.ARITHMETICS:
+        #             if "player_list" in kwargs:
+        #                 # TODO
+        #                 pass
+        #             #random Target
+        #             pass
+        #         else:
+        #             if self.target.holds_item(ItemType.BODYGUARD):
+        #                 Log.Action(self, LogOutcome.Failure)
+        #                 action_logged = True
+        #             else:
+        #                 money = self.target.status.money
+        #                 proportion = 0.1
+        #                 levels = player.status.elevations.count(FieldName.ARITHMETICS)
+        #                 if levels == 2:
+        #                     proportion = 0.2
+        #                 elif levels == 3:
+        #                     proportion = 0.3
+        #                 self.player.increase_money(money*proportion)
+        #                 self.target.reduce_money(money*proportion)
             
-            # RHETORIC AND LOGIC
-            # TODO law of contraposition
-            # TODO proficient in hyperbole
-            case ActionType.ArgumentumAdNauseam:
-                self.target.processing.complaints_blocked = True
-                self.target.processing.processed_complaints = []
-            case ActionType.PersuasiveArguments:
-                complaints = self.target.processing.processed_complaints
-                if len(complaints) == 1:
-                    self.target.processing.processed_complaints = [self.target_two]
-                elif len(complaints) == 2:
-                    pick = random.randint(0,1)
-                    self.target.processing.processed_complaints[pick] = self.target_two
+        #     # RHETORIC AND LOGIC
+        #     # TODO law of contraposition
+        #     # TODO proficient in hyperbole
+        #     case ActionType.ArgumentumAdNauseam:
+        #         self.target.processing.complaints_blocked = True
+        #         self.target.processing.processed_complaints = []
+        #     case ActionType.PersuasiveArguments:
+        #         complaints = self.target.processing.processed_complaints
+        #         if len(complaints) == 1:
+        #             self.target.processing.processed_complaints = [self.target_two]
+        #         elif len(complaints) == 2:
+        #             pick = random.randint(0,1)
+        #             self.target.processing.processed_complaints[pick] = self.target_two
             
-            # ARCHIVES
-            # TODO FAE LORE
-            case ActionType.OmenRecognition:
-                print("omen recog")
-                # notify GM
-            case ActionType.SchoolRecords:
-                if self.player.status.is_enrolled:
-                    elevs = self.target.status.elevations
-                    self.message = elevs # ig, idk
-                    # log 
-            case ActionType.BannedBooks:
-                # TODO
-                pass
+        #     # ARCHIVES
+        #     # TODO FAE LORE
+        #     case ActionType.OmenRecognition:
+        #         print("omen recog")
+        #         # notify GM
+        #     case ActionType.SchoolRecords:
+        #         if self.player.status.is_enrolled:
+        #             elevs = self.target.status.elevations
+        #             self.message = elevs # ig, idk
+        #             # log 
+        #     case ActionType.BannedBooks:
+        #         # TODO
+        #         pass
 
-            # SYMPATHY
-            # mommet-making handled above
-            # TODO malfeasance protection (sigh)
-            # don't forget insanity bonuses
+        #     # SYMPATHY
+        #     # mommet-making handled above
+        #     # TODO malfeasance protection (sigh)
+        #     # don't forget insanity bonuses
 
-            # PHYSICKING
-            case ActionType.MedicaEmergency:
-                self.player.status.last_medica_emergency = self.player.status.month # i guess? 
+        #     # PHYSICKING
+        #     case ActionType.MedicaEmergency:
+        #         self.player.status.last_medica_emergency = self.player.status.month # i guess? 
 
-            # TODO medica detainment
-            case ActionType.PsychologicalCounselling:
-                phys_levels = self.player.status.elevations.count(FieldName.PHYSICKING)
-                if self.player.master_of == FieldName.PHYSICKING:
-                    phys_levels = 4
+        #     # TODO medica detainment
+        #     case ActionType.PsychologicalCounselling:
+        #         phys_levels = self.player.status.elevations.count(FieldName.PHYSICKING)
+        #         if self.player.master_of == FieldName.PHYSICKING:
+        #             phys_levels = 4
 
-                self.target.processing.insanity_bonus -= phys_levels
-            # TODO cheating death
+        #         self.target.processing.insanity_bonus -= phys_levels
+        #     # TODO cheating death
 
-            # NAMING
-            case ActionType.UseName:
-                # TODO 
-                # log 
-                # remember insanity bonuses
-                pass
+        #     # NAMING
+        #     case ActionType.UseName:
+        #         # TODO 
+        #         # log 
+        #         # remember insanity bonuses
+        #         pass
 
 
-            # USE ITEMS
-            # remember to remove / decrease a use from the item
+        #     # USE ITEMS
+        #     # remember to remove / decrease a use from the item
 
-            # Alchemy
-            case ActionType.UseTenaculumAction:
-                # AA
-                pass
-            case ActionType.UseTenaculumItem:
-                # AA
-                pass
+        #     # Alchemy
+        #     case ActionType.UseTenaculumAction:
+        #         # AA
+        #         pass
+        #     case ActionType.UseTenaculumItem:
+        #         # AA
+        #         pass
 
-            case ActionType.UsePlumbob:
-                alc_levels = self.player.status.elevations.count(FieldName.ALCHEMY)
-                print(f"{alc_levels} level plum bob used by {self.player} on {self.target}")
-                pass
-            case ActionType.UseBonetar:
-                # OFFENSIVE
-                # need to get list of players at target location
-                alc_levels = self.player.levels_in(FieldName.ALCHEMY)
-                roll = random.randint(1,100) # maybe just make a func for this tbh
-                goes_volatile = False
+        #     case ActionType.UsePlumbob:
+        #         alc_levels = self.player.status.elevations.count(FieldName.ALCHEMY)
+        #         print(f"{alc_levels} level plum bob used by {self.player} on {self.target}")
+        #         pass
+        #     case ActionType.UseBonetar:
+        #         # OFFENSIVE
+        #         # need to get list of players at target location
+        #         alc_levels = self.player.levels_in(FieldName.ALCHEMY)
+        #         roll = random.randint(1,100) # maybe just make a func for this tbh
+        #         goes_volatile = False
 
-                if alc_levels < 2 and roll <= 50:
-                    goes_volatile = True
-                elif alc_levels == 2 and roll <= 25:
-                    goes_volatile = True
-                elif alc_levels == 3 and roll <= 10:
-                    goes_volatile = True 
-                elif alc_levels == 4:
-                    if self.target_two == True: # choose to go volatile
-                        goes_volatile = True
-                else:
-                    # error check
-                    pass
+        #         if alc_levels < 2 and roll <= 50:
+        #             goes_volatile = True
+        #         elif alc_levels == 2 and roll <= 25:
+        #             goes_volatile = True
+        #         elif alc_levels == 3 and roll <= 10:
+        #             goes_volatile = True 
+        #         elif alc_levels == 4:
+        #             if self.target_two == True: # choose to go volatile
+        #                 goes_volatile = True
+        #         else:
+        #             # error check
+        #             pass
                 
-                if not goes_volatile:
-                    print("destroy ", self.target)
+        #         if not goes_volatile:
+        #             print("destroy ", self.target)
                 
-                else:
-                    # choose players to kill
-                    if alc_levels == 3:
-                        self.status.last_in_medica = self.status.month + 1
-                    elif alc_levels == 4:
-                        roll = random.randint(1,100)
-                        if roll <= 10:
-                            self.status.last_in_medica = self.status.month + 1
-                    else:
-                        # you have as much chance of dying as everyone else
-                        # todo
-                        pass
+        #         else:
+        #             # choose players to kill
+        #             if alc_levels == 3:
+        #                 self.status.last_in_medica = self.status.month + 1
+        #             elif alc_levels == 4:
+        #                 roll = random.randint(1,100)
+        #                 if roll <= 10:
+        #                     self.status.last_in_medica = self.status.month + 1
+        #             else:
+        #                 # you have as much chance of dying as everyone else
+        #                 # todo
+        #                 pass
 
-            case ActionType.UseWard:
-                # need to get list of actions on the person
-                pass
-            case ActionType.UseThievesLamp:
-                if self.target.holds_item(ItemType.BODYGUARD):
-                    # action fails
-                    pass 
-                else:
-                    money = self.target.status.money * .3
-                    item_count = len(self.target.status.inventory)
+        #     case ActionType.UseWard:
+        #         # need to get list of actions on the person
+        #         pass
+        #     case ActionType.UseThievesLamp:
+        #         if self.target.holds_item(ItemType.BODYGUARD):
+        #             # action fails
+        #             pass 
+        #         else:
+        #             money = self.target.status.money * .3
+        #             item_count = len(self.target.status.inventory)
 
-                    # this is a little iffy
-                    for i in range(item_count // 2):
-                        stolen = random.choice(self.target.status.inventory)
-                        self.player.processing.items_received.append(stolen)
-                        self.target.status.inventory.remove(stolen)
-
-
+        #             # this is a little iffy
+        #             for i in range(item_count // 2):
+        #                 stolen = random.choice(self.target.status.inventory)
+        #                 self.player.processing.items_received.append(stolen)
+        #                 self.target.status.inventory.remove(stolen)
 
 
-            case ActionType.UseMommet:
-                # remember insanity bonuses
-                pass
+
+
+        #     case ActionType.UseMommet:
+        #         # remember insanity bonuses
+        #         pass
             
-            case ActionType.UseNahlrout:
-                # AA
-                pass
+        #     case ActionType.UseNahlrout:
+        #         # AA
+        #         pass
             
-            case ActionType.Sabotage:
-                # todo
-                pass
+        #     case ActionType.Sabotage:
+        #         # todo
+        #         pass
 
 
 

@@ -1,5 +1,5 @@
 from enum import Enum, IntEnum
-from player import Player
+#from player import Player
 
 
 class Rank(Enum):
@@ -10,16 +10,16 @@ class Rank(Enum):
     MASTER = 4
 
 class FieldName(IntEnum):
-    LINGUISTICS = 1
-    ARITHMETICS = 2
-    RHETORICLOGIC = 3
-    ARCHIVES = 4
-    SYMPATHY = 5
-    PHYSICKING = 6
-    ALCHEMY = 7
-    ARTIFICERY = 8
-    NAMING = 9
-    #GENERAL = 10  # ?
+    LINGUISTICS = 0
+    ARITHMETICS = 1
+    RHETORICLOGIC = 2
+    ARCHIVES = 3
+    SYMPATHY = 4
+    PHYSICKING = 5
+    ALCHEMY = 6
+    ARTIFICERY = 7
+    NAMING = 8
+    GENERAL = 9  # ?
 
 
 class Ability:
@@ -74,12 +74,12 @@ class FieldStatus:
         self.name = field # hmm
         self.info = info
         self.EP = {} # dict? or just full on list? (thinking dict atm)
-        self.master: Player = None
+        self.master: int = None
         self.month = 1
-        self.elevating: Player = None 
-        self.elevatedOnce: list[Player] = [] # since it's not actually rank? 
-        self.elevatedTwice: list[Player] = []
-        self.elevatedThrice: list[Player] = []
+        self.elevating: int = None 
+        self.elevatedOnce: list[int] = [] # since it's not actually rank? 
+        self.elevatedTwice: list[int] = []
+        self.elevatedThrice: list[int] = []
         # TODO: list of potential masters
     
     def get_EP_list(self):
