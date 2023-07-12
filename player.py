@@ -34,7 +34,7 @@ class EP:
                  archives = 0, sympathy = 0, physicking = 0, alchemy = 0,
                    artificery = 0, naming = 0) -> None:
         
-        # todo: figure out where this is used and remove, probably?
+       
         self.values = [linguistics, arithemtics, rhetoric, archives, sympathy,
                         physicking, alchemy, artificery, naming]
         # self.linguistics = linguistics
@@ -322,13 +322,13 @@ class Player:
 
     def elevate_in(self, field: FieldName):
         self.status.elevations.append(field)
-        num_EP = self.status.EP[field]
+        num_EP = self.status.EP.values[field]
         if num_EP < 5:
-            self.status.EP[field] = 0
+            self.status.EP.values[field] = 0
         else:
-            self.status.EP[field] -= 5
+            self.status.EP.values[field] -= 5
         
-        self.status.rank += 1 # todo test 
+        #self.status.rank = self.status.rank.next() # todo test 
         self.status.available_EP -= 1
 
         # anything else here? 
