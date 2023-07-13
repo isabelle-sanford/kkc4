@@ -294,7 +294,7 @@ class Player:
 
     # start of game constructor 
     def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
-        self.status: PlayerStatus = player_status
+        self.initial_status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
 
         if player_choices is None:
@@ -311,7 +311,7 @@ class Player:
         # need to remember to make new processing objects per turn
         if player_process is None:
             player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
-        self.processing: PlayerProcessing = player_process
+        self.status: PlayerProcessing = player_process
 
     def levels_in(self, field: FieldName):
         # error check?

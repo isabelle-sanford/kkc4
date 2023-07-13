@@ -1,5 +1,9 @@
-from enum import Enum
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from player import Player
 import random
+from enum import Enum
 from items import Item, ItemType
 from field import Rank, FieldName
 
@@ -73,12 +77,12 @@ class TargetType(Enum):
 
 class Action:
     def __init__(self, player, type: ActionType, target,
-                  target_two = None): # action_type ??
+                  target_two = None, action_type: ActionType = None): # action_type ??
         self.player = player # Player taking the action
         self.type: ActionType = type 
         # todo: make ActionCategory (Action-Affecting, Offensive, Other)
-        #self.target_action_type: str = action_type # ? what's this for?
-        self.target = target
+        self.target_action_type: ActionType = action_type # ? what's this for?
+        self.target: Player = target
         # maybe something indicating what kind of object the target will be?
         self.target_two = target_two
 
@@ -353,206 +357,253 @@ class Action:
 
 # Everything after this point is untouched from haelbarde branch
 # could be out of date, not sure
-    def perform_old(self):
-        if self.blocked:
-            Log.Action(self, LogOutcome.Blocked)
-            return
-        player_level = int(self.player.status.rank)
-        action_logged = False
+    # def perform_old(self):
+    #     if self.blocked:
+    #         Log.Action(self, LogOutcome.Blocked)
+    #         return
+    #     player_level = int(self.player.status.rank)
+    #     action_logged = False
 
 
 
-        # Item Creation Actions
-        # Artificery
-        if self.type == ActionType.CreateWard:
-            item = Item.Generate(ItemType.WARD,player_level)
-            self.player.add_item(item)
-        elif self.type == ActionType.CreateBloodless:
-            item = Item.Generate(ItemType.BLOODLESS,player_level)
-            self.player.add_item(item)
-        elif self.type == ActionType.CreateThievesLamp:
-            item = Item.Generate(ItemType.THIEVESLAMP,player_level)
-            self.player.add_item(item)
-        elif self.type == ActionType.CreateGram:
-            item = Item.Generate(ItemType.GRAM,player_level)
-            self.player.add_item(item)
-        # Alchemy
-        elif self.type == ActionType.CreateTenaculum:
-            item = Item.Generate(ItemType.TENACULUM,player_level)
-            self.player.add_item(item)
-        elif self.type == ActionType.CreateFirestop:
-            item = Item.Generate(ItemType.FIRESTOP,player_level)
-            self.player.add_item(item)
-        elif self.type == ActionType.CreatePlumbob:
-            item = Item.Generate(ItemType.PLUMBOB,player_level)
-            self.player.add_item(item)
-        elif self.type == ActionType.CreateBonetar:
-            item = Item.Generate(ItemType.BONETAR,player_level)
-            self.player.add_item(item)
+    #     # Item Creation Actions
+    #     # Artificery
+    #     if self.type == ActionType.CreateWard:
+    #         item = Item.Generate(ItemType.WARD,player_level)
+    #         self.player.add_item(item)
+    #     elif self.type == ActionType.CreateBloodless:
+    #         item = Item.Generate(ItemType.BLOODLESS,player_level)
+    #         self.player.add_item(item)
+    #     elif self.type == ActionType.CreateThievesLamp:
+    #         item = Item.Generate(ItemType.THIEVESLAMP,player_level)
+    #         self.player.add_item(item)
+    #     elif self.type == ActionType.CreateGram:
+    #         item = Item.Generate(ItemType.GRAM,player_level)
+    #         self.player.add_item(item)
+    #     # Alchemy
+    #     elif self.type == ActionType.CreateTenaculum:
+    #         item = Item.Generate(ItemType.TENACULUM,player_level)
+    #         self.player.add_item(item)
+    #     elif self.type == ActionType.CreateFirestop:
+    #         item = Item.Generate(ItemType.FIRESTOP,player_level)
+    #         self.player.add_item(item)
+    #     elif self.type == ActionType.CreatePlumbob:
+    #         item = Item.Generate(ItemType.PLUMBOB,player_level)
+    #         self.player.add_item(item)
+    #     elif self.type == ActionType.CreateBonetar:
+    #         item = Item.Generate(ItemType.BONETAR,player_level)
+    #         self.player.add_item(item)
 
-        # Mommet making may need aditional types, to distinguish level 1, 2, 3, 4
-        # Needs access to player list for level 1.
-        elif self.type == ActionType.MommetMaking: 
-            item = Item.Generate(ItemType.MOMMET,player_level, self.target)
-            self.player.add_item(item)
+    #     # Mommet making may need aditional types, to distinguish level 1, 2, 3, 4
+    #     # Needs access to player list for level 1.
+    #     elif self.type == ActionType.MommetMaking: 
+    #         item = Item.Generate(ItemType.MOMMET,player_level, self.target)
+    #         self.player.add_item(item)
 
-        # Linguistics
-        elif self.type == ActionType.MysteriousBulletins:
-            # Appened string to WriteUp details.
-            pass
-        elif self.type == ActionType.BribeTheMessenger:
-            Log.NotifyGM(f"{self.player.info.name} spies on {self.target}'s PMs.")
-            action_logged = True
-        elif self.type == ActionType.LinguisticAnalysis:
-            Log.NotifyGM() 
+    #     # Linguistics
+    #     elif self.type == ActionType.MysteriousBulletins:
+    #         # Appened string to WriteUp details.
+    #         pass
+    #     elif self.type == ActionType.BribeTheMessenger:
+    #         Log.NotifyGM(f"{self.player.info.name} spies on {self.target}'s PMs.")
+    #         action_logged = True
+    #     elif self.type == ActionType.LinguisticAnalysis:
+    #         Log.NotifyGM() 
 
-        # Arithmetics
-        elif self.type == ActionType.Pickpocket:
-            if self.player.status.master_of is not FieldName.ARITHMETICS:
-                #random Target
-                pass
-            if self.target.holds_item(ItemType.BODYGUARD):
-                Log.Action(self, LogOutcome.Failure)
-                action_logged = True
-            else:
-                money = self.target.status.money
-                proportion = 0.1
-                if player_level == Rank.RELAR:
-                    proportion = 0.2
-                elif player_level == Rank.ELTHE:
-                    proportion = 0.3
-                self.player.increase_money(money*proportion)
-                self.target.reduce_money(money*proportion)
+    #     # Arithmetics
+    #     elif self.type == ActionType.Pickpocket:
+    #         if self.player.status.master_of is not FieldName.ARITHMETICS:
+    #             #random Target
+    #             pass
+    #         if self.target.holds_item(ItemType.BODYGUARD):
+    #             Log.Action(self, LogOutcome.Failure)
+    #             action_logged = True
+    #         else:
+    #             money = self.target.status.money
+    #             proportion = 0.1
+    #             if player_level == Rank.RELAR:
+    #                 proportion = 0.2
+    #             elif player_level == Rank.ELTHE:
+    #                 proportion = 0.3
+    #             self.player.increase_money(money*proportion)
+    #             self.target.reduce_money(money*proportion)
         
-        # Rhetoric & Logic
-        elif self.type == ActionType.LawOfContraposition:
-            pass
-        elif self.type == ActionType.ProficientInHyperbole:
-            if self.target is not None:
-                self.player.status.complaints.append(self.target)
-            if self.target_two is not None:
-                self.player.status.complaints.append(self.target_two)
-        elif self.type == ActionType.ArgumentumAdNauseam:
-            for complaint in self.target.status.complaints:
-                if complaint.target == self.target_two:
-                    complaint.blocked = True
-                    return
-        elif self.type == ActionType.PersuasiveArguments:
-            # Do I need 3 targets here?
-            pass
+    #     # Rhetoric & Logic
+    #     elif self.type == ActionType.LawOfContraposition:
+    #         pass
+    #     elif self.type == ActionType.ProficientInHyperbole:
+    #         if self.target is not None:
+    #             self.player.status.complaints.append(self.target)
+    #         if self.target_two is not None:
+    #             self.player.status.complaints.append(self.target_two)
+    #     elif self.type == ActionType.ArgumentumAdNauseam:
+    #         for complaint in self.target.status.complaints:
+    #             if complaint.target == self.target_two:
+    #                 complaint.blocked = True
+    #                 return
+    #     elif self.type == ActionType.PersuasiveArguments:
+    #         # Do I need 3 targets here?
+    #         pass
 
-        # Archives
-        elif self.type == ActionType.FaeLore:
-            if self.target.info.is_evil:
-                self.target.status.blocked = True
-        elif self.type == ActionType.OmenRecognition:
-            Log.NotifyGM()
-        elif self.type == ActionType.SchoolRecords:
-            out = ""
-            if self.player.status.is_enrolled:
-                count = len(self.target.status.elevations)
-                if count >= 1:
-                    out += "."
-                # Log this
-                # Output to Player PM
-        elif self.type == ActionType.BannedBooks:
-            pass
+    #     # Archives
+    #     elif self.type == ActionType.FaeLore:
+    #         if self.target.info.is_evil:
+    #             self.target.status.blocked = True
+    #     elif self.type == ActionType.OmenRecognition:
+    #         Log.NotifyGM()
+    #     elif self.type == ActionType.SchoolRecords:
+    #         out = ""
+    #         if self.player.status.is_enrolled:
+    #             count = len(self.target.status.elevations)
+    #             if count >= 1:
+    #                 out += "."
+    #             # Log this
+    #             # Output to Player PM
+    #     elif self.type == ActionType.BannedBooks:
+    #         pass
         
-        # Sympathy
-        elif self.type == ActionType.MommetMaking:
-            pass
-        elif self.type == ActionType.MalfeasanceProtection:
-            pass
+    #     # Sympathy
+    #     elif self.type == ActionType.MommetMaking:
+    #         pass
+    #     elif self.type == ActionType.MalfeasanceProtection:
+    #         pass
 
-        # Physicking
-        elif self.type == ActionType.MedicaEmergency:
-            pass
-        elif self.type == ActionType.MedicaDetainment:
-            pass
-        elif self.type == ActionType.PsychologicalCounselling:
-            self.target.status.IP -= int(player_level)
-            Log.Action()
-        elif self.type == ActionType.CheatingDeath:
-            pass
+    #     # Physicking
+    #     elif self.type == ActionType.MedicaEmergency:
+    #         pass
+    #     elif self.type == ActionType.MedicaDetainment:
+    #         pass
+    #     elif self.type == ActionType.PsychologicalCounselling:
+    #         self.target.status.IP -= int(player_level)
+    #         Log.Action()
+    #     elif self.type == ActionType.CheatingDeath:
+    #         pass
 
-        # Naming
-        elif self.type == ActionType.UseName:
-            # Tell the GMs what names to use.
-            Log.NotifyGM()
+    #     # Naming
+    #     elif self.type == ActionType.UseName:
+    #         # Tell the GMs what names to use.
+    #         Log.NotifyGM()
 
         
-        # Item Usage
-        elif self.type == ActionType.UseTenaculumAction:
-            pass
-        elif self.type == ActionType.UseTenaculumItem:
-            pass
-        elif self.type == ActionType.UseFirestop:
-            pass
-        elif self.type == ActionType.UsePlumbob:
-            pass
-        elif self.type == ActionType.UseBonetar:
-            pass
+    #     # Item Usage
+    #     elif self.type == ActionType.UseTenaculumAction:
+    #         pass
+    #     elif self.type == ActionType.UseTenaculumItem:
+    #         pass
+    #     elif self.type == ActionType.UseFirestop:
+    #         pass
+    #     elif self.type == ActionType.UsePlumbob:
+    #         pass
+    #     elif self.type == ActionType.UseBonetar:
+    #         pass
 
-        elif self.type == ActionType.UseWard:
-            pass
-        elif self.type == ActionType.UseThievesLamp:
-            pass
+    #     elif self.type == ActionType.UseWard:
+    #         pass
+    #     elif self.type == ActionType.UseThievesLamp:
+    #         pass
 
-        elif self.type == ActionType.UseMommet:
-            pass
+    #     elif self.type == ActionType.UseMommet:
+    #         pass
         
-        elif self.type == ActionType.UseNahlrout:
-            pass
+    #     elif self.type == ActionType.UseNahlrout:
+    #         pass
 
-        # Other Actions
-        # UseAssassin
-        # UseCourier
-        # GainEP
+    #     # Other Actions
+    #     # UseAssassin
+    #     # UseCourier
+    #     # GainEP
 
-        # Complaint
-        elif self.type == ActionType.Complaint:
-            if self.target is not None:
-                self.player.status.complaints.append(self.target)
-            if self.target_two is not None:
-                self.player.status.complaints.append(self.target_two)
+    #     # Complaint
+    #     elif self.type == ActionType.Complaint:
+    #         if self.target is not None:
+    #             self.player.status.complaints.append(self.target)
+    #         if self.target_two is not None:
+    #             self.player.status.complaints.append(self.target_two)
 
-        if not action_logged:
-            Log.Action(self)
+    #     if not action_logged:
+    #         Log.Action(self)
         
 
 
 
     
     def __str__(self) -> str:
-        return f"{self.player.info.name}: {self.name} "
+        return f"{self.player.info.name}: {self.type} "
     
     def clear_blocked_by(self):
         self.blocked_by = []
         self.blocked_by_action: list[Action] = []
         # clear the blocked_by flag on players?
 
+    # Called by block actions, determines if there is a valid target action, 
+    # and notifies the action/player that there is an intention to blocked.
     def set_blocked_by(self):
-        if not self.blocked:    
-            if self.type.find("Block") < 0:
-                # print("Not a block action.")
-                return
+        # Duplicated in notify_is_blocked. Probably should be handled with categories
+        
+        block_one = [ActionType.UseTenaculumAction, ActionType.UseNahlrout]
+        block_all = [ActionType.FaeLore, ActionType.MedicaDetainment, ActionType.UseMommet]
+        block_actions = block_one + block_all
+        if (not self.blocked) and (self.type in block_actions):
             
             # Dunno if we just set the player flag, set the player and
             #  all action flags, or just the action flags.
-            if self.type == "Block All":
+            if self.type in block_all:
+                # print("In Block All")
+                # print(f"Target Status Blocked By{self.target.status.blocked_by}")
                 self.target.status.blocked_by.append(self.player)
-                # print(f"{self.player} blocks all {self.target}'s actions")
-                for a in self.target.choice.actions:
+                # print(f"Target Status Blocked By{self.target.status.blocked_by}")
+                # print(f"Num actions: {len(self.target.choices.actions)}")
+                for a in self.target.choices.actions:
+                    # print(f"Action Blocked By: {a.blocked_by}")
+                    # print(f"Action Blocked By Action: {a.blocked_by_action}")
                     a.blocked_by.append(self.player)
-                    a.blocked_by_action.append(a)
-                    # print(f"-- {a.name} blocked.")
+                    a.blocked_by_action.append(self)
+                    # print(f"Action Blocked By: {a.blocked_by}")
+                    # print(f"Action Blocked By Action: {a.blocked_by_action}")
 
-            elif self.type == "Block One":
-                for a in self.target.choice.actions:
-                    if a.type.find(self.target_action_type) >= 0:
-                        a.blocked_by.append(self.player)
-                        a.blocked_by_action.append(a)
-                        # print(f"{self.player} blocked {self.target}'s {a.type} action.")
-                        return
-                # print("No relevant actions found.")
+            elif self.type in block_one:
+                # print("In Block One")
+                # Random action chosen
+                action_list = self.target.choices.actions
+
+                # Unless there is a single valid target specified.
+                if len(action_list) > 0:
+                    target_action = random.choice(action_list)
+                    # If target was specified
+                    if self.target_action_type is not None:
+                        targetted_actions = [a for a in action_list if a.type == self.target_action_type]
+                        # If there was only one candidate 
+                        if len(targetted_actions) > 0:
+                            target_action = random.choice(targetted_actions)
+
+                    # Notifies the action of the intent to block
+                    target_action.blocked_by.append(self.player) # Possibly unnecessary?
+                    target_action.blocked_by_action.append(self)
+  
+    
+    # Actions are set up to be similar to doubly linked lists - 
+    # they know what actions they are blocking and which actions are blocking them.
+    # To determine a circular list, start with an action and work backwards through
+    # all blocks targetting it, creating a running list of actions in a sequence.
+    # If you ever arrive back at an action you've already considered, 
+    # you've found a (sub)loop.
+    def identify_block_cycle(self, sequence: list[Action]):
+        sequence.append(self)
+
+        if len(self.blocked_by) > 0:
+            for a in self.blocked_by_action:
+                # Can remove if blocked actions already removed 
+                # from action.blocked_by_action lists
+                if a.blocked:
+                    continue
+                
+                if (a in sequence):
+                    sequence_cycle = sequence[sequence.index(a):]
+                    for cycle_action in sequence_cycle:
+                        cycle_action.in_block_cycle = True
+                    print(f"Cycle found: [{'->'.join([actions_in_cycle.target.info.name for actions_in_cycle in sequence_cycle])}]")
+                else:
+                    a.identify_block_cycle(sequence.copy())
+        else:
+            print(f"Start of sequence found: [{'->'.join([action.player.info.name for action in sequence])}]")
 
