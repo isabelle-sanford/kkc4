@@ -1,8 +1,10 @@
 import random
-from items import Item
+from field import FieldStatus
+from horns import Horns
+from items import Item, ItemType
 from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices
-from actions import Action, ActionType
+from actions import Action, ActionType, ActionCategory
 from statics import Background, Lodging
 
 PLAYERS: list[Player] = [] 
@@ -65,7 +67,7 @@ def update_choices(new_choices):
 
 class Turn:
 
-    def __init__(self, playerlist: list[Player], gm_input, month: int):
+    def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]"):
         self.players = playerlist
         self.gm_input = gm_input
         self.month = month
@@ -74,9 +76,12 @@ class Turn:
         self.results = Result(month)
 
         self.actions: list[Action] = []
+        self.offensive_actions: list[Action] = []
 
-        sane_players: list[int] = [] # just ids 
-        living_players: list[int] = [] # just ids 
+        self.fields = fields
+
+        self.sane_players: list[int] = [] # just ids 
+        self.living_players: list[int] = [] # just ids 
     
     def start_term(self):
         # GIVE STIPENDS
@@ -118,34 +123,293 @@ class Turn:
                 # LOG
                 pass
     
-    def process_block_stuff(self):
-        # TODO
-        return # ?
+
+    def apply_valid_blocks(self, block_list: "list[Action]", count = 0, process_block_cycles = False):
+        state_changed = False
+
+        # Notify all actions of intent to be blocked.
+        if not process_block_cycles:
+            for a in block_list:
+                a.perform(notify_only = True)
+        
+        to_remove: list[Action] = []
+        for action in block_list:
+            # Ignoring players who have been blocked, if the player isn't being blocked, apply their blocks.
+            if not(action.blocked) or (action.in_block_cycle):
+                # Only apply block if not being blocked by something.
+                if (len(action.blocked_by) == 0 and not process_block_cycles) or (action.in_block_cycle):
+                    action_result = {"success": False, "state_changed": False, "process_block_cycles": process_block_cycles}
+                    action.perform(result=action_result)
+                    to_remove.append(action)
+                    if action_result["state_changed"]:
+                        state_changed = True
+        
+        for action in block_list:
+            if action.blocked and action not in to_remove:
+                action.clear_block_notification()
+                to_remove.append(action)
+
+        # Dunno if this goes before or after the block notification
+        for action in to_remove:
+            if (action.blocked):
+                action.perform()
+            block_list.remove(action)
+
+        for a in block_list:
+            if a.blocked == False:
+                a.clear_block_notification()
+        
+        if state_changed:
+            self.apply_valid_blocks(block_list, count + 1)
+
+
+    def process_blocks(self, action_list: "list[Action]"):
+        # Apply all mommets that definitely are not in loops
+        self.apply_valid_blocks(action_list)
+
+        # Identify all loops
+        for a in action_list:
+            a.perform(notify_only = True)
+        for a in action_list:
+            a.identify_block_cycle([])
+
+        # Block all loops
+        self.apply_valid_blocks(action_list, process_block_cycles=True)
+
+        # Apply any remaining blocks
+        self.apply_valid_blocks(action_list)
+
+        print("\n")
+        for p in PLAYERS:
+            for a in p.choices.actions:
+                print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
     
     def process_standard_actions(self):
-        #TODO 
+
+        for a in self.actions:
+            if a.category == ActionCategory.OTHER or a.category == ActionCategory.CREATEITEM:
+                # todo checks probably
+                a.perform()
+            elif a.category == ActionCategory.OFFENSIVE:
+                self.offensive_actions.append(a)
         return
+
+
+    def do_elevations(self):
+
+        to_elevate: list[Player] = []
+
+        for f in self.fields:
+            if f.master is not None: # PC master
+                m = f.master
+
+                if len(m.choices.to_elevate) > 0:
+                    if m.processing.can_elevate:
+                        to_elevate.append(m.choices.to_elevate[0])
+                        f.elevating = m.choices.to_elevate[0]
+                # else add tuition inflation 
+            
+            else: # NPC
+                elevation_candidates = f.get_EP_list()
+                # todo: during expulsion remove EP from fields
+
+                if len(elevation_candidates) > 0:
+                    npc_choice = random.choice(elevation_candidates)
+                    to_elevate.append(npc_choice)
+                    f.elevating = npc_choice
+        
+
+        # todo: recurse until duplicates are gone
+        for f in self.fields:
+            if f.elevating is not None:
+                f.elevate_player(f.elevating)
+                f.elevating.elevate_in(f.name)
+
+                print(f"Player {f.elevating.name} elevated in {f.name}")
+
+        # todo LOG
+
+    # check this over, hmm
+    def offset_IP(self):
+        for pid in self.sane_players:
+            p = self.players[pid]
+            if p.choices.offset_IP > 0:
+                offset = p.choices.offset_IP
+                if p.insanity_bonus > 0:
+                    if p.insanity_bonus < offset:
+                        num_EP = offset - p.insanity_bonus
+                    else:
+                        num_EP = offset 
+                
+                else: # IB is already 0
+                    return
+
+                ep_list = p.status.EP.get_list()
+                filing = p.choices.filing_EP
+
+                without_current_filings = []
+                for e in ep_list:
+                    if e not in filing:
+                        without_current_filings.append(e)
+                
+                if len(without_current_filings) <= num_EP:
+
+                    # remove all EP in other fields
+                    for e in without_current_filings:
+                        p.status.EP.values[e] -= 1 # SHOULD be fine not to go below 0, buc still check 
+                        num_EP -= 1
+                        ep_list.remove(e) 
+                    
+                    for j in range(num_EP):
+                        rem = random.choice(ep_list) # remember to check if ep_list is empty
+                        ep_list.remove(rem)
+                        p.status.EP.values[rem] -= 1
+                
+                else: # there's enough EP to remove without looking at current fields 
+
+                    for k in range(num_EP):
+                        rem = random.choice(without_current_filings) 
+                        ep_list.remove(rem)
+                        without_current_filings.remove(rem) 
+                        p.status.EP.values[rem] -= 1
+                        
+                # TODO LOG
+
+    # not sure this needs to be a sep func
+    def file_EP(self):
+        # todo log
+        for p in self.sane_players:
+            if not p.status.is_expelled and p.processing.can_file_EP:
+                # check that they aren't filing more than allowed
+                for e in p.choices.filing_EP:
+                    p.assign_EP(e)
+
 
     def process_mechanics(self):
         #TODO
-        # horns
+
+        # horns - todo LOG
+        horns = Horns()
+        horns.run_horns(self.players, self.fields)
+        # todo NAHLROUT
 
         # elevations
+        # TODO master-level elevations
+        self.do_elevations()
 
         # offset IP
+        self.offset_IP()
 
         # file EP
+        self.file_EP()
 
-        # # breakout roll
+        # breakout roll
+        for p in PLAYERS:
+            if not p.initial_status.is_sane and p.initial_status.is_alive:
+                roll = random.randint(1,20)
+                if len(p.known_names) >= 5:
+                    roll = random.randint(1,10)
+                
+                if roll == 1:
+                    print(f"{p.name} broke out !!!")
+                    p.status.is_sane = True 
+                    # todo break_out() func 
+
         return
 
     def process_offensive_actions(self):
         #TODO
 
+        sabotagee = None
+        being_attacked = [] # maybe include reason? 
+        could_go_insane = []
+
+        for p in self.sane_players:
+            if self.players[p].status.lodging == Lodging.Streets:
+                roll = random.randint(1,4)
+
+                if roll == 1:
+                    being_attacked.append(self.players[p])
+            
+            if self.players[p].processing.insanity_bonus > 0:
+                could_go_insane.append(self.players[p])
+
+        for a in self.offensive_actions:
+            # check if blocked? 
+            if a.target.status.lodging == Lodging.HorseAndFour:
+                roll = random.randint(1,2)
+                if roll == 1:
+                    a.successful = False
+            
+            if a.type == ActionType.Sabotage and a.successful:
+                if a.target.processing.can_be_targeted:
+                    sabotagee = a.target
+
+                    if sabotagee.holds_item(ItemType.BLOODLESS):
+                        b = sabotagee.get_items(ItemType.BLOODLESS)
+
+                        if len(b) > 0: # should always be true
+                            b[0].use() # todo, probs
+                        
+                            a.successful = True # bc not blocked
+                            sabotagee = None
+                    
+            
+            if a.type == ActionType.UseAssassin and a.successful:
+                if a.target.processing.can_be_targeted:
+                    being_attacked.append(a.target)
+
+            
+            # todo bonetar 
+
+            # todo mommet
+
+        still_attacked = []
+        protected = []
+        for attacked in being_attacked:
+            if attacked.holds_item(ItemType.GRAM):
+                g = attacked.get_items(ItemType.GRAM)
+                if len(g) > 0:
+                    g[0].use()
+                    protected.append(attacked)
+            
+            elif attacked.holds_item(ItemType.BODYGUARD):
+                bs = attacked.get_items(ItemType.BODYGUARD)
+                if len(bs) > 0:
+                    bs[0].use() # KILL
+                    protected.append(attacked)
+            
+            else:
+                still_attacked.append(attacked)
+        
+        if sabotagee is not None:
+            if sabotagee.holds_item(ItemType.GRAM):
+                g = attacked.get_items(ItemType.GRAM)
+                if len(g) > 0:
+                    g[0].use()
+                    protected.append(sabotagee)
+            elif sabotagee.holds_item(ItemType.BODYGUARD):
+                bs = attacked.get_items(ItemType.BODYGUARD)
+                if len(bs) > 0:
+                    bs[0].use() # SABOTAGE
+                    protected.append(sabotagee)
+            else:
+                sabotagee.go_insane()
+        
+        for p in could_go_insane:
+            roll = random.randint(1,10)
+
+            if roll + p.processing.insanity_bonus >= 12:
+                p.go_insane()
+
+        for a in still_attacked:
+            a.die()
+
+        # TODO LOGGING / RESULTS
         return
 
-    def process_turn(self):
+    def PROCESS_TURN(self):
         # update field statuses to new month (?)
         # and player objects
 
@@ -196,7 +460,7 @@ class Turn:
                 action_blocked.block_reasoning += "Ankers"
             # TODO log
         
-        self.process_block_stuff()
+        self.process_blocks(self.actions)
 
         self.process_standard_actions()
 

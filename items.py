@@ -68,3 +68,11 @@ class Item:
             return Item("Nahlrout", type, 1, True, True, None)
         elif type == ItemType.BODYGUARD:
             return Item("Bodyguard", type, 2,True,False,None)
+    
+    def use(self):
+        # TODO 
+
+        if self.uses > 1:
+            self.uses -= 1
+
+        return

@@ -1,6 +1,9 @@
-from enum import Enum, IntEnum
-#from player import Player
 
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from player import Player
+from enum import Enum, IntEnum
 
 class Rank(Enum):
     NONE = 0
@@ -74,9 +77,9 @@ class FieldStatus:
         self.name = field # hmm
         self.info = info
         self.EP = {} # dict? or just full on list? (thinking dict atm)
-        self.master: int = None
+        self.master: Player = None
         self.month = 1
-        self.elevating: int = None 
+        self.elevating: Player = None 
         self.elevatedOnce: list[int] = [] # since it's not actually rank? 
         self.elevatedTwice: list[int] = []
         self.elevatedThrice: list[int] = []
@@ -89,6 +92,25 @@ class FieldStatus:
             EP_proportional_list.append([p] * num) # TODO test pls
         print(f"EP list for {self.name} is {EP_proportional_list}")
         return EP_proportional_list
+
+    def elevate_player(self, player):
+        n = self.EP[player]
+        if n > 5:
+            self.EP[player] -= 5
+        else:
+            self.EP[player] = 0
+        
+        if player.id in self.elevatedOnce:
+            self.elevatedOnce.remove(player.id)
+            self.elevatedTwice.append(player.id)
+        elif player.id in self.elevatedTwice:
+            self.elevatedTwice.remove(player.id)
+            self.elevatedThrice.append(player.id)
+        elif player.id in self.elevatedThrice:
+            self.elevatedThrice.remove(player.id)
+            self.master = player # more checks here? 
+        else:
+            self.elevatedOnce.append(player.id)
     
 
 

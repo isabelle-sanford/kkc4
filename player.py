@@ -46,6 +46,14 @@ class EP:
         # self.alchemy = alchemy 
         # self.artificery = artificery
         # self.naming = naming 
+    
+    def get_list(self):
+        all_EP: list[FieldName] = []
+        for i in range(8):
+            for j in range(self.values[i]):
+                all_EP.append(FieldName(i))
+        
+        return all_EP
         
     def __str__(self) -> str:
         out = f"| Lin | Ari | R&L | Arc | Sym | Phy | Alc | Art | Nam |\n|"
@@ -94,6 +102,7 @@ class PlayerStatus:
         s.can_file_complaints = True 
         s.can_file_EP = True 
         s.can_be_targeted = True # medica emergency (only?)
+        s.can_elevate = True
         # is lashed? 
 
         s.accessible_abilities: list[ActionType] = []
@@ -168,7 +177,8 @@ class PlayerProcessing:
         self.can_file_complaints: bool = self.starting_status.can_file_complaints # should also reference status
         self.can_file_EP: bool = self.starting_status.can_file_EP
         self.can_be_targeted: bool = self.starting_status.can_be_targeted
-        # can_elevate? 
+        self.can_elevate = self.starting_status.can_elevate
+        # can file DP?
 
         # should probably instead process protects with kills, so they happen in appropriate order
         self.protected_from_sabotage = 0
@@ -239,6 +249,8 @@ class PlayerChoices:
         self.IMRE_BLACKMARKET_assassin: list[Player] = []
         self.IMRE_BLACKMARKET_take_contract: list[Item] = []
         self.IMRE_BLACKMARKET_place_contract: list[Item] = []
+
+        self.offset_IP = 0
  
     def __str__(self) -> str:
         # TODO
@@ -311,7 +323,7 @@ class Player:
         # need to remember to make new processing objects per turn
         if player_process is None:
             player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
-        self.status: PlayerProcessing = player_process
+        self.processing: PlayerProcessing = player_process
 
     def levels_in(self, field: FieldName):
         # error check?
@@ -335,6 +347,7 @@ class Player:
     # todo go_insane()
     # todo break_out()
     # todo calculate_tuition(gm_input)
+    # todo die()
         # remember to check masters, social class, arithmetics
         # probs have Tuition object that can be updated over turns?
 
@@ -373,6 +386,8 @@ class Player:
                 if item.type == item_type:
                     list.append(item)
         return list
+
+    # todo use_item()
 
     def increase_money(self, amount: float):
         self.status.money += amount
@@ -419,8 +434,8 @@ class Player:
             else:
                 self.status.DP += total
 
-    def assign_EP(self, field, total = 1):
-        self.status.EP.values[field-1] += total
+    def assign_EP(self, field: FieldName, total = 1):
+        self.status.EP.values[field] += total
 
 class PlayerRandom:
     def __init__(self) -> None:
