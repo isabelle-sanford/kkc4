@@ -387,7 +387,7 @@ class Player:
         else:
             self.status.EP.values[field] -= 5
         
-        self.status.rank = self.status.rank.next() # todo test 
+        self.status.rank = self.status.rank.get_next() # todo test 
         self.status.available_EP -= 1
 
         # anything else here? 
@@ -473,6 +473,8 @@ class Player:
                 if item.type == item_type:
                     list.append(item)
         return list
+
+
 
     # todo use_item()
 

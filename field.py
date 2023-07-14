@@ -13,7 +13,7 @@ class Rank(Enum):
     MASTER = 4
 
     # todo probably not this 
-    def __next__(self):
+    def get_next(self):
         if self.NONE:
             return self.ELIR
         if self.ELIR:

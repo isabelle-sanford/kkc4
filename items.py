@@ -20,7 +20,9 @@ class ItemType(Enum):
 
 
 class Item:
-    def __init__(self, name, type: ItemType, uses, defense, action, level, target= None) -> None:
+    ITEM_COUNT = 0
+
+    def __init__(self, name, type: ItemType, uses, defense, action, level, id, target= None) -> None:
         self.type: ItemType = type
 
         self.name: str = name # ??
@@ -32,22 +34,27 @@ class Item:
 
         self.half_made: bool = False
 
+        self.id = id
+
     @classmethod
     def Generate(cls, type: ItemType, level: int = 0, target = None):
+        ITEM_COUNT += 1
+        id = ITEM_COUNT
+        
         if type == ItemType.MOMMET: # add sep 3rd level?
-            return Item("Mommet", type, 1, False, True, level, target)
+            return Item("Mommet", type, 1, False, True, level, id, target)
         elif type == ItemType.TENACULUM:
             uses = 1
             if level == 4: uses = 2
-            return Item("Tenaculum", type, uses, False, True, level)
+            return Item("Tenaculum", type, uses, False, True, level, id)
         elif type == ItemType.FIRESTOP:
             uses = 1
             if level == 4: uses = 2
-            return Item("Firestop", type, uses, True, False, level)
+            return Item("Firestop", type, uses, True, False, level, id)
         elif type == ItemType.PLUMBOB:
-            return Item("Plumbob", type, 1, False, True, level)
+            return Item("Plumbob", type, 1, False, True, level, id)
         elif type == ItemType.BONETAR:
-            return Item("Bonetar", type, 1, False, True, level)
+            return Item("Bonetar", type, 1, False, True, level, id)
         elif (type == ItemType.WARD or type == ItemType.BLOODLESS 
               or type == ItemType.THIEVESLAMP or type == ItemType.GRAM):
             if level == 2: uses = random.randrange(1,2)
@@ -55,19 +62,19 @@ class Item:
             elif level == 4: uses = 3
             else: uses = 1
             if type == ItemType.WARD:
-                return Item("Ward", type, uses,True,True,level)
+                return Item("Ward", type, uses,True,True,level, id)
             elif type ==  ItemType.BLOODLESS:
-                return Item("Bloodless", type, uses, True, False, level)
+                return Item("Bloodless", type, uses, True, False, level, id)
             elif type == ItemType.THIEVESLAMP:
-                return Item("Thieve's Lamp", type, uses, False, True, level)
+                return Item("Thieve's Lamp", type, uses, False, True, level, id)
             else: # Gram
-                return Item("Gram", type, uses, True, False, level) 
+                return Item("Gram", type, uses, True, False, level, id) 
         elif type == ItemType.TALENTPIPES:
-            return Item("Talent Pipes", type, None, False, False, None)
+            return Item("Talent Pipes", type, None, False, False, None, id)
         elif type == ItemType.NAHLROUT:
-            return Item("Nahlrout", type, 1, True, True, None)
+            return Item("Nahlrout", type, 1, True, True, None, id)
         elif type == ItemType.BODYGUARD:
-            return Item("Bodyguard", type, 2,True,False,None)
+            return Item("Bodyguard", type, 2,True,False,None, id)
     
     def use(self):
         # TODO 

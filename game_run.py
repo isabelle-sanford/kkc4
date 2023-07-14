@@ -5,7 +5,7 @@ from horns import Horns
 from items import Item, ItemType
 from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices
-from actions import Action, ActionType, ActionCategory
+from actions import Action, ActionType, ActionCategory, Target
 from statics import Background, Lodging
 
 # idk 
@@ -280,15 +280,28 @@ class Turn:
                     standard_actions.append(a)
         
         return standard_actions
-    
+
+
     def process_standard_actions(self):
 
         for a in self.actions:
             if a.category == ActionCategory.OTHER or a.category == ActionCategory.CREATEITEM:
                 if a.successful:
+                    # not sure if these checks are already done in block processing
+                    if a.type.t1type == Target.PLAYER:
+                        if not a.target.status.can_be_targeted:
+                            a.successful = False
+                            continue # ??
+                    
+                    # probs gotta check for target None
+                    # bc sometimes player target is optional
+                    if a.type.t2type == Target.PLAYER and not a.target_two.status.can_be_targeted:
+                        a.successful = False
+                        continue
 
-                    # todo checks probably
+                    # todo more checks probably
                     a.perform()
+
             elif a.category == ActionCategory.OFFENSIVE:
                 self.offensive_actions.append(a)
         return
@@ -523,10 +536,6 @@ class Turn:
         for p in self.players:
             # add processing object for this turn
             p.processing = PlayerProcessing(p.info, p.status, p.choices, self.month)
-
-            # add actions to actions_list
-            #self.actions.append(p.choices.actions)
-
 
             # add next_status for next turn (to overwrite status at end of turn processing)
             p.initial_status = p.status

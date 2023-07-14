@@ -58,7 +58,7 @@ class Charges:
     # - Conduct Unbecoming a Member of the Arcanum (expulsion)
     # What is returned is a 5 element array(list), with the max d100 
     # rolls corresponding to the weights
-    def __init__(self, log: ProcessLog = None) -> None:
+    def __init__(self, log: ProcessLog = None, fields: "list[FieldStatus]" = None) -> None:
         Weightings(20,  0,   0,  0,  0, 100)
         Weightings(19,  0,   0,  0, 10,  90)
         Weightings(17,  0,   0,  0, 20,  80)
@@ -68,6 +68,9 @@ class Charges:
         Weightings(8,  20,  30, 30, 20,   0)
         Weightings(5,  60,  30, 10,  0,   0)
         Weightings(0,   0,   0,  0,  0,   0)
+        
+        self.log = log
+        self.fields = fields
 
     # Rolls a d100, finds which tier to compare the result with based on the players DP.
     # The punishment tier arrays has the max roll corresponding to the given punishment of that column.
@@ -103,7 +106,7 @@ class Charges:
             self.log.log(f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be punished with 3 lashings.")
             target.status.last_conduct_unbecoming = target.status.month #?
         elif outcome == "Expulsion":
-
+            target.expel(self.fields)
             self.log.log(
                 f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
         else:
@@ -229,7 +232,7 @@ class Horns:
                 players_on_the_horns.add(p)
 
         log.log("Determining charges...")
-        charges = Charges(log)
+        charges = Charges(log, all_fields)
         for p in players_on_the_horns:
             charges.determine_punishment(p)
 
