@@ -1,6 +1,6 @@
 from outcome import ProcessLog
 from player import Player
-from statics import Lodging
+from statics import Background, Lodging
 from field import FieldStatus
 import random
 
@@ -58,7 +58,7 @@ class Charges:
     # - Conduct Unbecoming a Member of the Arcanum (expulsion)
     # What is returned is a 5 element array(list), with the max d100 
     # rolls corresponding to the weights
-    def __init__(self) -> None:
+    def __init__(self, log: ProcessLog = None) -> None:
         Weightings(20,  0,   0,  0,  0, 100)
         Weightings(19,  0,   0,  0, 10,  90)
         Weightings(17,  0,   0,  0, 20,  80)
@@ -75,7 +75,7 @@ class Charges:
     # Uses the index found to set the result by passing the matching string in outcome as the argument of assign_outcome.
     def determine_punishment(self, target: Player):
         random_result = random.randrange(1, 100)
-        print(
+        self.log.log(
             f"\n{target.info.name} has {target.processing.DP} DP, and got a result of {random_result}.")
 
         # Checks each tier to find the relevant band for the target's DP
@@ -92,24 +92,24 @@ class Charges:
     # Apply Nahlrout at this point?
     def assign_outcome(self, target: Player, outcome: str):
         if outcome == "Charges Dropped":
-            print(f"All charges on {target.info.name} were dropped.")
+            self.log.log(f"All charges on {target.info.name} were dropped.")
         elif outcome == "Undignified Mischief":
-            print(f"{target.info.name} punished with formal apology.")
+            self.log.log(f"{target.info.name} punished with formal apology.")
         elif outcome == "Reckless Use":
-            print(
+            self.log.log(
                 f"{target.info.name} charged with Reckless Use of Sympathy and will be punished with 1 lashing.")
             target.status.last_reckless_use = target.status.month #? off by one?
         elif outcome == "Conduct Unbecoming":
-            print(f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be punished with 3 lashings.")
+            self.log.log(f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be punished with 3 lashings.")
             target.status.last_conduct_unbecoming = target.status.month #?
         elif outcome == "Expulsion":
-            target.status.is_expelled = True
-            target.status.can_file_EP = False
-            # TODO adjust vint/aturan stipends
-            print(
+
+            self.log.log(
                 f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
         else:
-            print(f"Error. Outcome provided was '{outcome}'.")
+            self.log.log(f"Error. Outcome provided was '{outcome}'.")
+        
+        
 
 ### ==== Runtime Code ==== ###
 
@@ -165,7 +165,7 @@ class Horns:
         print("run_complaints()... Done!")
 
     def run_horns(self, player_list: "list[Player]" = None, field_list: "list[FieldStatus]" = None, log: ProcessLog = None):
-        print("RunHorns()...")
+        log.log("RunHorns()......")
         all_players: list[Player] = []
         if player_list is not None:
             all_players = player_list
@@ -201,6 +201,8 @@ class Horns:
             if count > 1:
                 complaints.remove(p)
 
+        log.log("Complaints handled.")
+
         # By passing assign_DP the field of the Master assigning DP,
         #  it handles offsetting the DP gain with related EP.
 
@@ -215,6 +217,7 @@ class Horns:
                     if len(complaints) > 0:
                         complaints[random.randrange(0,len(complaints))].assign_DP(master_of=field.name)
         # TODO LOG
+        log.log("DP assigned.")
 
         # Adds DP from complaints
         for p in all_players:
@@ -225,11 +228,11 @@ class Horns:
             if (len(p.processing.complaints_received) > 0) or (p.processing.DP > 0):
                 players_on_the_horns.add(p)
 
-
-        charges = Charges()
+        log.log("Determining charges...")
+        charges = Charges(log)
         for p in players_on_the_horns:
             charges.determine_punishment(p)
 
         # for i in Weightings.tier_weights:
         #     print(i)
-        print("RunHorns()... Done!")
+        log.log("RunHorns()... Done!")

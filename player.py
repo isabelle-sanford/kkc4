@@ -1,9 +1,10 @@
+import copy
 from enum import Enum
 import random 
 
 from statics import Background, Lodging
 from actions import ActionType, Action
-from field import Rank, FieldName
+from field import FieldStatus, Rank, FieldName
 from items import ItemType, Item
 
 class BaseStat(Enum):
@@ -73,7 +74,7 @@ class PlayerStatus:
         #current_funds
     ):
         s = PlayerStatus(player_static)
-        s.month = 0
+        s.month =  -1 #??
         s.available_EP = 5
         s.rank = Rank.NONE
 
@@ -112,11 +113,11 @@ class PlayerStatus:
 
         # are there any other prev turn effects? 
         # this is the best way I could come up with to have effects into future turns
-        s.last_reckless_use = -1 # successful - nahlrout protected doesn't count here
-        s.last_conduct_unbecoming = -1
-        s.last_volatile_firestop = -1
-        s.last_medica_emergency = -1 # 
-        s.last_in_medica = -1 # for bonetar ig
+        s.last_reckless_use = -2 # successful - nahlrout protected doesn't count here
+        s.last_conduct_unbecoming = -2
+        s.last_volatile_firestop = -2
+        s.last_medica_emergency = -2 # 
+        s.last_in_medica = -2 # for bonetar ig
 
         # IMRE
         # hmmmm - could make own class? 
@@ -141,9 +142,43 @@ class PlayerStatus:
 
         return s
     
+    def new_turn(self):
+        newstatus = copy.deepcopy(self)
+
+        newstatus.month += 1
+
+        # change up being in Imre or not
+        if newstatus.lodging == Lodging.GreyMan or newstatus.lodging == Lodging.PearlOfImre:
+            newstatus.in_Imre = True
+        else:
+            # updated later when processing choices, if person wants to go
+            newstatus.in_Imre = False
+
+        # if roleblocked or no 
+        # !! idk what I'm doing sigh
+        blocked_by_anything = False
+        if newstatus.last_reckless_use == newstatus.month - 1:
+            blocked_by_anything = True
+        if newstatus.last_conduct_unbecoming > newstatus.month - 3:
+            blocked_by_anything = True
+        if newstatus.last_volatile_firestop == newstatus.month - 1:
+            blocked_by_anything = True
+            newstatus.can_file_EP = False
+            newstatus.can_file_complaints = False
+        if newstatus.last_medica_emergency == newstatus.month - 1:
+            blocked_by_anything = True
+            newstatus.can_be_targeted = False
+            # gotta check physicker level here sigh
+
+        # I guess???
+        if blocked_by_anything:
+            self.can_take_actions = False
+
+        return newstatus
+    
     # TODO string / print func 
 
-    # todo change stipend for vint/aturan
+    
 
 
 # working variables for processing turn
@@ -213,6 +248,7 @@ class PlayerChoices:
         self.enroll_next = True # check expulsion etc 
 
         # List of complaints made (NOT including PiH)
+        # remember cannot vote if expelled
         self.complaints: list[Player] = []
 
         # Stored input list of who they are blocking, as Player references
@@ -321,7 +357,7 @@ class Player:
         # sort of irregularly used, but maybe more helpful than passing full Player instances around everywhere
         self.id: int = player_static.id 
         self.name: str = player_static.name
-        self.month = 0 # hmm
+        self.month = -1 # hmm
 
         # need to remember to make new processing objects per turn
         if player_process is None:
@@ -343,6 +379,7 @@ class Player:
         return count
 
     def elevate_in(self, field: FieldName):
+        # TODO add accessible ability
         self.status.elevations.append(field)
         num_EP = self.status.EP.values[field]
         if num_EP < 5:
@@ -350,7 +387,7 @@ class Player:
         else:
             self.status.EP.values[field] -= 5
         
-        #self.status.rank = self.status.rank.next() # todo test 
+        self.status.rank = self.status.rank.next() # todo test 
         self.status.available_EP -= 1
 
         # anything else here? 
@@ -361,9 +398,14 @@ class Player:
         # remember to check masters, social class, arithmetics
         # probs have Tuition object that can be updated over turns?
 
-    def go_insane(self):
+    def go_insane(self, fields: "list[FieldStatus]"):
         # TODO
         self.status.is_sane = False 
+
+        for f in fields:
+            f.remove_player(self)
+        self.status.EP = None
+
         # ... other stuff? 
         return 
 
@@ -373,8 +415,13 @@ class Player:
         # rank stuff, accessible abilities, ...
         return 
     
-    def die(self):
+    def die(self, fields: "list[FieldStatus]"):
         self.status.is_alive = False
+
+        for f in fields:
+            f.remove_player(self)
+        self.status.EP = None
+        
         # TODO ??
     
         return
@@ -386,6 +433,19 @@ class Player:
         # Do checks to make sure the action is valid?
         # maybe do this in choices?
     
+    def expel(self, fields):
+        self.status.is_expelled = True
+        self.status.can_file_EP = True
+
+        for f in fields:
+            f.remove_player(self)
+        
+        if self.info.social_class == Background.Vint:
+            self.status.stipend = 20
+        
+        # anything else? 
+
+
     def add_item(self, item: Item):
         self.status.inventory.append(Item)
 

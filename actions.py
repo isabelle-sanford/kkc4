@@ -13,75 +13,8 @@ class ActionCategory(Enum):
     OTHER = 3
     CREATEITEM = 4
 
-class ActionType(Enum):
-    #Complaint = 1 # player
-    #GainEP = 2 # ? 
-    MysteriousBulletins = 3, ActionCategory.OTHER  # none
-    BribeTheMessenger = 4, ActionCategory.OTHER  # player
-    LinguisticAnalysis = 5, ActionCategory.OTHER  # player
-    Pickpocket = 6, ActionCategory.ACTIONAFFECTING # none or player (if master)
-    LawOfContraposition = 7, ActionCategory.ACTIONAFFECTING # 2 players
-    ProficientInHyperbole = 8, ActionCategory.OTHER # none / 2 players
-    ArgumentumAdNauseam = 9, ActionCategory.OTHER # player 
-    PersuasiveArguments = 10, ActionCategory.OTHER # 2 players 
-    FaeLore = 11, ActionCategory.ACTIONAFFECTING # player
-    OmenRecognition = 12, ActionCategory.OTHER # event (???)
-    SchoolRecords = 13, ActionCategory.OTHER # player 
-    BannedBooks = 14, ActionCategory.OTHER # field. target_2 ability
-    MommetMaking = 15, ActionCategory.OTHER # player
-    MalfeasanceProtection = 16, ActionCategory.ACTIONAFFECTING # 
-    MedicaEmergency = 17, ActionCategory.OTHER
-    MedicaDetainment = 18, ActionCategory.ACTIONAFFECTING
-    PsychologicalCounselling = 19, ActionCategory.OTHER
-    CheatingDeath = 20, ActionCategory.OTHER
 
-    # what if single CreateItem action type, target is item
-    CreateTenaculum = 21, ActionCategory.CREATEITEM
-    CreateFirestop = 22, ActionCategory.CREATEITEM
-    CreatePlumbob = 23, ActionCategory.CREATEITEM
-    CreateBonetar = 24, ActionCategory.CREATEITEM
-    CreateWard = 25, ActionCategory.CREATEITEM
-    CreateBloodless = 26, ActionCategory.CREATEITEM
-    CreateThievesLamp = 27, ActionCategory.CREATEITEM
-    CreateGram = 28, ActionCategory.CREATEITEM
-    
-    UseName = 29, ActionCategory.OTHER # !!
-
-    # what if UseItem type
-    UseMommet = 30, ActionCategory.ACTIONAFFECTING
-    UseTenaculumItem = 31, ActionCategory.ACTIONAFFECTING
-    UseTenaculumAction = 32, ActionCategory.ACTIONAFFECTING
-    #UseFirestop = 33 # no longer an action
-    UsePlumbob = 34, ActionCategory.OTHER # player
-    UseBonetar = 35, ActionCategory.OFFENSIVE # location
-    UseWard = 36, ActionCategory.OTHER
-    UseThievesLamp = 37, ActionCategory.ACTIONAFFECTING
-    UseNahlrout = 38, ActionCategory.ACTIONAFFECTING
-    UseCourier = 39, ActionCategory.OTHER 
-    UseAssassin = 40, ActionCategory.OFFENSIVE # player # note - does not take an action period / can't be blocked
-    Sabotage = 41, ActionCategory.OFFENSIVE # player
-
-    CreateItem = 42, ActionCategory.CREATEITEM
-    CreateHalfItem = 43, ActionCategory.CREATEITEM
-
-    def __new__(cls, value, category):
-        member = object.__new__(cls)
-        member._value_ = value
-        member.category = category
-        return member
-
-    def __int__(self):
-        return self.value
-    
-    def __str__(self) -> str:
-        return f"---"
-    
-# todo maybe - add what target type these have
-    # player, action, location, none, field ? 
-
-
-
-class TargetType(Enum):
+class Target(Enum):
     PLAYER = 1
     ACTION = 2
     LOCATION = 3
@@ -90,7 +23,94 @@ class TargetType(Enum):
     OTHER = 6 # bool for master bonetar
     FIELD = 7 # banned books
     ABILITY = 8 # banned books
-    NONE = 9
+    NONE = 9 # includes self-targets
+
+
+class ActionType(Enum):
+    MysteriousBulletins = 3, ActionCategory.OTHER, Target.NONE, Target.NONE
+    BribeTheMessenger = 4, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
+    LinguisticAnalysis = 5, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+    Pickpocket = 6, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.NONE # or none + none if not master
+    LawOfContraposition = 7, ActionCategory.ACTIONAFFECTING, Target.ACTION, Target.PLAYER
+    ProficientInHyperbole = 8, ActionCategory.OTHER, Target.PLAYER, Target.PLAYER 
+    ArgumentumAdNauseam = 9, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
+    PersuasiveArguments = 10, ActionCategory.OTHER, Target.PLAYER, Target.PLAYER 
+    FaeLore = 11, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.NONE # right?
+    OmenRecognition = 12, ActionCategory.OTHER, Target.EVENT, Target.NONE
+    SchoolRecords = 13, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+    BannedBooks = 14, ActionCategory.OTHER, Target.FIELD, Target.ABILITY
+    MommetMaking = 15, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+    MalfeasanceProtection = 16, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.NONE
+    MedicaEmergency = 17, ActionCategory.OTHER, Target.NONE, Target.NONE
+    MedicaDetainment = 18, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.NONE
+    PsychologicalCounselling = 19, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+    CheatingDeath = 20, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+
+    # what if single CreateItem action type, target is item
+    CreateTenaculum = 21, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateFirestop = 22, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreatePlumbob = 23, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateBonetar = 24, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateWard = 25, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateBloodless = 26, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateThievesLamp = 27, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateGram = 28, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    
+    UseName = 29, ActionCategory.OTHER, Target.OTHER, Target.OTHER # !!
+
+    # what if UseItem type
+    UseMommet = 30, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.NONE
+    UseTenaculumItem = 31, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.ITEM
+    UseTenaculumAction = 32, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.ACTION
+    UsePlumbob = 34, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+    UseBonetar = 35, ActionCategory.OFFENSIVE, Target.LOCATION, Target.OTHER
+    UseWard = 36, ActionCategory.OTHER, Target.NONE, Target.NONE
+    UseThievesLamp = 37, ActionCategory.ACTIONAFFECTING, Target.NONE, Target.NONE
+    UseNahlrout = 38, ActionCategory.ACTIONAFFECTING, Target.PLAYER, Target.NONE
+    UseCourier = 39, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
+
+    # ! maybe don't include this at all tbh? 
+    UseAssassin = 40, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player # note - does not take an action period / can't be blocked
+
+    Sabotage = 41, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player
+
+    CreateItem = 42, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateHalfItem = 43, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+
+    def __new__(cls, value, category, t1type, t2type):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.category = category
+        member.t1type = t1type
+        member.t2type = t2type
+        return member
+
+    def __int__(self):
+        return self.value
+    
+    def __str__(self) -> str:
+        return f"---"
+
+
+
+
+# todo maybe - add what target type these have
+    # player, action, location, none, field ? 
+
+HAS_IB = [
+    ActionType.MalfeasanceProtection,
+    ActionType.CreateTenaculum,
+    ActionType.CreateFirestop,
+    ActionType.CreatePlumbob,
+    ActionType.CreateBonetar,
+    ActionType.CreateWard,
+    ActionType.CreateBloodless,
+    ActionType.CreateThievesLamp,
+    ActionType.CreateGram,
+    ActionType.UseName,
+    ActionType.UseMommet,
+    ActionType.CreateItem #
+]
 
 class Action:
     def __init__(self, player, type: ActionType, target,

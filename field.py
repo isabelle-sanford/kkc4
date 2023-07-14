@@ -12,6 +12,17 @@ class Rank(Enum):
     ELTHE = 3
     MASTER = 4
 
+    # todo probably not this 
+    def __next__(self):
+        if self.NONE:
+            return self.ELIR
+        if self.ELIR:
+            return self.RELAR
+        if self.RELAR:
+            return self.ELTHE
+        if self.ELTHE:
+            return self.MASTER
+
 class FieldName(IntEnum):
     LINGUISTICS = 0
     ARITHMETICS = 1
@@ -98,6 +109,20 @@ class FieldStatus:
             for n in range(num):
                 EP_proportional_list.append(p) # TODO test pls
         return EP_proportional_list
+    
+    # death, expulsion, insanity
+    def remove_player(self, player):
+        if player in self.EP:
+            del self.EP[player]
+        if player == self.master:
+            self.master = None
+            # TODO get new master 
+        if player.id in self.elevatedOnce:
+            self.elevatedOnce.remove(player.id)
+        if player.id in self.elevatedTwice:
+            self.elevatedTwice.remove(player.id)
+        if player.id in self.elevatedThrice:
+            self.elevatedThrice.remove(player.id)
 
     def elevate_player(self, player):
         n = self.EP[player]

@@ -117,7 +117,8 @@ class Turn:
             for a in p.choices.actions:
 
                 self.actions.append(a)
-        
+        # other lists? imre? 
+
         if gm_input["complaints"]:
             for v in range(len(gm_input["complaints"])):
                 self.players[v].choices.complaints = gm_input["complaints"][v]
@@ -165,6 +166,18 @@ class Turn:
                 # WHATEVER, TODO
                 # LOG
                 pass
+            
+            if p.initial_status.lodging == Lodging.WindyTower:
+                p.status.available_EP -= 1
+
+            # TODO lodging effects 
+            if p.status.lodging == Lodging.WindyTower:
+                p.status.available_EP += 1
+                # what if master / expelled / whatevs 
+            elif p.status.lodging == Lodging.GreyMan or p.status.lodging == Lodging.PearlOfImre:
+                p.status.in_Imre = True
+        # todo make sure expelled students not in mews
+
 
         self.log.log("Stipends, tuition, & lodging processed.")
     
@@ -229,13 +242,53 @@ class Turn:
             for a in p.choices.actions:
                 print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
+    def preprocessing(self):
+        # assigning insanity bonuses
+
+        standard_actions: list[Action] = []
+
+        # mews
+        for pid in self.sane_players:
+            p = self.players[pid]
+            if p.status.lodging == Lodging.Mews:
+                p.processing.insanity_bonus += 2
+            elif p.status.lodging == Lodging.SpindleAndDraft:
+                p.processing.insanity_bonus -= 2
+            
+        # action IBs
+        # tbh just move this stuff under perform() though
+        for a in self.actions:
+            if a.successful:
+                # TODO
+                if a.type.category == ActionCategory.CREATEITEM:
+                    standard_actions.append(a)
+                    # ASSIGN APPROPRIATE IB
+                    pass
+                elif a.type == ActionType.MalfeasanceProtection:
+                    # assign appropriate ib
+                    pass 
+                elif a.type == ActionType.UseName:
+                    # assign appropriate ib
+                    pass
+                elif a.type == ActionType.UseMommet:
+                    # assign ib
+                    pass
+                else:
+                    pass
+
+                if a.type.category == ActionCategory.OTHER:
+                    standard_actions.append(a)
+        
+        return standard_actions
     
     def process_standard_actions(self):
 
         for a in self.actions:
             if a.category == ActionCategory.OTHER or a.category == ActionCategory.CREATEITEM:
-                # todo checks probably
-                a.perform()
+                if a.successful:
+
+                    # todo checks probably
+                    a.perform()
             elif a.category == ActionCategory.OFFENSIVE:
                 self.offensive_actions.append(a)
         return
@@ -258,8 +311,7 @@ class Turn:
             
             else: # NPC
                 elevation_candidates: list[Player] = f.get_EP_list()
-                print(f"NPC master {f.name} picking who to elevate among: {elevation_candidates}")
-                # todo: during expulsion remove EP from fields
+                self.log.log(f"NPC master {f.name} picking who to elevate among: {elevation_candidates}")
 
                 if len(elevation_candidates) > 0:
                     npc_choice = random.choice(elevation_candidates)
@@ -267,10 +319,11 @@ class Turn:
                     f.elevating = npc_choice
         
 
+
         # todo: recurse until duplicates are gone
         for f in self.fields:
             if f.elevating is not None:
-                print(f"Player {f.elevating.name} elevated in {f.name}")
+                self.log.log(f"Player {f.elevating.name} elevated in {f.name}")
 
                 f.elevate_player(f.elevating)
                 f.elevating.elevate_in(f.name)
@@ -339,11 +392,9 @@ class Turn:
 
 
     def process_mechanics(self):
-        #TODO
 
-        # horns - todo LOG
         horns = Horns()
-        horns.run_horns(self.players, self.fields)
+        horns.run_horns(self.players, self.fields, self.log)
         # todo NAHLROUT
 
         # elevations
@@ -376,6 +427,7 @@ class Turn:
         sabotagee = None
         being_attacked = [] # maybe include reason? 
         could_go_insane = []
+        protected = []
 
         for p in self.sane_players:
             if self.players[p].status.lodging == Lodging.Streets:
@@ -392,9 +444,12 @@ class Turn:
             if a.target.status.lodging == Lodging.HorseAndFour:
                 roll = random.randint(1,2)
                 if roll == 1:
-                    a.successful = False
+                    protected.append(a.target) # hmmm
+                    # TODO fix 
             
             if a.type == ActionType.Sabotage and a.successful:
+                # TODO remember that if insane, this is unblockable kill
+                # if expelled, it's a kill (but blockable)
                 if a.target.processing.can_be_targeted:
                     sabotagee = a.target
 
@@ -418,7 +473,7 @@ class Turn:
             # todo mommet
 
         still_attacked = []
-        protected = []
+        
         for attacked in being_attacked:
             if attacked.holds_item(ItemType.GRAM):
                 g = attacked.get_items(ItemType.GRAM)
@@ -463,19 +518,11 @@ class Turn:
 
     def PROCESS_TURN(self):
         # update field statuses to new month (?)
-        # and player objects
 
         # setup
         for p in self.players:
             # add processing object for this turn
             p.processing = PlayerProcessing(p.info, p.status, p.choices, self.month)
-
-            # make sane_players and living_players lists
-            # if p.status.is_sane:
-            #     self.sane_players.append(p.id)
-            # if p.status.is_alive:
-            #     self.living_players.append(p.id)
-            # maybe other lists? imre? 
 
             # add actions to actions_list
             #self.actions.append(p.choices.actions)
@@ -483,8 +530,8 @@ class Turn:
 
             # add next_status for next turn (to overwrite status at end of turn processing)
             p.initial_status = p.status
-            p.status = copy.deepcopy(p.status)
-            # todo: change things like can_take_actions back where needed
+            p.status = p.status.new_turn()
+            p.month += 1
 
         # term beginning -----
         if self.month % 3 == 0 and self.month != 0:
