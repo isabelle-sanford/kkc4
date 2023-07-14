@@ -112,17 +112,45 @@ class Action:
         self.in_block_cycle: bool = False
         self.block_reasoning = "" # for GM results
 
+
+    def print_block_details(self):
+        out = f"Action: {self}\n"
+        out += f"Player: {self.player.info.name} Target: {self.target.info.name} Target_Two: {self.target_two}\n"
+        out += f"In_Block_cycle: {self.in_block_cycle}, Blocked: {self.blocked}, Blocked_By: [{', '.join([p.info.name for p in self.blocked_by])}]\n"
+        print(out)
+
     # only handling OTHER-category actions atm
     def perform(self, **kwargs):
-        if self.blocked:
+        if self.blocked and not self.in_block_cycle:
             # log it
-            print("blocked")
+            out_one = ", ".join(p.info.name for p in self.blocked_by)
+            out_two = ", ".join(a.type.name for a in self.blocked_by_action)
+            print(f"{self.player.info.name}'s {self.type.name} blocked by [{out_one}] using [{out_two}]")
+            self.successful = False
             return
         
         # todo everywhere: check that target can be targeted
         # also for target types being correct
 
         action_logged = False
+
+        if self.type == ActionType.UseMommet:
+            # Dunno if this can be cleaned up a bit
+            notify_only = False
+            if "notify_only" in kwargs:
+                notify_only = kwargs["notify_only"]
+            if "result" in kwargs:    
+                result = kwargs["result"]
+            else:
+                result = {"process_block_cycles": False}
+            
+            self.block_one(notify_only, result)
+            if result["success"]:
+                self.in_block_cycle = False
+                # Remove item
+                # Would be nice to have the item have a reference to the action.
+                print(f"{self.player.info.name} succesfully used Mommet")
+
 
         # match self.type:
 
@@ -523,63 +551,10 @@ class Action:
     #     if not action_logged:
     #         Log.Action(self)
         
-
-
-
     
     def __str__(self) -> str:
         return f"{self.player.info.name}: {self.type} "
     
-    def clear_blocked_by(self):
-        self.blocked_by = []
-        self.blocked_by_action: list[Action] = []
-        # clear the blocked_by flag on players?
-
-    # Called by block actions, determines if there is a valid target action, 
-    # and notifies the action/player that there is an intention to blocked.
-    def set_blocked_by(self):
-        # Duplicated in notify_is_blocked. Probably should be handled with categories
-        
-        block_one = [ActionType.UseTenaculumAction, ActionType.UseNahlrout]
-        block_all = [ActionType.FaeLore, ActionType.MedicaDetainment, ActionType.UseMommet]
-        block_actions = block_one + block_all
-        if (not self.blocked) and (self.type in block_actions):
-            
-            # Dunno if we just set the player flag, set the player and
-            #  all action flags, or just the action flags.
-            if self.type in block_all:
-                # print("In Block All")
-                # print(f"Target Status Blocked By{self.target.status.blocked_by}")
-                self.target.status.blocked_by.append(self.player)
-                # print(f"Target Status Blocked By{self.target.status.blocked_by}")
-                # print(f"Num actions: {len(self.target.choices.actions)}")
-                for a in self.target.choices.actions:
-                    # print(f"Action Blocked By: {a.blocked_by}")
-                    # print(f"Action Blocked By Action: {a.blocked_by_action}")
-                    a.blocked_by.append(self.player)
-                    a.blocked_by_action.append(self)
-                    # print(f"Action Blocked By: {a.blocked_by}")
-                    # print(f"Action Blocked By Action: {a.blocked_by_action}")
-
-            elif self.type in block_one:
-                # print("In Block One")
-                # Random action chosen
-                action_list = self.target.choices.actions
-
-                # Unless there is a single valid target specified.
-                if len(action_list) > 0:
-                    target_action = random.choice(action_list)
-                    # If target was specified
-                    if self.target_action_type is not None:
-                        targetted_actions = [a for a in action_list if a.type == self.target_action_type]
-                        # If there was only one candidate 
-                        if len(targetted_actions) > 0:
-                            target_action = random.choice(targetted_actions)
-
-                    # Notifies the action of the intent to block
-                    target_action.blocked_by.append(self.player) # Possibly unnecessary?
-                    target_action.blocked_by_action.append(self)
-  
     
     # Actions are set up to be similar to doubly linked lists - 
     # they know what actions they are blocking and which actions are blocking them.
@@ -601,9 +576,82 @@ class Action:
                     sequence_cycle = sequence[sequence.index(a):]
                     for cycle_action in sequence_cycle:
                         cycle_action.in_block_cycle = True
-                    print(f"Cycle found: [{'->'.join([actions_in_cycle.target.info.name for actions_in_cycle in sequence_cycle])}]")
+                    print(f"    Cycle found: [{'<-'.join([actions_in_cycle.target.info.name for actions_in_cycle in sequence_cycle])}<-{a.target.info.name}]")
                 else:
                     a.identify_block_cycle(sequence.copy())
         else:
-            print(f"Start of sequence found: [{'->'.join([action.player.info.name for action in sequence])}]")
+            print(f"    Start of sequence found: [{'<-'.join([action.player.info.name for action in sequence])}]")
 
+    def block_one(self, notify_only, result: dict):
+        # Blocks are normally random targets, and target_two is blank
+        # Tenaculum can specify a type of action, passing ActionType to target_two
+        # Otherwise, to only roll once, once random action chosen, stored in target_two
+
+        # If target action not already fixed - NOTE: THIS MUST BE ABLE TO DEAL WITH IMRE LOCATIONS.
+        if not isinstance(self.target_two, Action):
+            action_list = self.target.choices.actions
+            if len(action_list) > 0:
+                target_action = random.choice(action_list)
+                # If target was specified
+                if isinstance(self.target_two, ActionType):
+                    targetted_actions = [a for a in action_list if a.type == self.target_action_type]
+                    # If there was only one candidate 
+                    if len(targetted_actions) > 0:
+                        target_action = random.choice(targetted_actions)
+                self.target_two = target_action
+            else:
+                # No possible actions
+                self.target_two = None
+
+        # when dealing with block cycles, don't need to do the notify step
+        # Otherwise notify target actions of intent to block
+        if notify_only:
+            if self.target_two is not None:
+                self.target_two.blocked_by.append(self.player)# Possibly unnecessary?
+                self.target_two.blocked_by_action.append(self)
+            result["success"] = False
+        # If actually apply block
+        else: 
+            if self.target_two is not None:
+                if self.target_two.blocked == False:
+                    self.target_two.blocked = True
+                    result["state_changed"] = True
+            result["success"] = True
+
+
+    # Probably needs something to handle if target has no actions (equivalent of self.target_two is not None checks above)
+    def block_all(self, notify_only, result: dict):
+        if not result["process_block_cycles"]:       
+            self.target.status.blocked_by.append(self.player)
+        if not notify_only:
+            if self.target.status.is_blocked == False: # Only sets flags if not already blocked.
+                self.target.status.is_blocked = True
+                result["state_changed"] = True
+            result["success"] = True
+        else:
+            result["success"] = False
+        
+        for a in self.target.choices.actions:
+            if not result["process_block_cycles"]:  
+                a.blocked_by.append(self.player)
+                a.blocked_by_action.append(self)
+            if not notify_only:
+                if a.blocked == False: # Only sets flags if not already blocked.
+                    a.blocked = True
+                    result["state_changed"] = True
+                result["success"] = True
+            else:
+                result["success"] = False
+            
+
+    def clear_block_notification(self):
+        # If block was single target
+        if isinstance(self.target_two, Action):
+            self.target_two.blocked_by.remove(self.player)
+            self.target_two.blocked_by_action.remove(self)
+        # If blocked all? 
+        elif self.target_two is not None:
+            self.target.status.blocked_by.remove(self.player)
+            for a in self.target.choices.actions:
+                a.blocked_by.remove(self.player)
+                a.blocked_by_action.remove(self)
