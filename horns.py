@@ -1,3 +1,4 @@
+from outcome import ProcessLog
 from player import Player
 from statics import Lodging
 from field import FieldStatus
@@ -75,11 +76,11 @@ class Charges:
     def determine_punishment(self, target: Player):
         random_result = random.randrange(1, 100)
         print(
-            f"\n{target.info.name} has {target.status.DP} DP, and got a result of {random_result}.")
+            f"\n{target.info.name} has {target.processing.DP} DP, and got a result of {random_result}.")
 
         # Checks each tier to find the relevant band for the target's DP
         for t in Weightings.tier_weights:
-            if (target.status.DP >= t.dp_range_minimum):
+            if (target.processing.DP >= t.dp_range_minimum):
                 # Checks each possible outcome to find the one corresponding to the rolled result
                 for i in range(len(t.result)):
                     if random_result <= t.result[i]:
@@ -163,7 +164,7 @@ class Horns:
         #   This class would need to happen after blocks though.
         print("run_complaints()... Done!")
 
-    def run_horns(self, player_list: "list[Player]" = None, field_list: "list[FieldStatus]" = None):
+    def run_horns(self, player_list: "list[Player]" = None, field_list: "list[FieldStatus]" = None, log: ProcessLog = None):
         print("RunHorns()...")
         all_players: list[Player] = []
         if player_list is not None:
@@ -186,7 +187,7 @@ class Horns:
 
             for c in p.processing.processed_complaints:
                 # generates complaints list for NPC Master DP distribution
-                complaints.append(c)
+                complaints.append(player_list[c]) # hmm # !
 
                 # Notify all players of complaints received.
                 if player_list is None:
@@ -212,16 +213,16 @@ class Horns:
             else: # npc master
                 for count in range(5):
                     if len(complaints) > 0:
-                        complaints[random.randrange(len(complaints))].assign_DP(master_of=field.name)
-
+                        complaints[random.randrange(0,len(complaints))].assign_DP(master_of=field.name)
+        # TODO LOG
 
         # Adds DP from complaints
         for p in all_players:
-            p.assign_DP(len(p.status.complaints_received)//2)
+            p.assign_DP(len(p.processing.complaints_received)//2)
 
             # OnHorns either if recieved any complaint, or PC Master assigned DP to you.
             # why not just check if DP > 0? 
-            if (len(p.status.complaints_received) > 0) or (p.status.DP > 0):
+            if (len(p.processing.complaints_received) > 0) or (p.processing.DP > 0):
                 players_on_the_horns.add(p)
 
 

@@ -1,5 +1,6 @@
+import copy
 import random
-from field import FieldStatus
+from field import FieldStatus, FIELDS
 from horns import Horns
 from items import Item, ItemType
 from outcome import ProcessLog, Result
@@ -7,24 +8,38 @@ from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerC
 from actions import Action, ActionType, ActionCategory
 from statics import Background, Lodging
 
-PLAYERS: list[Player] = [] 
+# idk 
+#PLAYERS: "list[Player]" = [] 
 
+# could put all this in a Game class
 def add_player(input, id):
-    p = PlayerStatic(input.player_name, input.player_rpname, input.is_evil, input.background)
+    p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
     p.id = id
 
     inventory = []
-    if input.inventory is not None:
-        inventory.append(Item.Generate(input.inventory)) # does this work or do you need to do something different bc 2 nahlrout? 
-    ps = PlayerStatus(p, input.lodging, input.musical_stat, inventory)
+    if input["inventory"] is not None:
+        inventory.append(Item.Generate(input["inventory"])) # does this work or do you need to do something different bc 2 nahlrout? 
+    ps = PlayerStatus.distro_init(p, input["lodging"], input["musical_stat"], inventory)
 
-    choice = PlayerChoices(p)
+    player = Player(p, ps)
+    
 
-    player = Player(p, ps, choice)
+
+    if input["ep1"] is not None:
+        player.assign_EP(FIELDS[input["ep1"][0]].name, input["ep1"][1])
+        FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
+
+    
+    if input["ep2"] is not None:
+        player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
+        FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
+
+    #choice = PlayerChoices(p)
 
     return player
 
 def start_game(distro_inputs):
+    PLAYERS = []
     i = 0
     for d in distro_inputs:
         # make Player objects for month 0
@@ -33,7 +48,7 @@ def start_game(distro_inputs):
         PLAYERS.append(p)
     return PLAYERS
 
-def add_action(player_id, action_info):
+def add_action(PLAYERS, player_id, action_info):
     p = PLAYERS[player_id]
 
     if not p.status.can_take_actions:
@@ -54,15 +69,24 @@ def add_action(player_id, action_info):
 
 
 
-def update_choices(new_choices):
-    c = PLAYERS[new_choices["player"]]
+def update_choices(PLAYERS, new_choices):
 
-    if new_choices["imre_next"]: c.imre_next = True
-    if new_choices["add_action"]:
-        add_action(c.id, new_choices["add_action"])
-    # what about updating an action? do we just clear all actions before this func? 
-    
-    # todo other choices
+    for choice in new_choices:
+        c = PLAYERS[choice["player"]]
+
+        if choice["imre_next"]: c.imre_next = True
+        if choice["EP"]:
+            # check here?
+            c.choices.filing_EP = choice["EP"]
+                
+        if choice["actions"]:
+            for a in choice["actions"]:
+
+                add_action(PLAYERS, c.id, a)
+        # what about updating an action? do we just clear all actions before this func? 
+        
+        # todo other choices
+            # imre stuff
 
 
 class Turn:
@@ -82,12 +106,31 @@ class Turn:
 
         self.sane_players: list[int] = [] # just ids 
         self.living_players: list[int] = [] # just ids 
+
+        for p in playerlist:
+            if p.status.is_alive:
+                self.living_players.append(p.id)
+
+                if p.status.is_sane:
+                    self.sane_players.append(p.id)
+            
+            for a in p.choices.actions:
+
+                self.actions.append(a)
+        
+        if gm_input["complaints"]:
+            for v in range(len(gm_input["complaints"])):
+                self.players[v].choices.complaints = gm_input["complaints"][v]
     
     def start_term(self):
+
+        self.log.add_section("NEW TERM", "Starting new term.")
+        
         # GIVE STIPENDS
         for pid in self.sane_players:
-            p = PLAYERS[pid]
+            p = self.players[pid]
             p.status.money += p.initial_status.stipend
+
 
         # DO TUITION STUFF
         # remember to check for masters, social class
@@ -95,7 +138,7 @@ class Turn:
                 if not p.status.is_enrolled:
                     tuition = p.status.tuition # from last enrollment
                 else:
-                    tuition = p.calculate_tuition() # TODO
+                    tuition = p.calculate_tuition(self.gm_input) # TODO
                 
                 if p.status.money >= tuition:
                     # todo check for the preferences thingy
@@ -122,6 +165,8 @@ class Turn:
                 # WHATEVER, TODO
                 # LOG
                 pass
+
+        self.log.log("Stipends, tuition, & lodging processed.")
     
 
     def apply_valid_blocks(self, block_list: "list[Action]", count = 0, process_block_cycles = False):
@@ -180,7 +225,7 @@ class Turn:
         self.apply_valid_blocks(action_list)
 
         print("\n")
-        for p in PLAYERS:
+        for p in self.players:
             for a in p.choices.actions:
                 print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
@@ -196,6 +241,7 @@ class Turn:
         return
 
 
+    # todo somewhere: remember to account for fields being destroyed
     def do_elevations(self):
 
         to_elevate: list[Player] = []
@@ -211,7 +257,8 @@ class Turn:
                 # else add tuition inflation 
             
             else: # NPC
-                elevation_candidates = f.get_EP_list()
+                elevation_candidates: list[Player] = f.get_EP_list()
+                print(f"NPC master {f.name} picking who to elevate among: {elevation_candidates}")
                 # todo: during expulsion remove EP from fields
 
                 if len(elevation_candidates) > 0:
@@ -223,10 +270,12 @@ class Turn:
         # todo: recurse until duplicates are gone
         for f in self.fields:
             if f.elevating is not None:
+                print(f"Player {f.elevating.name} elevated in {f.name}")
+
                 f.elevate_player(f.elevating)
                 f.elevating.elevate_in(f.name)
 
-                print(f"Player {f.elevating.name} elevated in {f.name}")
+                
 
         # todo LOG
 
@@ -279,11 +328,14 @@ class Turn:
     # not sure this needs to be a sep func
     def file_EP(self):
         # todo log
-        for p in self.sane_players:
+        for pid in self.sane_players:
+            p = self.players[pid]
             if not p.status.is_expelled and p.processing.can_file_EP:
                 # check that they aren't filing more than allowed
                 for e in p.choices.filing_EP:
                     p.assign_EP(e)
+
+                    self.fields[e].add_EP(p)
 
 
     def process_mechanics(self):
@@ -305,7 +357,7 @@ class Turn:
         self.file_EP()
 
         # breakout roll
-        for p in PLAYERS:
+        for p in self.players:
             if not p.initial_status.is_sane and p.initial_status.is_alive:
                 roll = random.randint(1,20)
                 if len(p.known_names) >= 5:
@@ -419,26 +471,27 @@ class Turn:
             p.processing = PlayerProcessing(p.info, p.status, p.choices, self.month)
 
             # make sane_players and living_players lists
-            if p.status.is_sane:
-                self.sane_players.append(p.id)
-            if p.status.is_alive:
-                self.living_players.append(p.id)
+            # if p.status.is_sane:
+            #     self.sane_players.append(p.id)
+            # if p.status.is_alive:
+            #     self.living_players.append(p.id)
             # maybe other lists? imre? 
 
             # add actions to actions_list
-            self.actions.append(p.choices.actions)
+            #self.actions.append(p.choices.actions)
 
 
             # add next_status for next turn (to overwrite status at end of turn processing)
             p.initial_status = p.status
-            p.next_status = p.status.deepcopy()
+            p.status = copy.deepcopy(p.status)
             # todo: change things like can_take_actions back where needed
 
         # term beginning -----
-        if self.month % 3 == 0:
+        if self.month % 3 == 0 and self.month != 0:
             self.start_term()
         
         # set up passive roleblocks
+        self.log.add_section("Roleblocks & The Like", "Starting to process roleblocks etc.")
         for pid in self.sane_players:
             p = self.players[pid]
             
@@ -453,20 +506,42 @@ class Turn:
                 p.processing.is_blocked = True
                 p.processing.can_be_targeted = False
             
-            if p.next_status.lodging == Lodging.Ankers and random.randrange(0,100) < 15:
+            if p.status.lodging == Lodging.Ankers and random.randrange(0,100) < 15:
                 # TODO check for in imre
-                action_blocked = random.choice(p.choice.actions)
+                action_blocked = random.choice(p.choices.actions)
                 action_blocked.blocked = True
                 action_blocked.block_reasoning += "Ankers"
             # TODO log
         
+        self.log.log("Passive roleblocks processed...")
+
         self.process_blocks(self.actions)
 
+        self.log.log("All blocks processed!")
+
+        self.log.add_section("Standard Actions", "Starting to process standard actions...")
+        # preprocessing? 
         self.process_standard_actions()
 
-        self.process_mechanics()
+        self.log.log("Standard actions processed!")
 
+        # TODO imre
+
+
+        self.log.add_section("Mechanics stuff", "Starting to process mechanics...")
+        self.process_mechanics()
+        self.log.log("Mechanics processed!")
+
+        self.log.add_section("Offensive Actions", "Processing offensive actions...")
         self.process_offensive_actions()
+        self.log.log("Offensive actions processed!")
+
+        self.log.add_section("Final", "Turn is processed! blah blah blah")
+
+        return self.log.get_log()
+
+        # stuff? 
+        # return results, probably
             
             
 

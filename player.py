@@ -106,6 +106,8 @@ class PlayerStatus:
         # is lashed? 
 
         s.accessible_abilities: list[ActionType] = []
+        if player_static.is_evil:
+            s.accessible_abilities.append(ActionType.Sabotage)
         s.known_names = [] # ? (for breakout roll)
 
         # are there any other prev turn effects? 
@@ -154,7 +156,7 @@ class PlayerProcessing:
         # also want ending_status?
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
-        self.complaints_received: list[Player] = []
+        self.complaints_received: list[Player] = [] # this is POST processing
         self.processed_complaints = self.choices.complaints # todo should initially set as original complaints
         
         # Total DP
@@ -307,6 +309,7 @@ class Player:
     # start of game constructor 
     def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
         self.initial_status: PlayerStatus = player_status
+        self.status: PlayerStatus = player_status
         self.info: PlayerStatic = player_static 
 
         if player_choices is None:
@@ -324,6 +327,13 @@ class Player:
         if player_process is None:
             player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
         self.processing: PlayerProcessing = player_process
+
+    def __str__(self):
+
+        ret = f"{self.info}{self.status.EP}\n"
+
+        return ret
+
 
     def levels_in(self, field: FieldName):
         # error check?
@@ -344,14 +354,31 @@ class Player:
         self.status.available_EP -= 1
 
         # anything else here? 
-    # todo go_insane()
-    # todo break_out()
-    # todo calculate_tuition(gm_input)
-    # todo die()
+
+    def calculate_tuition(self, gm_input):
+        # TODO
+        return
         # remember to check masters, social class, arithmetics
         # probs have Tuition object that can be updated over turns?
 
-# everything below here untouched since haelbarde branch (except assign_DP)
+    def go_insane(self):
+        # TODO
+        self.status.is_sane = False 
+        # ... other stuff? 
+        return 
+
+    def break_out(self):
+        # TODO
+        self.status.is_sane = True
+        # rank stuff, accessible abilities, ...
+        return 
+    
+    def die(self):
+        self.status.is_alive = False
+        # TODO ??
+    
+        return
+
     def take_action(self, action: Action):
 
         self.choices.actions.append(action)
@@ -415,24 +442,24 @@ class Player:
 
     # changed this slightly bc I wasn't clear what it was doing / if it was right
     def assign_DP(self, total = 1, master_of:FieldName = None):
-            if master_of is not None:
-                print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.values[master_of]} ep in {master_of.name}")
-                
-                num_EP = self.status.ep.values[master_of]
-                
-                if num_EP > 0:
-                    diff = num_EP - total
-                    if diff >= 0: # at least as much EP as DP
-                        self.status.EP.values[master_of.name] -= total # or = diff
-                        total = 0
-                    else:
-                        total -= num_EP # or = -diff
-                        self.status.EP.values[master_of] = 0
-                
-                self.status.DP += total
-                
-            else:
-                self.status.DP += total
+        if master_of is not None:
+            #print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.values[master_of]} ep in {master_of.name}")
+            
+            num_EP = self.status.EP.values[master_of]
+            
+            if num_EP > 0:
+                diff = num_EP - total
+                if diff >= 0: # at least as much EP as DP
+                    self.status.EP.values[master_of] -= total # or = diff
+                    total = 0
+                else:
+                    total -= num_EP # or = -diff
+                    self.status.EP.values[master_of] = 0
+            
+            self.processing.DP += total
+            
+        else:
+            self.processing.DP += total
 
     def assign_EP(self, field: FieldName, total = 1):
         self.status.EP.values[field] += total
