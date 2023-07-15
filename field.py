@@ -126,7 +126,7 @@ class FieldStatus:
 
         # add new potential candidates for master
         new_candidates = []
-        for p, num in self.EP:
+        for p, num in self.EP.items():
             if num >= 15:
                 if p.status.rank == Rank.ELTHE and p.status.can_be_elevated:
                     new_candidates.append(p)
@@ -180,7 +180,7 @@ class FieldStatus:
         else:
             self.elevatedOnce.append(player.id)
         
-        if player.rank == Rank.ELTHE:
+        if player.status.rank == Rank.ELTHE:
             # could do the remove_player here
             self.master = player # more stuff? idk
     

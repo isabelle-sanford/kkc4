@@ -425,6 +425,7 @@ class Turn:
         
         # test this recursion pls
         while len(conflicts.keys()) > 0:
+            self.log.log("Conflicts exist.", conflicts)
             for p, fields in conflicts.items():
                 # pick which field gets to elevate
                 roll = random.choice(fields)

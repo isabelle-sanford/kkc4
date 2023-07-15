@@ -37,10 +37,8 @@ class Item:
         self.id = id
 
     @classmethod
-    def Generate(cls, type: ItemType, level: int = 0, target = None):
-        ITEM_COUNT += 1
-        id = ITEM_COUNT
-        
+    def Generate(cls, type: ItemType, level: int = 0, target = None, id = 0):
+        # TODO make incrementing ids
         if type == ItemType.MOMMET: # add sep 3rd level?
             return Item("Mommet", type, 1, False, True, level, id, target)
         elif type == ItemType.TENACULUM:
