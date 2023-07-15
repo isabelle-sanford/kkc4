@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+import random
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from player import Player
@@ -36,6 +37,7 @@ class FieldName(IntEnum):
     GENERAL = 9  # ?
 
 
+# todo: add is_positive for streets actions
 class Ability:
     def __init__(
         self,
@@ -87,7 +89,7 @@ class FieldStatus:
     def __init__(self, field: FieldName, info: FieldInfo):
         self.name = field # hmm
         self.info = info
-        self.EP = {} # dict? or just full on list? (thinking dict atm)
+        self.EP = {} # dict player: numEP
         self.master: Player = None
         self.month = 0
         self.elevating: Player = None 
@@ -95,6 +97,7 @@ class FieldStatus:
         self.elevatedTwice: list[int] = []
         self.elevatedThrice: list[int] = []
         # TODO: list of potential masters
+        self.next_masters: list[Player] = []
     
     def add_EP(self, player, num: int = 1):
         if player in self.EP:
@@ -110,6 +113,41 @@ class FieldStatus:
                 EP_proportional_list.append(p) # TODO test pls
         return EP_proportional_list
     
+    # todo DESTROY
+
+    def update_master_candidates(self):
+        # remove ineligible candidates
+        
+        for candidate in self.next_masters:
+            if self.EP[p] >= 15 and p.status.can_be_elevated:
+                continue
+            else:
+
+
+        # add new potential candidates for master
+        new_candidates = []
+        for p, num in self.EP:
+            if num >= 15:
+                if p.status.rank == Rank.ELTHE and p.status.can_be_elevated:
+                    new_candidates.append(p)
+        
+        random.shuffle(new_candidates)
+
+        for n in new_candidates:
+            if n not in self.next_masters:
+                self.next_masters.append(n)
+
+        if self.master is not None:
+            return
+        
+        if len(self.next_masters) < 1:
+            # no masters available
+            return
+        
+
+        
+
+
     # death, expulsion, insanity
     def remove_player(self, player):
         if player in self.EP:

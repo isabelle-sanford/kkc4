@@ -99,11 +99,12 @@ class PlayerStatus:
 
         # things the player knows / happened prev turn
         # so their page can have invalid stuff grayed out or whatever
-        s.can_take_actions = True 
+        s.can_take_actions = True # why is this blue
         s.can_file_complaints = True 
         s.can_file_EP = True 
         s.can_be_targeted = True # medica emergency (only?)
         s.can_elevate = True
+        s.can_be_elevated = True
         # is lashed? 
 
         s.accessible_abilities: list[ActionType] = []
@@ -370,6 +371,7 @@ class Player:
 
         return ret
 
+    # todo become_master(field)
 
     def levels_in(self, field: FieldName):
         # error check?
@@ -390,6 +392,8 @@ class Player:
         self.status.rank = self.status.rank.get_next() # todo test 
         self.status.available_EP -= 1
 
+        # TODO if elthe + only studied in one field, add 5 EP
+
         # anything else here? 
 
     def calculate_tuition(self, gm_input):
@@ -401,6 +405,7 @@ class Player:
     def go_insane(self, fields: "list[FieldStatus]"):
         # TODO
         self.status.is_sane = False 
+        self.status.can_be_elevated = False
 
         for f in fields:
             f.remove_player(self)
@@ -417,6 +422,13 @@ class Player:
     
     def die(self, fields: "list[FieldStatus]"):
         self.status.is_alive = False
+        self.status.can_take_actions = False
+        self.status.can_be_targeted = False
+        self.status.can_be_elevated = False 
+        self.status.is_enrolled = False
+        self.status.can_file_complaints = False
+        self.status.can_file_EP = False
+
 
         for f in fields:
             f.remove_player(self)
@@ -436,6 +448,7 @@ class Player:
     def expel(self, fields):
         self.status.is_expelled = True
         self.status.can_file_EP = True
+        self.status.can_be_elevated = False
 
         for f in fields:
             f.remove_player(self)

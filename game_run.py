@@ -1,6 +1,6 @@
 import copy
 import random
-from field import FieldStatus, FIELDS
+from field import FieldStatus, FIELDS, Rank
 from horns import Horns
 from items import Item, ItemType
 from outcome import ProcessLog, Result
@@ -283,7 +283,7 @@ class Turn:
 
 
     def process_standard_actions(self):
-
+        # todo: check streets pos actions
         for a in self.actions:
             if a.category == ActionCategory.OTHER or a.category == ActionCategory.CREATEITEM:
                 if a.successful:
@@ -307,10 +307,58 @@ class Turn:
         return
 
 
+    def do_new_masters(self):
+        new_masters = {}
+
+        for f in self.fields:
+            f_master = None
+            
+            # add new potential candidates for master
+            new_candidates = []
+            for p, num in f.EP:
+                if num >= 15:
+                    if p.status.rank == Rank.ELTHE and p.status.can_be_elevated:
+                        new_candidates.append(p)
+            
+            random.shuffle(new_candidates)
+
+            for n in new_candidates:
+                if n not in f.next_masters:
+                    f.next_masters.append(n)
+            
+            # if no PC master, try to elevate someone
+            if f.master is None:
+                if len(f.next_masters) > 0:
+                    new_next_masters = f.next_masters.copy()
+                    for p in f.next_masters:
+                        if f.EP[p] >= 15 and p.status.can_be_elevated:
+                            f_master = p
+                            new_next_masters.remove(p)
+                            break
+                        else:
+                            # no longer a candidate
+                            new_next_masters.remove(p)
+                    
+                    f.next_masters = new_next_masters
+
+                if f_master is not None:
+                    new_masters[f] = f_master
+            
+
+        # check just in case someone tries to become master of 2 things simultaneously 
+
+            
+
+
+
+
+
     # todo somewhere: remember to account for fields being destroyed
+    # this is Yikes
     def do_elevations(self):
 
-        to_elevate: list[Player] = []
+        to_elevate = {}
+        new_masters = {}
 
         for f in self.fields:
             if f.master is not None: # PC master
@@ -318,7 +366,7 @@ class Turn:
 
                 if len(m.choices.to_elevate) > 0:
                     if m.processing.can_elevate:
-                        to_elevate.append(m.choices.to_elevate[0])
+                        to_elevate[f] = m.choices.to_elevate[0]
                         f.elevating = m.choices.to_elevate[0]
                 # else add tuition inflation 
             
@@ -326,14 +374,97 @@ class Turn:
                 elevation_candidates: list[Player] = f.get_EP_list()
                 self.log.log(f"NPC master {f.name} picking who to elevate among: {elevation_candidates}")
 
-                if len(elevation_candidates) > 0:
+                new_master = None
+
+                # check for possible master(s)
+                new_next_list = f.next_masters
+                if len(f.next_masters) > 0:
+                    
+                    for p in f.next_masters:
+                        if f.EP[p] >= 15 and p.status.can_be_elevated:
+                            new_master = p
+                            new_next_list.remove(p)
+                            break
+                        else:
+                            new_next_list.remove(p)
+                        
+                            
+
+                # add new potential candidates
+                # this is... kinda weird
+                ms = []
+                for p, num in f.EP:
+                    if num >= 15: # this is still before filing, right? 
+                        if p.status.rank == Rank.ELTHE and p.status.can_be_elevated:
+                            ms.append(p)
+                            if p not in new_next_list:
+                                new_next_list.append(p)
+                
+                # ! need some way to record master's prev EP in case they destroy the field 
+                if len(ms) > 0 and new_master is None:
+                    if len(ms) == 1:
+                        # elevate that player
+                        new_master = ms[0]
+
+                    else: # multiple possible new masters
+                        new_master = random.choice(ms)
+                        ms.remove(new_master)
+                        random.shuffle(ms)
+
+                        new_next_list.append(*ms)
+                
+                f.next_masters = new_next_list
+
+                if new_master is not None:
+                    # f.remove_player(new_master)
+                    # f.master = new_master
+                    f.elevating = new_master
+                    new_masters[f.name] = new_master
+                    # TODO
+                    
+                # if no new master, then elevate someone
+                elif len(elevation_candidates) > 0:
                     npc_choice = random.choice(elevation_candidates)
                     to_elevate.append(npc_choice)
                     f.elevating = npc_choice
+                
+                else:
+                    # no one to elevate
+                    self.log.log(f"{f.name} has no one to elevate.")
         
+        # check if any duplicate masters, else elevate new masters
+        if len(new_masters.keys()) > 0: # hm
+            conflicts = []
+            vals = new_masters.values()
+            for m in vals:
+                if vals.count(m) > 1:
+                    conflicts.append(m)
+            
+            if len(conflicts) > 0:
+                self.log.log("PROBLEM: MASTER-ELEVATION CONFLICTS")
+                # TODO
+                pass
 
+            # TODO: elevate masters
+            for f, m in new_masters.items():
+                f.remove_player(m)
+                f.master = m
+                # ??
 
         # todo: recurse until duplicates are gone
+        elev_conflicts = {}
+        elev_players = to_elevate.values()
+        # there's got to be a better way to pull duplicates
+        for f, p in to_elevate.items():
+            elev_conflicts[p] = []
+            if elev_players.count(p) > 1:
+                elev_conflicts[p].append(f)
+
+        for pl, fn in elev_conflicts:
+            if len(fn) > 1: # ?
+                pick = random.choice(fn)
+
+
         for f in self.fields:
             if f.elevating is not None:
                 self.log.log(f"Player {f.elevating.name} elevated in {f.name}")
