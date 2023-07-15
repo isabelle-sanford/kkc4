@@ -1,6 +1,9 @@
 
 
 
+from actions import Action
+
+
 class ProcessLog:
     # for output of what's happening at each step during turn processing
 
@@ -47,7 +50,7 @@ class Result:
 
         self.public_results = [] 
         self.player_messages = [] #?
-        self.all_actions = []
+        self.all_actions: list[Action] = []
         self.non_action_results = []
 
         self.warnings = []

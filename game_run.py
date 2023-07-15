@@ -242,45 +242,6 @@ class Turn:
             for a in p.choices.actions:
                 print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
-    def preprocessing(self):
-        # assigning insanity bonuses
-
-        standard_actions: list[Action] = []
-
-        # mews
-        for pid in self.sane_players:
-            p = self.players[pid]
-            if p.status.lodging == Lodging.Mews:
-                p.processing.insanity_bonus += 2
-            elif p.status.lodging == Lodging.SpindleAndDraft:
-                p.processing.insanity_bonus -= 2
-            
-        # action IBs
-        # tbh just move this stuff under perform() though
-        for a in self.actions:
-            if a.successful:
-                # TODO
-                if a.type.category == ActionCategory.CREATEITEM:
-                    standard_actions.append(a)
-                    # ASSIGN APPROPRIATE IB
-                    pass
-                elif a.type == ActionType.MalfeasanceProtection:
-                    # assign appropriate ib
-                    pass 
-                elif a.type == ActionType.UseName:
-                    # assign appropriate ib
-                    pass
-                elif a.type == ActionType.UseMommet:
-                    # assign ib
-                    pass
-                else:
-                    pass
-
-                if a.type.category == ActionCategory.OTHER:
-                    standard_actions.append(a)
-        
-        return standard_actions
-
 
     def process_standard_actions(self):
         # todo: check streets pos actions
@@ -534,7 +495,6 @@ class Turn:
         # todo NAHLROUT
 
         # elevations
-        # TODO master-level elevations
         self.do_elevations()
 
         # offset IP
@@ -669,6 +629,14 @@ class Turn:
         if self.month % 3 == 0 and self.month != 0:
             self.start_term()
         
+        # lodging effects / IB
+        for pid in self.sane_players:
+            p = self.players[pid]
+            if p.status.lodging == Lodging.Mews:
+                p.processing.insanity_bonus += 2
+            elif p.status.lodging == Lodging.SpindleAndDraft:
+                p.processing.insanity_bonus -= 2
+
         # set up passive roleblocks
         self.log.add_section("Roleblocks & The Like", "Starting to process roleblocks etc.")
         for pid in self.sane_players:

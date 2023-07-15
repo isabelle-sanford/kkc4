@@ -22,7 +22,7 @@ class ItemType(Enum):
 class Item:
     ITEM_COUNT = 0
 
-    def __init__(self, name, type: ItemType, uses, defense, action, level, id, target= None) -> None:
+    def __init__(self, name, type: ItemType, uses, defense, action, level, id, target= None, half = False) -> None:
         self.type: ItemType = type
 
         self.name: str = name # ??
@@ -37,7 +37,7 @@ class Item:
         self.id = id
 
     @classmethod
-    def Generate(cls, type: ItemType, level: int = 0, target = None, id = 0):
+    def Generate(cls, type: ItemType, level: int = 0, target = None, id = 0, half = False):
         # TODO make incrementing ids
         if type == ItemType.MOMMET: # add sep 3rd level?
             return Item("Mommet", type, 1, False, True, level, id, target)
