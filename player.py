@@ -395,6 +395,9 @@ class Player:
         # TODO if elthe + only studied in one field, add 5 EP
 
         # anything else here? 
+        # TODO more stuff if master (probs)
+
+        # TODO add new accessible abilities
 
     def calculate_tuition(self, gm_input):
         # TODO

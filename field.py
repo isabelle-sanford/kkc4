@@ -114,15 +114,15 @@ class FieldStatus:
         return EP_proportional_list
     
     # todo DESTROY
-
+# ! need some way to record master's prev EP in case they destroy the field 
     def update_master_candidates(self):
         # remove ineligible candidates
-        
+
         for candidate in self.next_masters:
             if self.EP[p] >= 15 and p.status.can_be_elevated:
                 continue
             else:
-
+                self.next_masters.remove(candidate) # is this ok?
 
         # add new potential candidates for master
         new_candidates = []
@@ -144,8 +144,7 @@ class FieldStatus:
             # no masters available
             return
         
-
-        
+        return self.next_masters
 
 
     # death, expulsion, insanity
@@ -180,6 +179,10 @@ class FieldStatus:
             self.master = player # more checks here? 
         else:
             self.elevatedOnce.append(player.id)
+        
+        if player.rank == Rank.ELTHE:
+            # could do the remove_player here
+            self.master = player # more stuff? idk
     
 
 
