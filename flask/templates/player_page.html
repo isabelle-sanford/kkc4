@@ -1,8 +1,5 @@
 {% extends 'index.html' %} {% block body %}
 
-<!-- 
-  Bootstrap docs: https://getbootstrap.com/docs
--->
 <div class="container pt-2" style="font-family: Luminari">
   <div class="row">
     <div class="col-9 player center">
@@ -20,10 +17,14 @@
         <strong>
           {% if player.info.is_evil %}Skindancer {% else %}Student {% endif %}
         </strong>
-        currently [status at University]. You have [number] of elevation(s) in
-        [field]. You are staying in {{player.status.lodging.fullname}}.<br />
-        Your stipend is {{ player.info.social_class.stipend }} talents and your
-        tuition this term was [].
+        currently {% if player.status.is_enrolled %}enrolled at the University.
+        {% elif player.status.is_expelled %}expelled from the University. {%
+        else %}unenrolled at the University. {% endif %}. You have
+        {{len(player.status.elevations)}} of elevation(s) in
+        {{player.status.elevations}}. You are staying in
+        {{player.status.lodging.fullname}}.<br />
+        Your stipend is {{ player.status.stipend }} talents and your tuition
+        this term was [].
       </p>
       <p>[performance flavor text]</p>
       <p>
@@ -56,11 +57,12 @@
       <fieldset>
         <legend align="center">Inventory</legend>
         <div>
-          <p>You have [] talents, [] jots, and [] drabs.</p>
-          <p>You have [] items.</p>
+          <p>You have {{player.status.print_money()}}.</p>
+          <p>You have {{len(player.status.inventory)}} item(s).</p>
           <p>You have [] debts.</p>
           <p>You have [] contracts</p>
         </div>
+        <!-- TODO inventory list -->
       </fieldset>
     </div>
     <form class="col-6">
@@ -75,9 +77,11 @@
             >
             <select class="form-select" id="Lodging" name="Lodging">
               <option value="Streets">On the Streets</option>
-              <!-- TODO underthing iff broke out -->
+              {% if player.status.broke_out %}
               <option value="Underthing">The Underthing</option>
+              {% endif %} {% if not player.status.is_expelled %}
               <option value="Mews">The Mews</option>
+              {% endif %}
               <option value="Anker's">Anker's</option>
               <option value="King's-Drab">The King's Drab</option>
               <option value="Golden-Pony">The Golden Pony</option>
@@ -139,10 +143,12 @@
           <div class="input-group">
             <span class="input-group-text actions">General</span>
             <select class="form-select" id="action1" name="action1">
-              <option value="Sabotage">Sabotage</option>
-              <option value="Create">Create</option>
+              {% for a in player.status.accessible_abilities %}
+              <option value="{{a}}">{{a}}</option>
+              { % endfor %}
             </select>
             <select class="form-select" id="target1" name="target1">
+              <!-- TODO -->
               <option value="Stink">Stink</option>
               <option value="Elbereth">Elbereth</option>
               <option value="Wilson">Wilson</option>
@@ -198,6 +204,7 @@
     <form class="col-6 pt-2">
       <div>
         <fieldset class="fieldset-uni">
+          <!-- todo if can_file_EP (else gray) -->
           <legend align="center" class="legend-uni">Elevation Points</legend>
           <div class="row">
             <div class="col-5">
@@ -291,9 +298,12 @@
               </div>
             </div>
             <div class="col-7">
+              <!-- TODO -->
               <span
                 >You currently have EP in: <br />
-                [fields]<br />
+                {% for f in player.status.EP.get_list() %} {% if f > 0 %} {{ f}}
+                <br />
+                {% endif %} {% endfor %}
                 <br />
               </span>
               <span style="text-decoration: underline"
@@ -329,6 +339,7 @@
         <div class="row">
           <div class="col-3">
             <span>Players with EP:</span>
+            <!-- TODO -->
           </div>
           <div class="col-3">
             <span>Elevate:</span>

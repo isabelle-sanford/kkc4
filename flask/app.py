@@ -33,7 +33,7 @@ def gm():
 
 @app.route("/gm/fields")
 def gm_fields():
-    return render_template('gm-fields.html', fieldstatus=fields)
+    return render_template('gm-fields.html', fields=fields)
 
 @app.route("/gm/players")
 def gm_players():

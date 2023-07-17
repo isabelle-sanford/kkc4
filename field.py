@@ -55,6 +55,7 @@ class Ability:
         is_negative: bool = False,
         is_passive: bool = False
         # could add insanity bonus
+        # todo: add category, probably - or just actiontype? 
     ):
         self.name = ability_name
         self.field = field
@@ -98,8 +99,8 @@ class FieldStatus:
         self.elevatedOnce: list[int] = [] # since it's not actually rank? 
         self.elevatedTwice: list[int] = []
         self.elevatedThrice: list[int] = []
-        # TODO: list of potential masters
         self.next_masters: list[Player] = []
+        self.DP = [] # todo
     
     def add_EP(self, player, num: int = 1):
         if player in self.EP:

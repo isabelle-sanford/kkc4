@@ -1,4 +1,5 @@
 import copy
+from dataclasses import dataclass
 from enum import Enum
 import random 
 
@@ -29,28 +30,59 @@ class PlayerStatic:
         ret += "Skindancer" if self.is_evil else "Student"
         ret += "\n"
         return ret
-    
+
+@dataclass
+class EP2:
+    # TODO figure out what's going on here
+    linguistics: int = 0
+    arithmetics: int = 0
+    rhetoric: int = 0
+    archives: int = 0
+    sympathy: int = 0
+    physicking: int = 0
+    alchemy: int = 0
+    artificery: int = 0
+    naming: int = 0
+    ep_list = [linguistics, arithmetics, rhetoric, archives, sympathy, physicking, alchemy, artificery, naming]
+    ep_dict = {
+            "Linguistics": linguistics, 
+            "Arithmetics": arithmetics, 
+            "Rhetoric & Logic": rhetoric,
+            "Archives": archives, 
+            "Sympathy": sympathy,
+            "Physicking": physicking,
+            "Alchemy": alchemy,
+            "Artificery": artificery,
+            "Naming": naming
+            }
+
+# wait this should be a dataclass
 class EP:
-    def __init__(self, linguistics = 0, arithemtics = 0, rhetoric = 0, 
+    def __init__(self, linguistics = 0, arithmetics = 0, rhetoric = 0, 
                  archives = 0, sympathy = 0, physicking = 0, alchemy = 0,
                    artificery = 0, naming = 0) -> None:
         
        
-        self.values = [linguistics, arithemtics, rhetoric, archives, sympathy,
+        self.values = [linguistics, arithmetics, rhetoric, archives, sympathy,
                         physicking, alchemy, artificery, naming]
-        # self.linguistics = linguistics
-        # self.arithemtics = arithemtics
-        # self.rhetoric = rhetoric 
-        # self.archives = archives
-        # self.sympathy = sympathy
-        # self.physicking = physicking
-        # self.alchemy = alchemy 
-        # self.artificery = artificery
-        # self.naming = naming 
+
+        self.dict = {
+            "Linguistics": linguistics, 
+            "Arithmetics": arithmetics, 
+            "Rhetoric & Logic": rhetoric,
+            "Archives": archives, 
+            "Sympathy": sympathy,
+            "Physicking": physicking,
+            "Alchemy": alchemy,
+            "Artificery": artificery,
+            "Naming": naming
+            }
     
-    def get_list(self):
+    # def get_dict(self)
+
+    def get_list(self): # [rhet, rhet, ling, ling, ling, ...]
         all_EP: list[FieldName] = []
-        for i in range(8):
+        for i in range(0,9): # ?
             for j in range(self.values[i]):
                 all_EP.append(FieldName(i))
         
@@ -66,6 +98,24 @@ class PlayerStatus:
 
     def __init__(self, player_static):
         self.info = player_static
+
+    def short_status(self):
+        ret = "" 
+        ret += "Alive" if self.is_alive else "Dead"
+        ret += ", "
+        ret += "Sane" if self.is_sane else "Insane"
+        ret += " (Expelled)" if self.is_expelled else ""
+
+        return ret
+
+    def print_money(self):
+        # this can probs be better / nicer 
+        m = self.money # 3.14
+        m *= 100 # 314
+        m = str(m) # "314"
+        ret = f"{m[0]} talent(s), {m[1]} jot(s), and {m[2]} drab(s)" 
+
+        return ret
 
     # input from GM distribution 
     @classmethod
@@ -96,6 +146,7 @@ class PlayerStatus:
         s.is_expelled = False 
         s.is_enrolled = True 
         s.in_Imre = False
+        s.broke_out = False 
 
         # things the player knows / happened prev turn
         # so their page can have invalid stuff grayed out or whatever
@@ -107,7 +158,7 @@ class PlayerStatus:
         s.can_be_elevated = True
         # is lashed? 
 
-        s.accessible_abilities: list[ActionType] = []
+        s.accessible_abilities: list[ActionType] = [] # TODO
         if player_static.is_evil:
             s.accessible_abilities.append(ActionType.Sabotage)
         s.known_names = [] # ? (for breakout roll)
@@ -373,6 +424,8 @@ class Player:
 
     # todo become_master(field)
 
+    # todo action period stuff (sigh)
+
     def levels_in(self, field: FieldName):
         # error check?
         count = self.status.elevations.count(field)
@@ -420,6 +473,7 @@ class Player:
     def break_out(self):
         # TODO
         self.status.is_sane = True
+        self.status.broke_out = True
         # rank stuff, accessible abilities, ...
         return 
     

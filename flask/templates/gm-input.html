@@ -22,6 +22,8 @@
         {% for i in range(4) %}
         <div class="input-group">
           <select class="form-select" id="Vote" name="Players">
+            <option value="None">None</option>
+            <!-- sane players only? -->
             {% for player in playerlist %}
             <option value="{{player}}">{{player}}</option>
             {% endfor %}

@@ -11,68 +11,72 @@ from statics import Background, Lodging
 # idk 
 #PLAYERS: "list[Player]" = [] 
 
-# could put all this in a Game class
-def add_player(input, id):
-    p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
-    p.id = id
+class Game:
 
-    inventory = []
-    if input["inventory"] is not None:
-        inventory.append(Item.Generate(input["inventory"])) # does this work or do you need to do something different bc 2 nahlrout? 
-    ps = PlayerStatus.distro_init(p, input["lodging"], input["musical_stat"], inventory)
-
-    player = Player(p, ps)
-    
+    def __init__(self):
+        self.num_players = 0
+        self.players: list[Player] = []
+        self.turns: list[Turn] = []
+        # this is where field status init should go
 
 
-    if input["ep1"] is not None:
-        player.assign_EP(FIELDS[input["ep1"][0]].name, input["ep1"][1])
-        FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
+    def add_player(self, input):
+        self.num_players += 1
 
-    
-    if input["ep2"] is not None:
-        player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
-        FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
+        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
+        p.id = self.num_players
 
-    #choice = PlayerChoices(p)
+        inventory = []
+        if input["inventory"] is not None:
+            inventory.append(Item.Generate(input["inventory"])) # does this work or do you need to do something different bc 2 nahlrout? 
+        ps = PlayerStatus.distro_init(p, input["lodging"], input["musical_stat"], inventory)
 
-    return player
+        player = Player(p, ps)
 
-def start_game(distro_inputs):
-    PLAYERS = []
-    i = 0
-    for d in distro_inputs:
-        # make Player objects for month 0
-        p = add_player(d, i) 
-        i += 1
-        PLAYERS.append(p)
-    return PLAYERS
+        if input["ep1"] is not None:
+            player.assign_EP(FIELDS[input["ep1"][0]].name, input["ep1"][1])
+            FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
 
-def add_action(PLAYERS, player_id, action_info):
-    p = PLAYERS[player_id]
-
-    if not p.status.can_take_actions:
-        print("Player cannot take actions!") # log, and better
-    elif action_info["action_type"] not in p.status.accessible_abilities:
-        # log, not print
-        print("Player cannot take this action!")
-    # anything else?
-
-    # this bit can probably be much better (get func maybe?)
-    t2 = None
-    if "target_two" in action_info:
-        t2 = action_info["target_two"]
-    
-    a = Action(p, action_info["action_type"], action_info["target"], t2)
-
-    p.take_action(a)
+        
+        if input["ep2"] is not None:
+            player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
+            FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
 
 
+        self.players.append(player)
 
-def update_choices(PLAYERS, new_choices):
+        return player
 
+    def start_game(self, distro_inputs):
+        for d in distro_inputs:
+            self.add_player(d) 
+
+
+    def add_action(self, player_id, action_info):
+        p = self.players[player_id]
+
+        if not p.status.can_take_actions:
+            print("Player cannot take actions!") # log, and better
+        elif action_info["action_type"] not in p.status.accessible_abilities:
+            # log, not print
+            print("Player cannot take this action!")
+        # anything else?
+
+        # this bit can probably be much better (get func maybe?)
+        t2 = None
+        if "target_two" in action_info:
+            t2 = action_info["target_two"]
+        
+        a = Action(p, action_info["action_type"], action_info["target"], t2)
+
+        p.take_action(a)
+
+
+
+def update_choices(self, new_choices):
+    # erase all prev choices? (for just the player(s) in the list?)
     for choice in new_choices:
-        c = PLAYERS[choice["player"]]
+        c = self.players[choice["player"]]
 
         if choice["imre_next"]: c.imre_next = True
         if choice["EP"]:
@@ -82,13 +86,13 @@ def update_choices(PLAYERS, new_choices):
         if choice["actions"]:
             for a in choice["actions"]:
 
-                add_action(PLAYERS, c.id, a)
+                self.add_action(self.players, c.id, a)
         # what about updating an action? do we just clear all actions before this func? 
         
         # todo other choices
             # imre stuff
 
-
+# could put this inside game, idk
 class Turn:
 
     def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]"):
@@ -246,7 +250,7 @@ class Turn:
     def process_standard_actions(self):
         # todo: check streets pos actions
         for a in self.actions:
-            if a.category == ActionCategory.OTHER or a.category == ActionCategory.CREATEITEM:
+            if a.type.category == ActionCategory.OTHER or a.type.category == ActionCategory.CREATEITEM:
                 if a.successful:
                     # not sure if these checks are already done in block processing
                     if a.type.t1type == Target.PLAYER:
@@ -263,7 +267,7 @@ class Turn:
                     # todo more checks probably
                     a.perform()
 
-            elif a.category == ActionCategory.OFFENSIVE:
+            elif a.type.category == ActionCategory.OFFENSIVE:
                 self.offensive_actions.append(a)
         return
 

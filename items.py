@@ -1,7 +1,6 @@
 from enum import Enum
 import random
 
-# untouched since haelbarde, seems fine
 
 class ItemType(Enum):
     MOMMET = 1
@@ -81,3 +80,12 @@ class Item:
             self.uses -= 1
 
         return
+    
+    def __str__(self):
+        ret = f"{self.name}"
+        if self.target is not None:
+            # mommet only
+            ret += f" on {self.target} "
+        if self.uses > 1:
+            ret += f" ({self.uses} use(s))"
+        

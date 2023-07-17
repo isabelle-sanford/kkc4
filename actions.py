@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from player import Player
@@ -25,8 +26,19 @@ class Target(Enum):
     ABILITY = 8 # banned books
     NONE = 9 # includes self-targets
 
+@dataclass
+class ActionInfo:
+    id: int
+    name: str
+    category: ActionCategory
+    target1: Target
+    target2: Target = Target.NONE
+    is_positive: bool = False
+    is_negative: bool = False
+    insanity_bonus: int = 0
 
 class ActionType(Enum):
+    # isn't there a way to generate enums instead of having to have them all here like this? 
     MysteriousBulletins = 1, ActionCategory.OTHER, Target.NONE, Target.NONE
     BribeTheMessenger = 2, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
     LinguisticAnalysis = 3, ActionCategory.OTHER, Target.PLAYER, Target.NONE
@@ -113,6 +125,7 @@ HAS_IB = [ # hmm
 ]
 
 class Action:
+    # maybe ActionInfo instead of type? not sure
     def __init__(self, player, type: ActionType, target,
                   target_two = None, level = None, item: Item = None): # action_type ??
         self.player = player # Player taking the action
@@ -148,6 +161,19 @@ class Action:
         self.blocked_by_action: list[Action] = []
         self.in_block_cycle: bool = False
         self.block_reasoning = "" # for GM results
+
+    def __str__(self):
+        # assumes action-taker is known 
+        ret = self.type.name # ! gotta be info 
+        if self.target is not None:
+            ret += f"({self.target}"
+            if self.target_two is not None:
+                ret += f"-> {self.target_two})"
+            ret += ")"
+        
+        return ret
+
+    # todo more detailed str
 
 
     def print_block_details(self):

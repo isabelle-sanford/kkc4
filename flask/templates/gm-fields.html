@@ -19,11 +19,15 @@
         <li class="list-group-item list-group-item-info">
           <h4>EP in Field</h4>
         </li>
-        <li class="list-group-item player-ep">[player] - [EP]</li>
+        {% for player in fields.EP %}
+        <li class="list-group-item player-ep">
+          {{player}} - {{fields.EP[player]}}
+        </li>
+        {% endfor %}
       </ul>
       <span class="my-2">Elevate:</span>
       <ul class="list-group my-2">
-        <li class="list-group-item elevate">[Player]</li>
+        <li class="list-group-item elevate">{{fields.elevating}}</li>
       </ul>
     </div>
     <div class="col-4">
@@ -31,11 +35,9 @@
         <li class="list-group-item list-group-item-danger">
           <h4>DP Filed</h4>
         </li>
-        <li class="list-group-item dp-filed">[DP1]</li>
-        <li class="list-group-item dp-filed">[DP2]</li>
-        <li class="list-group-item dp-filed">[DP3]</li>
-        <li class="list-group-item dp-filed">[DP4]</li>
-        <li class="list-group-item dp-filed">[DP5]</li>
+        {% for p in fields.DP %}
+        <li class="list-group-item dp-filed">{{p}}</li>
+        {% endfor %}
       </ul>
     </div>
   </div>

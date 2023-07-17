@@ -12,7 +12,7 @@
       <h2>{{ p.info.name }}</h2>
       <span>{{p.info.rp_name}}</span>
       <ul class="list-group my-2">
-        <li class="list-group-item">[Status]</li>
+        <li class="list-group-item">{{p.status.short_status()}}</li>
         <li class="list-group-item">
           {% if p.info.is_evil %}Skindancer {% else %}Student {% endif %}
         </li>
@@ -20,7 +20,10 @@
       </ul>
       <ul class="list-group my-2">
         <li class="list-group-item musical">{{p.status.musical_stat}}</li>
-        <li class="list-group-item insanity-modifier">[Insanity]</li>
+        <!-- ? -->
+        <li class="list-group-item insanity-modifier">
+          {{p.processing.insanity_bonus}}
+        </li>
       </ul>
       <ul class="list-group my-2">
         <li class="list-group-item">{{p.status.lodging.fullname}}</li>
@@ -29,16 +32,17 @@
     </div>
     <div class="col-3">
       <ul class="list-group my-2">
-        <li class="list-group-item">[Uni/Imre Next Turn]</li>
+        <li class="list-group-item">
+          {% if p.choices.imre_next %}Imre Next {% endif %}
+        </li>
       </ul>
       <ul class="list-group my-2">
         <li class="list-group-item list-group-item-warning">
           <h4>Current Actions</h4>
         </li>
-        <li class="list-group-item actions">[Action1]</li>
-        <li class="list-group-item actions">[Action2]</li>
-        <li class="list-group-item actions">[Action3]</li>
-        <li class="list-group-item actions">[Action4]</li>
+        {% for a in p.choices.actions %}
+        <li class="list-group-item actions">{{a}}</li>
+        {% endfor %}
       </ul>
     </div>
     <div class="col-3">
@@ -47,7 +51,9 @@
           <h4>Items</h4>
         </li>
         <!-- todo -->
-        <li class="list-group-item inventory">{{p.status.inventory}}</li>
+        {% for i in p.status.inventory %}
+        <li class="list-group-item inventory">{{i}}</li>
+        {% endfor %}
       </ul>
     </div>
     <div class="col-3">
