@@ -12,14 +12,14 @@ class ActionCategory(Enum):
     BLOCKETC = 1
     OFFENSIVE = 2
     OTHER = 3
-    CREATEITEM = 4
+    CREATEITEM = 4 # hmm
 
 
 class Target(Enum):
     PLAYER = 1
     ACTION = 2
     LOCATION = 3
-    ITEM = 4
+    ITEM = 4 # maybe distinguish item and itemtype?
     EVENT = 5 # for Omen Recognition and mommet lvl 3
     OTHER = 6 # bool for master bonetar
     FIELD = 7 # banned books
@@ -58,7 +58,7 @@ pickpocket = ActionInfo(5, "Pickpocket", ActionCategory.BLOCKETC, Target.PLAYER,
 great_deals = ActionInfo(34, "Great Deals", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
 decreased_tuition = ActionInfo(35, "Decreased Tuition", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
 
-argumentum_ad_nauseam = ActionInfo(6, "Argumentum Ad Nauseam", ActionCategory.OTHER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELIR))
+argumentum_ad_nauseam = ActionInfo(6, "Argumentum Ad Nauseam", ActionCategory.OTHER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELIR), is_negative=True) # IS NEGATIVE
 proficient_in_hyperbole = ActionInfo(7, "Proficient In Hyperbole", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.RELAR))
 persuasive_arguments = ActionInfo(8, "Persuasive Arguments", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELTHE))
 law_of_contraposition = ActionInfo(9, "Law of Contraposition", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.MASTER))
@@ -73,14 +73,27 @@ malfeasance_protection = ActionInfo(15, "Mommet Protection", ActionCategory.CREA
 
 
 medica_emergency = ActionInfo(16, "Medica Emergency", ActionCategory.OTHER, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
-medica_detainment = ActionInfo(16, "Medica Detainment", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
-psych_counselling = ActionInfo(17, "")
-# TODO
+medica_detainment = ActionInfo(17, "Medica Detainment", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
+psych_counselling = ActionInfo(18, "Psychological Counselling", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
+cheating_death = ActionInfo(19, "Cheating Death", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=Ability2(FieldName.PHYSICKING,Rank.ELIR, True))
 
+create_item = ActionInfo(20, "Create Item", ActionCategory.CREATEITEM, Target.ITEM)
+create_half_item = ActionInfo(21, "Create Half Item", ActionCategory.CREATEITEM, Target.ITEM)
 
+use_name = ActionInfo(22, "Use Name", ActionCategory.OTHER, field_ability=Ability2(FieldName.NAMING))
 
+use_mommet = ActionInfo(23, "Use Mommet", ActionCategory.BLOCKETC, is_negative=True) # IB 
+use_tenaculum_item = ActionInfo(24, "Use Tenaculum (Item)", ActionCategory.BLOCKETC, Target.ITEM, is_negative=True)
+use_tenaculum_action = ActionInfo(25, "Use Tenaculum (Action)", ActionCategory.BLOCKETC, Target.ACTION, is_negative=True)
+use_plumbob = ActionInfo(26, "Use Plum Bob", ActionCategory.OTHER, Target.PLAYER, is_negative=True) # neg?
+use_bonetar = ActionInfo(27, "Use Bonetar", ActionCategory.OFFENSIVE, Target.LOCATION, is_negative=True)
+use_ward = ActionInfo(28, "Use Ward", ActionCategory.OTHER)
+use_thieveslamp = ActionInfo(29, "Use Thieves Lamp", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True)
+use_nahlrout = ActionInfo(30, "Use Nahlrout", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True)
 
-sabotage = ActionInfo(41, "Sabotage", ActionCategory.OFFENSIVE, Target.PLAYER, is_negative=True)
+sabotage = ActionInfo(31, "Sabotage", ActionCategory.OFFENSIVE, Target.PLAYER, is_negative=True)
+
+give_item = ActionInfo(32, "Give Item", ActionCategory.OTHER, Target.PLAYER, Target.ITEM, is_positive=True)
 
 # TODO 
 class ActionType(Enum):
@@ -89,25 +102,25 @@ class ActionType(Enum):
     MysteriousBulletins = 2, myst_bulletins
     BribeTheMessenger = 3, bribe_messenger
     LinguisticAnalysis = 4, linguistic_analysis
-    Pickpocket = 5,
-    ArgumentumAdNauseam = 6, 
-    ProficientInHyperbole = 7, 
-    PersuasiveArguments = 8, 
-    LawOfContraposition = 9, 
-    OmenRecognition = 10, 
-    SchoolRecords = 11,
-    BannedBooks = 12
-    FaeLore = 13,
-    MommetMaking = 14
-    MalfeasanceProtection = 15,
-    MedicaEmergency = 16
-    MedicaDetainment = 17, 
-    PsychologicalCounselling = 18
-    CheatingDeath = 19
+    Pickpocket = 5, pickpocket
+    ArgumentumAdNauseam = 6, argumentum_ad_nauseam
+    ProficientInHyperbole = 7, proficient_in_hyperbole
+    PersuasiveArguments = 8, persuasive_arguments
+    LawOfContraposition = 9, law_of_contraposition
+    OmenRecognition = 10, omen_recognition
+    SchoolRecords = 11, school_records
+    BannedBooks = 12, banned_books
+    FaeLore = 13, fae_lore
+    MommetMaking = 14, mommet_making
+    MalfeasanceProtection = 15, malfeasance_protection
+    MedicaEmergency = 16, medica_emergency
+    MedicaDetainment = 17, medica_detainment
+    PsychologicalCounselling = 18, psych_counselling
+    CheatingDeath = 19, cheating_death
 
     # what if single CreateItem action type, target is item
-    CreateItem = 20
-    CreateHalfItem = 21
+    CreateItem = 20, create_item
+    CreateHalfItem = 21, create_half_item
     # CreateTenaculum = 20
     # CreateFirestop = 21
     # CreatePlumbob = 22
@@ -117,25 +130,26 @@ class ActionType(Enum):
     # CreateThievesLamp = 27
     # CreateGram = 28
     
-    UseName = 22
+    UseName = 22, use_name
 
-    # what if UseItem type
-    UseMommet = 23 , 
-    UseTenaculumItem = 24
-    UseTenaculumAction = 25 
-    UsePlumbob = 26, 
-    UseBonetar = 35,
-    UseWard = 27,
-    UseThievesLamp = 28 , 
-    UseNahlrout = 29 , 
-    UseCourier = 30, 
+    # what if UseItem type - no, too many targets then
+    UseMommet = 23 , use_mommet
+    UseTenaculumItem = 24, use_tenaculum_item
+    UseTenaculumAction = 25, use_tenaculum_action
+    UsePlumbob = 26, use_plumbob
+    UseBonetar = 27, use_bonetar
+    UseWard = 28, use_ward
+    UseThievesLamp = 29, use_thieveslamp
+    UseNahlrout = 30, use_nahlrout
+
+    #UseCourier = 31, # not really an action
 
     # ! maybe don't include this at all tbh? 
     #UseAssassin = 40, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player # note - does not take an action period / can't be blocked
 
     Sabotage = 31, sabotage
 
-    GiveItem = 32
+    GiveItem = 32, give_item
 
     # PASSIVE, maybe shouldn't be here 
     ReducedInterest = 33, reduced_interest

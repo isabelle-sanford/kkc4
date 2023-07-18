@@ -409,11 +409,11 @@ class Player:
     def elevate_in(self, field: FieldName):
         # TODO add accessible ability
         self.status.elevations.append(field)
-        num_EP = self.status.EP.values[field]
+        num_EP = self.status.EP.vals[field]
         if num_EP < 5:
-            self.status.EP.values[field] = 0
+            self.status.EP.vals[field] = 0
         else:
-            self.status.EP.values[field] -= 5
+            self.status.EP.vals[field] -= 5
         
         self.status.rank = self.status.rank.get_next() # todo test 
         self.status.available_EP -= 1
@@ -548,18 +548,18 @@ class Player:
     # changed this slightly bc I wasn't clear what it was doing / if it was right
     def assign_DP(self, total = 1, master_of:FieldName = None):
         if master_of is not None:
-            #print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.values[master_of]} ep in {master_of.name}")
+            #print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.vals[master_of]} ep in {master_of.name}")
             
-            num_EP = self.status.EP.values[master_of]
+            num_EP = self.status.EP.vals[master_of]
             
             if num_EP > 0:
                 diff = num_EP - total
                 if diff >= 0: # at least as much EP as DP
-                    self.status.EP.values[master_of] -= total # or = diff
+                    self.status.EP.vals[master_of] -= total # or = diff
                     total = 0
                 else:
                     total -= num_EP # or = -diff
-                    self.status.EP.values[master_of] = 0
+                    self.status.EP.vals[master_of] = 0
             
             self.processing.DP += total
             

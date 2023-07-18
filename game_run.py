@@ -22,7 +22,7 @@ class Game:
 
 
     def add_player(self, input):
-        self.num_players += 1
+        
 
         p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
         p.id = self.num_players
@@ -45,6 +45,8 @@ class Game:
 
 
         self.players.append(player)
+
+        self.num_players += 1
 
         return player
 
