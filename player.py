@@ -129,6 +129,7 @@ class PlayerStatus:
             "DEVI_defaulted": False,
             "DEVI_collateral": [],
             "BLACKMARKET_Contractlog": []
+            # TODO blacklistings probs
         }
 
         return s
@@ -265,32 +266,35 @@ class PlayerChoices:
         self.to_elevate: list[Player] = [] # ordered preference list
 
         # IMRE (check if player is there?)
-        # also again maybe change to dict, this is really messy
-        self.IMRE_EOLIAN_audition: bool = False
-        self.IMRE_EOLIAN_practice: bool = False
-
-        self.IMRE_DEVI_acquire_loan: bool = False
-        self.IMRE_DEVI_give_collateral: list[Item] = []
-        self.IMRE_DEVI_loan_amount: float =  0.0
-        # Do you actively choose to pay the loan or is it direct debit?
-
-        self.IMRE_GILES_acquire_loan: bool = False
-        self.IMRE_GILES_loan_amount: float =  0.0
-
-        self.IMRE_LOADEDDICE_placed_bet: bool = False
-        self.IMRE_LOADEDDICE_bet_amount: float = 0.0
-        self.IMRE_LOADEDDICE_numbers: list[int] = []
-
-        self.IMRE_APOTHECARY_nahlrout: int = 0
-        self.IMRE_APOTHECARY_couriers: list[str] = []
-        self.IMRE_APOTHECARY_bloodless: int = 0
-        self.IMRE_APOTHECARY_gram: int = 0
-
-        self.IMRE_BLACKMARKET_mommet: list[Item] = []
-        self.IMRE_BLACKMARKET_bodyguard: int = 0
-        self.IMRE_BLACKMARKET_assassin: list[Player] = []
-        self.IMRE_BLACKMARKET_take_contract: list[Item] = []
-        self.IMRE_BLACKMARKET_place_contract: list[Item] = []
+        self.IMRE_CHOICES = {
+            "Eolian": {
+                "audition": False,
+                "practice": False
+            },
+            "Devi": {
+                "acquire_loan": False,
+                "give_collateral": [], # item list
+                "loan_amount": 0.0
+            }, "Giles": {
+                "acquire_loan": False,
+                "loan_amount": 0.0
+            }, "Loaded Dice": {
+                "place_bet": False,
+                "bet_amt": 0.0,
+                "numbers": []
+            }, "Apothecary": {
+                "nahlrout": 0,
+                "courier": 0, # does this need target?
+                "bloodless": 0,
+                "gram": 0
+            }, "Black Market": {
+                "mommet": [], # items
+                "bodyguard": [], # player targets
+                "assassin": [], # player targets
+                "take_contract": [], # contract ids
+                "place_contract": [] # contract info
+            }
+        }
 
         self.offset_IP = 0
  
@@ -375,6 +379,8 @@ class Player:
 
         # TODO add new accessible abilities
 
+        # todo aturan chance of backing out of arcane fields
+
     def calculate_tuition(self, gm_input):
         # TODO
         return
@@ -403,7 +409,7 @@ class Player:
     def die(self, fields: "list[FieldStatus]"):
         self.status.is_alive = False
         self.status.can_take_actions = False
-        self.status.can_be_targeted = False
+        self.status.can_be_targeted = False #no
         self.status.can_be_elevated = False 
         self.status.is_enrolled = False
         self.status.can_file_complaints = False
@@ -467,8 +473,65 @@ class Player:
                     list.append(item)
         return list
 
+    # not sure if to do imre stuff here or in process_imre tbh
+    def visit_eolian(self):
+        if self.status.IMRE_INFO["EOLIAN_auditioned"]:
+            # cannot re-audition
+            return
+        
+        if self.choices.IMRE_CHOICES["Eolian"]["practice"]:
+            self.status.musical_stat += 0.5
+            return 
+        
+        if self.choices.IMRE_CHOICES["Eolian"]["audition"]:
+            mstat = self.status.musical_stat
+            pipes = False
+            # TODO
 
+            if pipes:
+                self.status.inventory.append(Item.Generate(ItemType.TALENTPIPES))
+            
+            return
 
+    def gamble_loadeddice(self):
+        # todo check blacklisting
+        if not self.choices.IMRE_CHOICES["Loaded Dice"]["place_bet"]:
+            return
+        houseroll = random.randint(1,20)
+        if self.info.social_class == Background.Ceald:
+            houseroll = random.randint(1, 6)
+        elif self.info.social_class == Background.Ruh:
+            houseroll = random.randint(1,12)
+        
+        nums = self.choices.IMRE_CHOICES["Loaded Dice"]["numbers"]
+        bet_amt = self.choices.IMRE_CHOICES["Loaded Dice"]["bet_amt"] 
+
+        if houseroll in nums: # win! 
+            
+            numlen = len(nums)
+
+            if numlen == 1:
+                multiplier = 20
+            elif numlen == 2:
+                multiplier = 15
+            elif numlen == 3:
+                multiplier = 10
+            elif numlen == 4:
+                multiplier = 5
+            elif numlen == 5:
+                multiplier = 2
+            else: 
+                # error
+                print(" uh oh")
+            
+            winnings = bet_amt * multiplier
+
+            self.increase_money(winnings)
+        
+        else: # lost
+            self.reduce_money(bet_amt)
+    
+    
     # todo use_item()
 
     def increase_money(self, amount: float):

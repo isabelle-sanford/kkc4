@@ -61,7 +61,7 @@ particularly notable todos
 - tuition 
 - imre
 - action period stuff
-- item stuff (use_item, ids, half items)
+- item stuff (use_item, ids, half items, master-level alchemy items being 2-use)
 - results
 - destroying locations/fields
 - naming (sigh)
@@ -80,6 +80,7 @@ abilities
 - law of contraposition, proficient in hyperbole 
 - fae lore 
 - medica detainment, cheating death
+- banned books (incl. getting caught)
 
 small
 - remove createitem category? 
@@ -93,3 +94,18 @@ small
 - gm input stuff aside from complaints
 - make mastery/elevation less ugly
     - also, pc master choice takes precedence over npc
+- underthing (cannot be targeted or take actions)
+- IP offset is 1 IP per FOUR EP
+- breakout removes 1 random power
+- failure to do formal apology means 2 DP next turn
+- expelled students can only target ppl in Imre or other expelled students
+- sabotages kill expelled students unless protected
+- multiple masters try to elevate a student -> field where they have MORE EP takes precedence
+- masters who cannot pay tuition get demoted 
+- making an item over just one turn they can't file complaints or EP or take other actions 
+- need to deal with Events (for omen recognition)
+- banned books takes two action periods and 2 in one turn has similar effects to item creation
+- you can't visit the grey man if you defaulted with giles
+- need to figure out what items are worth as collateral in actuality tho 
+- blacklisting loaded dice stuff
+- loaded dice: make sure cealds/ruh only have option to bet on numbers up thru 6/12 

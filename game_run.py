@@ -2,6 +2,7 @@ import copy
 import random
 from field import FieldStatus, FIELDS
 from horns import Horns
+from imre import Apothecary, BlackMarket
 from items import Item, ItemType
 from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices
@@ -20,10 +21,11 @@ class Game:
         self.turns: list[Turn] = []
         # this is where field status init should go
 
+        self.apothecary = Apothecary()
+        self.blackmarket = BlackMarket()
+
 
     def add_player(self, input):
-        
-
         p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
         p.id = self.num_players
 
@@ -114,6 +116,7 @@ class Turn:
 
         self.sane_players: list[int] = [] # just ids 
         self.living_players: list[int] = [] # just ids 
+        self.imre_players: list[int] = [] # just ids
 
         for p in playerlist:
             if p.status.is_alive:
@@ -125,6 +128,10 @@ class Turn:
             for a in p.choices.actions:
 
                 self.actions.append(a)
+            
+            if p.choices.imre_next: # is this good?
+                self.imre_players.append(p.id)
+
         # other lists? imre? 
 
         if gm_input["complaints"]:
@@ -338,6 +345,7 @@ class Turn:
 
     # todo somewhere: remember to account for fields being destroyed
     # this is Yikes
+    # todo: PC masters take precedence; first tiebreaker is # of EP in field
     def do_elevations(self):
 
         to_elevate = {} # player: field
@@ -619,6 +627,28 @@ class Turn:
 
         # TODO LOGGING / RESULTS
         return
+    
+    def process_imre(self):
+        loaded_dice_roll = random.randint(1,20)
+
+        for pid in self.imre_players:
+            p = self.players[pid]
+
+            # TODO: blocks stuff
+
+            p.visit_eolian()
+
+            p.gamble_loadeddice()
+
+
+        # APOTHECARY
+
+        # MONEYLENDERS
+
+        # BLACK MARKET
+
+        return
+
 
     def PROCESS_TURN(self):
         # update field statuses to new month (?)
