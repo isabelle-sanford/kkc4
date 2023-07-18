@@ -2,14 +2,14 @@
 
 <div class="container pt-2" style="font-family: Luminari">
   <div class="row">
-    <h1>KKC4 Player Information</h1>
+    <h1 class="h1-player-info">KKC4 Player Information</h1>
   </div>
 
   { % for p in players %}
 
   <div class="row">
     <div class="col-3">
-      <h2>{{ p.info.name }}</h2>
+      <h2 class="h2-player-info">{{ p.info.name }}</h2>
       <span>{{p.info.rp_name}}</span>
       <ul class="list-group my-2">
         <li class="list-group-item">{{p.status.short_status()}}</li>
