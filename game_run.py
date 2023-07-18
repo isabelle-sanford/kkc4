@@ -1,12 +1,13 @@
 import copy
 import random
-from field import FieldStatus, FIELDS, Rank
+from field import FieldStatus, FIELDS
 from horns import Horns
 from items import Item, ItemType
 from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices
-from actions import Action, ActionType, ActionCategory, Target
-from statics import Background, Lodging
+from actioninfo import Target
+from actions import Action, ActionType, ActionCategory
+from statics import Background, Lodging, Rank
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -52,45 +53,45 @@ class Game:
             self.add_player(d) 
 
 
-    def add_action(self, player_id, action_info):
+    def add_action(self, player_id, action):
         p = self.players[player_id]
 
         if not p.status.can_take_actions:
             print("Player cannot take actions!") # log, and better
-        elif action_info["action_type"] not in p.status.accessible_abilities:
+        elif action["action_type"] not in p.status.accessible_abilities:
             # log, not print
             print("Player cannot take this action!")
         # anything else?
 
         # this bit can probably be much better (get func maybe?)
         t2 = None
-        if "target_two" in action_info:
-            t2 = action_info["target_two"]
+        if "target_two" in action:
+            t2 = action["target_two"]
         
-        a = Action(p, action_info["action_type"], action_info["target"], t2)
+        a = Action(p, action["action_type"].info, action["target"], t2)
 
         p.take_action(a)
 
 
 
-def update_choices(self, new_choices):
-    # erase all prev choices? (for just the player(s) in the list?)
-    for choice in new_choices:
-        c = self.players[choice["player"]]
+    def update_choices(self, new_choices):
+        # erase all prev choices? (for just the player(s) in the list?)
+        for choice in new_choices:
+            c = self.players[choice["player"]]
 
-        if choice["imre_next"]: c.imre_next = True
-        if choice["EP"]:
-            # check here?
-            c.choices.filing_EP = choice["EP"]
-                
-        if choice["actions"]:
-            for a in choice["actions"]:
+            if choice["imre_next"]: c.imre_next = True
+            if choice["EP"]:
+                # check here?
+                c.choices.filing_EP = choice["EP"]
+                    
+            if choice["actions"]:
+                for a in choice["actions"]:
 
-                self.add_action(self.players, c.id, a)
-        # what about updating an action? do we just clear all actions before this func? 
-        
-        # todo other choices
-            # imre stuff
+                    self.add_action(c.id, a)
+            # what about updating an action? do we just clear all actions before this func? 
+            
+            # todo other choices
+                # imre stuff
 
 # could put this inside game, idk
 class Turn:

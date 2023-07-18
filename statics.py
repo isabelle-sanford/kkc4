@@ -1,19 +1,53 @@
 from enum import Enum, IntEnum
 
+class FieldName(IntEnum):
+    LINGUISTICS = 0
+    ARITHMETICS = 1
+    RHETORICLOGIC = 2
+    ARCHIVES = 3
+    SYMPATHY = 4
+    PHYSICKING = 5
+    ALCHEMY = 6
+    ARTIFICERY = 7
+    NAMING = 8
+    GENERAL = 9  # ? # gotta remember this when iterating thru
+# maybe separate out action periods, bc Item Creation and all
+
+
+
+class Rank(Enum):
+    NONE = 0
+    ELIR = 1
+    RELAR = 2
+    ELTHE = 3
+    MASTER = 4
+
+    # todo probably not this 
+    def get_next(self):
+        if self.NONE:
+            return self.ELIR
+        if self.ELIR:
+            return self.RELAR
+        if self.RELAR:
+            return self.ELTHE
+        if self.ELTHE:
+            return self.MASTER
+
+
 
 
 class Lodging(Enum):
     Streets = 0, "The Streets", 0
     Underthing = 1, "The Underthing", 0
-    Mews = 2, "Mews", 1
-    Ankers = 3, "Ankers", 4
-    KingsDrab = 4, "The King's Drab", 6
-    GreyMan = 5, "The Grey Man", 7
-    GoldenPony = 6, "The Golden Pony", 8
-    WindyTower = 7, "The Windy Tower", 9
-    HorseAndFour = 8, "The Horse and Four", 10
-    PearlOfImre = 9, "The Pearl of Imre", 11
-    SpindleAndDraft = 10, "The Spindle and Draft", 12
+    Mews = 2, "Mews", 1 # +2 IP
+    Ankers = 3, "Ankers", 4 # 15% 1 action cancelled
+    KingsDrab = 4, "The King's Drab", 6 # ?% stolen item
+    GreyMan = 5, "The Grey Man", 7 # Giles, Imre
+    GoldenPony = 6, "The Golden Pony", 8 # -2 complaints
+    WindyTower = 7, "The Windy Tower", 9 # +1 EP to file
+    HorseAndFour = 8, "The Horse and Four", 10 # 50% kill/sab fail
+    PearlOfImre = 9, "The Pearl of Imre", 11 # imre, cheaper contracts
+    SpindleAndDraft = 10, "The Spindle and Draft", 12 # -2 IP
 
     # add a destroyed flag? and maybe method? 
 

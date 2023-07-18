@@ -1,11 +1,12 @@
 import copy
 from dataclasses import dataclass
 from enum import Enum
-import random 
+import random
+from actioninfo import ActionInfo 
 
-from statics import Background, Lodging
+from statics import Background, Lodging, FieldName, Rank
 from actions import ActionType, Action
-from field import FieldStatus, Rank, FieldName
+from field import FieldStatus
 from items import ItemType, Item
 
 class BaseStat(Enum):
@@ -32,65 +33,32 @@ class PlayerStatic:
         return ret
 
 @dataclass
-class EP2:
-    # TODO figure out what's going on here
-    linguistics: int = 0
-    arithmetics: int = 0
-    rhetoric: int = 0
-    archives: int = 0
-    sympathy: int = 0
-    physicking: int = 0
-    alchemy: int = 0
-    artificery: int = 0
-    naming: int = 0
-    ep_list = [linguistics, arithmetics, rhetoric, archives, sympathy, physicking, alchemy, artificery, naming]
-    ep_dict = {
-            "Linguistics": linguistics, 
-            "Arithmetics": arithmetics, 
-            "Rhetoric & Logic": rhetoric,
-            "Archives": archives, 
-            "Sympathy": sympathy,
-            "Physicking": physicking,
-            "Alchemy": alchemy,
-            "Artificery": artificery,
-            "Naming": naming
-            }
-
-# wait this should be a dataclass
 class EP:
-    def __init__(self, linguistics = 0, arithmetics = 0, rhetoric = 0, 
-                 archives = 0, sympathy = 0, physicking = 0, alchemy = 0,
-                   artificery = 0, naming = 0) -> None:
-        
-       
-        self.values = [linguistics, arithmetics, rhetoric, archives, sympathy,
-                        physicking, alchemy, artificery, naming]
-
-        self.dict = {
-            "Linguistics": linguistics, 
-            "Arithmetics": arithmetics, 
-            "Rhetoric & Logic": rhetoric,
-            "Archives": archives, 
-            "Sympathy": sympathy,
-            "Physicking": physicking,
-            "Alchemy": alchemy,
-            "Artificery": artificery,
-            "Naming": naming
+    # TODO figure out what's going on here
+    vals = {
+            FieldName.LINGUISTICS: 0, 
+            FieldName.ARITHMETICS: 0, 
+            FieldName.RHETORICLOGIC: 0,
+            FieldName.ARCHIVES: 0, 
+            FieldName.SYMPATHY: 0,
+            FieldName.PHYSICKING: 0,
+            FieldName.ALCHEMY: 0,
+            FieldName.ARTIFICERY: 0,
+            FieldName.NAMING: 0
             }
     
-    # def get_dict(self)
-
     def get_list(self): # [rhet, rhet, ling, ling, ling, ...]
         all_EP: list[FieldName] = []
-        for i in range(0,9): # ?
-            for j in range(self.values[i]):
+        for i in self.vals.keys(): # ?
+            for j in range(self.vals[i]):
                 all_EP.append(FieldName(i))
-        
+    
         return all_EP
-        
+    
     def __str__(self) -> str:
+        #hmm
         out = f"| Lin | Ari | R&L | Arc | Sym | Phy | Alc | Art | Nam |\n|"
-        for v in self.values:
+        for v in self.vals.values():
             out += f"{v: >3}  |"
         return out
 
@@ -158,7 +126,7 @@ class PlayerStatus:
         s.can_be_elevated = True
         # is lashed? 
 
-        s.accessible_abilities: list[ActionType] = [] # TODO
+        s.accessible_abilities: list[ActionInfo] = [] # TODO
         if player_static.is_evil:
             s.accessible_abilities.append(ActionType.Sabotage)
         s.known_names = [] # ? (for breakout roll)
@@ -231,8 +199,6 @@ class PlayerStatus:
     # TODO string / print func 
 
     
-
-
 # working variables for processing turn
 class PlayerProcessing:
     def __init__(self, player_info, player_status, player_choices, month):
@@ -421,6 +387,13 @@ class Player:
         ret = f"{self.info}{self.status.EP}\n"
 
         return ret
+    
+    def __repr__(self):
+        # todo not this
+        ret = f"{self.info.name} ({self.info.social_class} "
+        ret += "Skindancer" if self.info.is_evil else "Student"
+        ret += f" {self.status.rank})"
+        return ret
 
     # todo become_master(field)
 
@@ -594,7 +567,7 @@ class Player:
             self.processing.DP += total
 
     def assign_EP(self, field: FieldName, total = 1):
-        self.status.EP.values[field] += total
+        self.status.EP.vals[field] += total
 
 class PlayerRandom:
     def __init__(self) -> None:

@@ -3,43 +3,14 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from actions import Target
+from statics import FieldName, Rank
+
 if TYPE_CHECKING:
     from player import Player
 from enum import Enum, IntEnum
+from actioninfo import Target
 
-class Rank(Enum):
-    NONE = 0
-    ELIR = 1
-    RELAR = 2
-    ELTHE = 3
-    MASTER = 4
-
-    # todo probably not this 
-    def get_next(self):
-        if self.NONE:
-            return self.ELIR
-        if self.ELIR:
-            return self.RELAR
-        if self.RELAR:
-            return self.ELTHE
-        if self.ELTHE:
-            return self.MASTER
-
-class FieldName(IntEnum):
-    LINGUISTICS = 0
-    ARITHMETICS = 1
-    RHETORICLOGIC = 2
-    ARCHIVES = 3
-    SYMPATHY = 4
-    PHYSICKING = 5
-    ALCHEMY = 6
-    ARTIFICERY = 7
-    NAMING = 8
-    GENERAL = 9  # ? # gotta remember this when iterating thru
-# maybe separate out action periods, bc Item Creation and all
-
-# todo: add is_positive for streets actions
+# want to use Ability2 (currently in actioninfo)
 class Ability:
     def __init__(
         self,

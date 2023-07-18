@@ -4,133 +4,38 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from player import Player
 import random
-from enum import Enum
+from enum import Enum, IntEnum
 from items import Item, ItemType
-from field import Rank, FieldName
-
-class ActionCategory(Enum):
-    BLOCKETC = 1
-    OFFENSIVE = 2
-    OTHER = 3
-    CREATEITEM = 4
-
-
-class Target(Enum):
-    PLAYER = 1
-    ACTION = 2
-    LOCATION = 3
-    ITEM = 4
-    EVENT = 5 # for Omen Recognition and mommet lvl 3
-    OTHER = 6 # bool for master bonetar
-    FIELD = 7 # banned books
-    ABILITY = 8 # banned books
-    NONE = 9 # includes self-targets
-
-@dataclass
-class ActionInfo:
-    id: int
-    name: str
-    category: ActionCategory
-    target1: Target
-    target2: Target = Target.NONE
-    is_positive: bool = False
-    is_negative: bool = False
-    insanity_bonus: int = 0
-
-class ActionType(Enum):
-    # isn't there a way to generate enums instead of having to have them all here like this? 
-    MysteriousBulletins = 1, ActionCategory.OTHER, Target.NONE, Target.NONE
-    BribeTheMessenger = 2, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
-    LinguisticAnalysis = 3, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    Pickpocket = 4, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE # or none + none if not master
-    LawOfContraposition = 5, ActionCategory.BLOCKETC, Target.ACTION, Target.PLAYER
-    ProficientInHyperbole = 6, ActionCategory.OTHER, Target.PLAYER, Target.PLAYER 
-    ArgumentumAdNauseam = 7, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
-    PersuasiveArguments = 8, ActionCategory.OTHER, Target.PLAYER, Target.PLAYER 
-    FaeLore = 9, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE # right?
-    OmenRecognition = 12, ActionCategory.OTHER, Target.EVENT, Target.NONE
-    SchoolRecords = 13, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    BannedBooks = 14, ActionCategory.OTHER, Target.FIELD, Target.ABILITY
-    MommetMaking = 15, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    MalfeasanceProtection = 16, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    MedicaEmergency = 17, ActionCategory.OTHER, Target.NONE, Target.NONE
-    MedicaDetainment = 18, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    PsychologicalCounselling = 19, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    CheatingDeath = 20, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-
-    # what if single CreateItem action type, target is item
-    CreateTenaculum = 21, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateFirestop = 22, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreatePlumbob = 23, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateBonetar = 24, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateWard = 25, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateBloodless = 26, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateThievesLamp = 27, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateGram = 28, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    
-    UseName = 29, ActionCategory.OTHER, Target.OTHER, Target.OTHER # !!
-
-    # what if UseItem type
-    UseMommet = 30, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    UseTenaculumItem = 31, ActionCategory.BLOCKETC, Target.PLAYER, Target.ITEM
-    UseTenaculumAction = 32, ActionCategory.BLOCKETC, Target.PLAYER, Target.ACTION
-    UsePlumbob = 34, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    UseBonetar = 35, ActionCategory.OFFENSIVE, Target.LOCATION, Target.OTHER
-    UseWard = 36, ActionCategory.OTHER, Target.NONE, Target.NONE
-    UseThievesLamp = 37, ActionCategory.BLOCKETC, Target.NONE, Target.NONE
-    UseNahlrout = 38, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    UseCourier = 39, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
-
-    # ! maybe don't include this at all tbh? 
-    #UseAssassin = 40, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player # note - does not take an action period / can't be blocked
-
-    Sabotage = 41, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player
-
-    CreateItem = 42, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateHalfItem = 43, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-
-    def __new__(cls, value, category, t1type, t2type):
-        member = object.__new__(cls)
-        member._value_ = value
-        member.category = category
-        member.t1type = t1type
-        member.t2type = t2type
-        return member
-
-    def __int__(self):
-        return self.value
-    
-    def __str__(self) -> str:
-        return f"---"
-
+from statics import FieldName, Rank
+from actioninfo import ActionInfo, ActionCategory, ActionType #, Target
 
 
 
 # todo maybe - add what target type these have
     # player, action, location, none, field ? 
 
-HAS_IB = [ # hmm
-    ActionType.MalfeasanceProtection,
-    ActionType.CreateTenaculum,
-    ActionType.CreateFirestop,
-    ActionType.CreatePlumbob,
-    ActionType.CreateBonetar,
-    ActionType.CreateWard,
-    ActionType.CreateBloodless,
-    ActionType.CreateThievesLamp,
-    ActionType.CreateGram,
-    ActionType.UseName,
-    ActionType.UseMommet,
-    ActionType.CreateItem #
-]
+# HAS_IB = [ # hmm
+#     ActionType.MalfeasanceProtection,
+#     ActionType.CreateTenaculum,
+#     ActionType.CreateFirestop,
+#     ActionType.CreatePlumbob,
+#     ActionType.CreateBonetar,
+#     ActionType.CreateWard,
+#     ActionType.CreateBloodless,
+#     ActionType.CreateThievesLamp,
+#     ActionType.CreateGram,
+#     ActionType.UseName,
+#     ActionType.UseMommet,
+#     ActionType.CreateItem #
+# ]
 
 class Action:
     # maybe ActionInfo instead of type? not sure
-    def __init__(self, player, type: ActionType, target,
+    def __init__(self, player, type: ActionInfo, target,
                   target_two = None, level = None, item: Item = None): # action_type ??
         self.player = player # Player taking the action
         
-        self.type: ActionType = type 
+        self.type: ActionInfo = type 
         self.category: ActionCategory = type.category
         self.target = target
         self.target_two = target_two

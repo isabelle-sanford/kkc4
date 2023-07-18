@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 from enum import Enum
+from statics import FieldName, Rank
 
-from field import Ability, FieldName, Rank
+from typing import TYPE_CHECKING
 
+
+if TYPE_CHECKING:
+    from field import Rank
 
 class ActionCategory(Enum):
     BLOCKETC = 1
@@ -26,7 +30,7 @@ class Target(Enum):
 @dataclass
 class Ability2():
     field: FieldName
-    min_rank: Rank
+    min_rank: Rank = Rank.ELIR
     has_level_effects: bool = False
 
 @dataclass
@@ -34,6 +38,7 @@ class ActionInfo:
     id: int
     name: str
     category: ActionCategory
+    # type? 
     target1: Target = Target.NONE
     target2: Target = Target.NONE
     is_positive: bool = False
@@ -43,24 +48,39 @@ class ActionInfo:
     is_passive: bool = False # only for field abilities tbh
 
 
-hand_delivery = ActionInfo(1, "Hand Delivery", ActionCategory.OTHER, field_ability=Ability2(FieldName.LINGUISTICS), is_passive=True)
+hand_delivery = ActionInfo(1, "Hand Delivery", ActionCategory.OTHER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.ELIR), is_passive=True)
 myst_bulletins = ActionInfo(2, "Mysterious Bulletins", ActionCategory.OTHER, Target.NONE, field_ability=Ability2(FieldName.LINGUISTICS, Rank.RELAR))
 bribe_messenger = ActionInfo(3, "Bribe the Messenger", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.ELTHE))
 linguistic_analysis = ActionInfo(4, "Linguistic Analysis", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.MASTER))
 
-reduced_interest = ActionInfo(5, "Reduced Interest", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR,True), is_passive=True)
-pickpocket = ActionInfo(6, "Pickpocket", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True)) 
-great_deals = ActionInfo(7, "Great Deals", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
-decreased_tution = ActionInfo(8, "Decreased Tuition", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
+reduced_interest = ActionInfo(33, "Reduced Interest", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR,True), is_passive=True)
+pickpocket = ActionInfo(5, "Pickpocket", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True)) 
+great_deals = ActionInfo(34, "Great Deals", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
+decreased_tuition = ActionInfo(35, "Decreased Tuition", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
 
-argumentum_ad_nauseam = ActionInfo(9, "Argumentum Ad Nauseam", ActionCategory.OTHER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELIR))
-proficient_in_hyperbole = ActionInfo(9, "Proficient In Hyperbole", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.RELAR))
-persuasive_arguments = ActionInfo(10, "Persuasive Arguments", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELTHE))
-law_of_contraposition = ActionInfo(11, "Law of Contraposition", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.MASTER))
+argumentum_ad_nauseam = ActionInfo(6, "Argumentum Ad Nauseam", ActionCategory.OTHER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELIR))
+proficient_in_hyperbole = ActionInfo(7, "Proficient In Hyperbole", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.RELAR))
+persuasive_arguments = ActionInfo(8, "Persuasive Arguments", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELTHE))
+law_of_contraposition = ActionInfo(9, "Law of Contraposition", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.MASTER))
 
-omen_recognition = ActionInfo(12, "Omen Recognition", ActionCategory.OTHER, Target.EVENT, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELIR))
-school_records = ActionInfo(13, "School Records", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.RELAR))
+omen_recognition = ActionInfo(19, "Omen Recognition", ActionCategory.OTHER, Target.EVENT, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELIR))
+school_records = ActionInfo(11, "School Records", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.RELAR))
+banned_books = ActionInfo(12, "Banned Books", ActionCategory.OTHER, Target.FIELD, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELTHE, True))
+fae_lore = ActionInfo(13, "Fae Lore", ActionCategory.BLOCKETC, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.MASTER))
+
+mommet_making = ActionInfo(14, "Mommet Making", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=Ability2(FieldName.SYMPATHY, Rank.ELIR, True)) # IB per level
+malfeasance_protection = ActionInfo(15, "Mommet Protection", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=Ability2(FieldName.SYMPATHY, Rank.ELIR, True)) # SOMETIMES negative; IB is per level
+
+
+medica_emergency = ActionInfo(16, "Medica Emergency", ActionCategory.OTHER, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
+medica_detainment = ActionInfo(16, "Medica Detainment", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
+psych_counselling = ActionInfo(17, "")
 # TODO
+
+
+
+
+sabotage = ActionInfo(41, "Sabotage", ActionCategory.OFFENSIVE, Target.PLAYER, is_negative=True)
 
 # TODO 
 class ActionType(Enum):
@@ -69,49 +89,68 @@ class ActionType(Enum):
     MysteriousBulletins = 2, myst_bulletins
     BribeTheMessenger = 3, bribe_messenger
     LinguisticAnalysis = 4, linguistic_analysis
-    Pickpocket = 4, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE # or none + none if not master
-    LawOfContraposition = 5, ActionCategory.BLOCKETC, Target.ACTION, Target.PLAYER
-    ProficientInHyperbole = 6, ActionCategory.OTHER, Target.PLAYER, Target.PLAYER 
-    ArgumentumAdNauseam = 7, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
-    PersuasiveArguments = 8, ActionCategory.OTHER, Target.PLAYER, Target.PLAYER 
-    FaeLore = 9, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE # right?
-    OmenRecognition = 12, ActionCategory.OTHER, Target.EVENT, Target.NONE
-    SchoolRecords = 13, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    BannedBooks = 14, ActionCategory.OTHER, Target.FIELD, Target.ABILITY
-    MommetMaking = 15, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    MalfeasanceProtection = 16, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    MedicaEmergency = 17, ActionCategory.OTHER, Target.NONE, Target.NONE
-    MedicaDetainment = 18, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    PsychologicalCounselling = 19, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    CheatingDeath = 20, ActionCategory.OTHER, Target.PLAYER, Target.NONE
+    Pickpocket = 5,
+    ArgumentumAdNauseam = 6, 
+    ProficientInHyperbole = 7, 
+    PersuasiveArguments = 8, 
+    LawOfContraposition = 9, 
+    OmenRecognition = 10, 
+    SchoolRecords = 11,
+    BannedBooks = 12
+    FaeLore = 13,
+    MommetMaking = 14
+    MalfeasanceProtection = 15,
+    MedicaEmergency = 16
+    MedicaDetainment = 17, 
+    PsychologicalCounselling = 18
+    CheatingDeath = 19
 
     # what if single CreateItem action type, target is item
-    CreateTenaculum = 21, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateFirestop = 22, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreatePlumbob = 23, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateBonetar = 24, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateWard = 25, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateBloodless = 26, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateThievesLamp = 27, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateGram = 28, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    CreateItem = 20
+    CreateHalfItem = 21
+    # CreateTenaculum = 20
+    # CreateFirestop = 21
+    # CreatePlumbob = 22
+    # CreateBonetar = 23
+    # CreateWard = 24
+    # CreateBloodless = 25
+    # CreateThievesLamp = 27
+    # CreateGram = 28
     
-    UseName = 29, ActionCategory.OTHER, Target.OTHER, Target.OTHER # !!
+    UseName = 22
 
     # what if UseItem type
-    UseMommet = 30, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    UseTenaculumItem = 31, ActionCategory.BLOCKETC, Target.PLAYER, Target.ITEM
-    UseTenaculumAction = 32, ActionCategory.BLOCKETC, Target.PLAYER, Target.ACTION
-    UsePlumbob = 34, ActionCategory.OTHER, Target.PLAYER, Target.NONE
-    UseBonetar = 35, ActionCategory.OFFENSIVE, Target.LOCATION, Target.OTHER
-    UseWard = 36, ActionCategory.OTHER, Target.NONE, Target.NONE
-    UseThievesLamp = 37, ActionCategory.BLOCKETC, Target.NONE, Target.NONE
-    UseNahlrout = 38, ActionCategory.BLOCKETC, Target.PLAYER, Target.NONE
-    UseCourier = 39, ActionCategory.OTHER, Target.PLAYER, Target.NONE 
+    UseMommet = 23 , 
+    UseTenaculumItem = 24
+    UseTenaculumAction = 25 
+    UsePlumbob = 26, 
+    UseBonetar = 35,
+    UseWard = 27,
+    UseThievesLamp = 28 , 
+    UseNahlrout = 29 , 
+    UseCourier = 30, 
 
     # ! maybe don't include this at all tbh? 
     #UseAssassin = 40, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player # note - does not take an action period / can't be blocked
 
-    Sabotage = 41, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player
+    Sabotage = 31, sabotage
 
-    CreateItem = 42, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
-    CreateHalfItem = 43, ActionCategory.CREATEITEM, Target.ITEM, Target.NONE
+    GiveItem = 32
+
+    # PASSIVE, maybe shouldn't be here 
+    ReducedInterest = 33, reduced_interest
+    GreatDeals = 34, great_deals
+    DecreasedTuition = 35, decreased_tuition
+
+
+    def __new__(cls, value, info):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.info = info
+        return member
+
+    def __int__(self):
+        return self.value
+    
+    def __str__(self):
+        return f"{self.info} ({self.value})"
