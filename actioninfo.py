@@ -142,11 +142,6 @@ class ActionType(Enum):
     UseThievesLamp = 29, use_thieveslamp
     UseNahlrout = 30, use_nahlrout
 
-    #UseCourier = 31, # not really an action
-
-    # ! maybe don't include this at all tbh? 
-    #UseAssassin = 40, ActionCategory.OFFENSIVE, Target.PLAYER, Target.NONE # player # note - does not take an action period / can't be blocked
-
     Sabotage = 31, sabotage
 
     GiveItem = 32, give_item

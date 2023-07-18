@@ -53,3 +53,43 @@ notes
 stuff not in ooa 
 - update # of EP available (during elevating?)
 - update vint/aturan stipends during expulsion
+
+
+
+particularly notable todos 
+- accessible_abilities
+- tuition 
+- imre
+- action period stuff
+- item stuff (use_item, ids, half items)
+- results
+- destroying locations/fields
+- naming (sigh)
+- customization of results
+- sql 
+- getting info out of pages into code :))
+- offensive / defensive things
+
+abilities
+- malfeasance protection nonsense 
+- cheating death
+- switch stuff to ability2 version
+- mommet making
+- all linguistics 
+- arithmetics passives
+- law of contraposition, proficient in hyperbole 
+- fae lore 
+- medica detainment, cheating death
+
+small
+- remove createitem category? 
+- add target type specific-item?
+- more str / more detailed str (action, actioninfo, playerstatus, ...)
+- go over block cycle stuff ffs
+- way more error checking everywhere
+- insanity bonuses (check over mostly)
+- update_choices 
+- make sure playerlists are generally of just the living ones
+- gm input stuff aside from complaints
+- make mastery/elevation less ugly
+    - also, pc master choice takes precedence over npc

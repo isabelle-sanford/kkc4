@@ -18,13 +18,11 @@ class BaseStat(Enum):
 class PlayerStatic:
     def __init__(self, name:str , rp_name:str, is_evil:bool, 
                  social_class:Background, id:int = -1):
-        # ? id?  TODO
         self.id = id
         self.name: str = name 
         self.rp_name: str = rp_name
         self.is_evil: bool = is_evil # or could be skindancer
         self.social_class: Background = social_class
-        # ! base stat? 
     
     def __str__(self):
         ret = f"Player: {self.name} ({self.rp_name}) - {self.social_class} - "
@@ -67,23 +65,6 @@ class PlayerStatus:
     def __init__(self, player_static):
         self.info = player_static
 
-    def short_status(self):
-        ret = "" 
-        ret += "Alive" if self.is_alive else "Dead"
-        ret += ", "
-        ret += "Sane" if self.is_sane else "Insane"
-        ret += " (Expelled)" if self.is_expelled else ""
-
-        return ret
-
-    def print_money(self):
-        # this can probs be better / nicer 
-        m = self.money # 3.14
-        m *= 100 # 314
-        m = str(m) # "314"
-        ret = f"{m[0]} talent(s), {m[1]} jot(s), and {m[2]} drab(s)" 
-
-        return ret
 
     # input from GM distribution 
     @classmethod
@@ -114,21 +95,21 @@ class PlayerStatus:
         s.is_expelled = False 
         s.is_enrolled = True 
         s.in_Imre = False
-        s.broke_out = False 
+        s.broke_out = False # for underthing
 
         # things the player knows / happened prev turn
         # so their page can have invalid stuff grayed out or whatever
         s.can_take_actions = True # why is this blue
         s.can_file_complaints = True 
         s.can_file_EP = True 
-        s.can_be_targeted = True # medica emergency (only?)
+        s.can_be_targeted = True # medica emergency, vint/aturan
         s.can_elevate = True
         s.can_be_elevated = True
         # is lashed? 
 
         s.accessible_abilities: list[ActionInfo] = [] # TODO
         if player_static.is_evil:
-            s.accessible_abilities.append(ActionType.Sabotage)
+            s.accessible_abilities.append(ActionType.Sabotage.info)
         s.known_names = [] # ? (for breakout roll)
 
         # are there any other prev turn effects? 
@@ -149,16 +130,6 @@ class PlayerStatus:
             "DEVI_collateral": [],
             "BLACKMARKET_Contractlog": []
         }
-
-        # s.IMRE_EOLIAN_auditioned: bool = False
-        
-        # s.IMRE_GILES_defaulted: bool = False
-        # s.IMRE_GILES_amount_owed: float = 0.0
-        # s.IMRE_DEVI_defaulted: bool = False
-        # s.IMRE_DEVI_amount_owed: float = 0.0
-        # s.IMRE_DEVI_collateral: list[Item] = []
-
-        # s.IMRE_BLACKMARKET_ContractLog: list[Item] = []
 
         return s
     
@@ -210,9 +181,9 @@ class PlayerProcessing:
 
         self.complaints_blocked = False # Set when target of Argumentum Ad Nauseam.
         self.complaints_received: list[Player] = [] # this is POST processing
-        self.processed_complaints = self.choices.complaints # todo should initially set as original complaints
+        self.processed_complaints = self.choices.complaints 
         
-        # Total DP
+        # Total DP on the player
         self.DP: int = 0
 
         # Flag for whether they have been successfully blocked.
@@ -229,16 +200,13 @@ class PlayerProcessing:
         self.split_neg_actions_between = None # 3rd level
         self.all_actions_also_affect = None # 1-2
         
-        self.can_file_complaints: bool = self.starting_status.can_file_complaints # should also reference status
+        self.can_file_complaints: bool = self.starting_status.can_file_complaints 
         self.can_file_EP: bool = self.starting_status.can_file_EP
         self.can_be_targeted: bool = self.starting_status.can_be_targeted
         self.can_elevate = self.starting_status.can_elevate
         # can file DP?
 
-        # should probably instead process protects with kills, so they happen in appropriate order
-        self.protected_from_sabotage = 0
-        self.protected_from_kill = 0
-        self.protects = [] # hmm
+        # protect / attack info, maybe? 
 
         self.items_received: list[Item] = []
         # todo remember to add this ^ to next_status
@@ -246,7 +214,26 @@ class PlayerProcessing:
         self.getting_elevated_in: FieldName = None
 
         self.insanity_bonus = 0 # might want to take something from prev status?
-        # and check mews
+        # and check mews / spindle & draft
+
+    def short_status(self):
+        ret = "" 
+        ret += "Alive" if self.is_alive else "Dead"
+        ret += ", "
+        ret += "Sane" if self.is_sane else "Insane"
+        ret += " (Expelled)" if self.is_expelled else ""
+
+        return ret
+
+    def print_money(self):
+        # this can probs be better / nicer 
+        m = self.money # 3.14
+        m *= 100 # 314
+        m = str(m) # "314"
+        ret = f"{m[0]} talent(s), {m[1]} jot(s), and {m[2]} drab(s)" 
+
+        return ret
+
 
 class PlayerChoices:
     # basically a record of what things a player wants to do this turn
@@ -259,17 +246,16 @@ class PlayerChoices:
         self.month = month
         # maybe also status here? 
 
-        if self.month % 3 == 0:
+        if self.month % 3 == 2: # make lodging choice in month BEFORE term start
             self.next_lodging: Lodging = Lodging.Streets
 
-        self.imre_next = False # should check if in imre lodging?
+        self.imre_next = False # should check if in imre lodging
         self.enroll_next = True # check expulsion etc 
 
         # List of complaints made (NOT including PiH)
         # remember cannot vote if expelled
         self.complaints: list[Player] = []
 
-        # Stored input list of who they are blocking, as Player references
         self.actions: list[Action] = []
 
         self.filing_EP: list[FieldName] = []
@@ -315,30 +301,6 @@ class PlayerChoices:
 
         return ret
 
-    # helper function to add multiple maybe? 
-    # def file_EP(self, field, slot): 
-    #     if slot >= self.player.available_EP: return False 
-
-    #     if field in FieldName: # ? 
-    #         self.EP_filed[slot] = field
-    
-    # def go_to_Imre(self):
-    #     # TODO 
-    #     self.imre_next = True
-
-
-    # def set_next_lodging(self, lodging):
-    #     if self.month % 3 == 0:
-    #         self.next_lodging = lodging
-    #     else:
-    #         return False 
-    
-    # def enroll_next(self):
-    #     if self.player.is_expelled: # is this enough? 
-    #         self.enroll_next_term = True
-    #     else:
-    #         return False 
-
 
     # def __str__(self):
     #     # this is probably not ideal :p
@@ -348,18 +310,7 @@ class PlayerChoices:
         
     #     return line1 + line2 + line3
 
-    # todo vote
-
-    # todo imre stuff
-        # practice / play @ the eolian (play_pipes, practice_pipes)
-        # apothecary (buy_item)
-        # buy assassin/bodyguard/sold items (buy_contract)
-        # give_contract / take_contract (need a "taken_contracts" attribute probs)
-        # loaded dice nums 
-        # devi/giles loan 
-
 class Player:
-
     # start of game constructor 
     def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
         self.initial_status: PlayerStatus = player_status
@@ -368,7 +319,7 @@ class Player:
 
         if player_choices is None:
             player_choices = PlayerChoices(player_static, 0)
-        self.choices: PlayerChoices = player_choices # renamed this, hopefully it stuck
+        self.choices: PlayerChoices = player_choices 
 
         # self.past_statuses = [] ? 
         
@@ -407,7 +358,6 @@ class Player:
         return count
 
     def elevate_in(self, field: FieldName):
-        # TODO add accessible ability
         self.status.elevations.append(field)
         num_EP = self.status.EP.vals[field]
         if num_EP < 5:
@@ -415,7 +365,7 @@ class Player:
         else:
             self.status.EP.vals[field] -= 5
         
-        self.status.rank = self.status.rank.get_next() # todo test 
+        self.status.rank = self.status.rank.get_next()
         self.status.available_EP -= 1
 
         # TODO if elthe + only studied in one field, add 5 EP
@@ -569,6 +519,7 @@ class Player:
     def assign_EP(self, field: FieldName, total = 1):
         self.status.EP.vals[field] += total
 
+# maybe put this elsewhere - a test.py file? 
 class PlayerRandom:
     def __init__(self) -> None:
         pass

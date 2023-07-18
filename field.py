@@ -67,7 +67,7 @@ class FieldStatus:
         self.master: Player = None
         self.month = 0
         self.elevating: Player = None 
-        self.elevatedOnce: list[int] = [] # since it's not actually rank? 
+        self.elevatedOnce: list[int] = [] 
         self.elevatedTwice: list[int] = []
         self.elevatedThrice: list[int] = []
         self.next_masters: list[Player] = []
@@ -88,10 +88,9 @@ class FieldStatus:
         return EP_proportional_list
     
     # todo DESTROY
-# ! need some way to record master's prev EP in case they destroy the field 
+
     def update_master_candidates(self):
         # remove ineligible candidates
-
         for candidate in self.next_masters:
             if self.EP[p] >= 15 and p.status.can_be_elevated:
                 continue
@@ -121,7 +120,7 @@ class FieldStatus:
         return self.next_masters
 
 
-    # death, expulsion, insanity
+    # death, expulsion, insanity, masters
     def remove_player(self, player):
         if player in self.EP:
             del self.EP[player]

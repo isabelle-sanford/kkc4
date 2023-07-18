@@ -55,6 +55,7 @@ class Game:
             self.add_player(d) 
 
 
+    # ...should this be in Turn? not sure
     def add_action(self, player_id, action):
         p = self.players[player_id]
 
@@ -70,7 +71,7 @@ class Game:
         if "target_two" in action:
             t2 = action["target_two"]
         
-        a = Action(p, action["action_type"].info, action["target"], t2)
+        a = Action(p, action["action_type"], action["target"], t2)
 
         p.take_action(a)
 

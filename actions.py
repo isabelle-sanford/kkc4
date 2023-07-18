@@ -10,33 +10,13 @@ from statics import FieldName, Rank
 from actioninfo import ActionInfo, ActionCategory, ActionType #, Target
 
 
-
-# todo maybe - add what target type these have
-    # player, action, location, none, field ? 
-
-# HAS_IB = [ # hmm
-#     ActionType.MalfeasanceProtection,
-#     ActionType.CreateTenaculum,
-#     ActionType.CreateFirestop,
-#     ActionType.CreatePlumbob,
-#     ActionType.CreateBonetar,
-#     ActionType.CreateWard,
-#     ActionType.CreateBloodless,
-#     ActionType.CreateThievesLamp,
-#     ActionType.CreateGram,
-#     ActionType.UseName,
-#     ActionType.UseMommet,
-#     ActionType.CreateItem #
-# ]
-
 class Action:
-    # maybe ActionInfo instead of type? not sure
-    def __init__(self, player, type: ActionInfo, target,
-                  target_two = None, level = None, item: Item = None): # action_type ??
+    def __init__(self, player, type: ActionType, target,
+                  target_two = None, level = None, item: Item = None): 
         self.player = player # Player taking the action
         
-        self.type: ActionInfo = type 
-        self.category: ActionCategory = type.category
+        self.type: ActionType = type # could use info? idk
+        self.category: ActionCategory = type.info.category
         self.target = target
         self.target_two = target_two
         # todo: target types?
@@ -50,16 +30,9 @@ class Action:
 
         self.message: str = None
 
-        # could have ActionType be more specific instead of this
-        # probs should be an argument though
         self.level = level # hmm
 
-        self.item = item
-
-        # month?
-
-        # IS POSITIVE (for streets purposes)
-        # is negative (for malfeasance protection and maybe other stuff)
+        self.item = item # if using or targeting a specific item
 
         # Working variables to process cycles and chains
         self.blocked_by = []
@@ -69,6 +42,7 @@ class Action:
 
     def __str__(self):
         # assumes action-taker is known 
+        # e.g. Law of Contraposition (Hael -> Wilson)
         ret = self.type.name # ! gotta be info 
         if self.target is not None:
             ret += f"({self.target}"
@@ -85,7 +59,7 @@ class Action:
         out = f"Action: {self}\n"
         out += f"Player: {self.player.info.name} Target: {self.target.info.name} Target_Two: {self.target_two}\n"
         out += f"In_Block_cycle: {self.in_block_cycle}, Blocked: {self.blocked}, Blocked_By: [{', '.join([p.info.name for p in self.blocked_by])}]\n"
-        print(out)
+        print(out) # maybe return? 
 
     
     def perform(self, **kwargs):
@@ -116,8 +90,7 @@ class Action:
             self.block_one(notify_only, result)
             if result["success"]:
                 self.in_block_cycle = False
-                # Remove item
-                # Would be nice to have the item have a reference to the action.
+                # todo remove item
                 print(f"{self.player.info.name} succesfully used Mommet")
 
 
@@ -125,8 +98,8 @@ class Action:
 
             case ActionType.CreateItem:
                 # maybe make helper function for this
-                art_level = self.player.status.elevations.count(FieldName.ARTIFICERY)
-                alc_level = self.player.status.elevations.count(FieldName.ALCHEMY)
+                art_level = self.player.levels_in(FieldName.ARTIFICERY)
+                alc_level = self.player.levels_in(FieldName.ALCHEMY)
 
                 match self.target:
                     
@@ -171,8 +144,6 @@ class Action:
 
                 self.player.add_item(item)
             
-            # field abilities
-
             # LINGUISTICS
             case ActionType.MysteriousBulletins:
                 # append string to writeup results
@@ -196,12 +167,12 @@ class Action:
                     pass
                 else:
                     if self.target.holds_item(ItemType.BODYGUARD):
-                        Log.Action(self, LogOutcome.Failure)
+                        #Log.Action(self, LogOutcome.Failure)
                         action_logged = True
                     else:
                         money = self.target.status.money
                         proportion = 0.1
-                        levels = player.status.elevations.count(FieldName.ARITHMETICS)
+                        levels = self.player.status.elevations.count(FieldName.ARITHMETICS)
                         if levels == 2:
                             proportion = 0.2
                         elif levels == 3:
@@ -248,9 +219,7 @@ class Action:
 
             # TODO medica detainment
             case ActionType.PsychologicalCounselling:
-                phys_levels = self.player.status.elevations.count(FieldName.PHYSICKING)
-                if self.player.master_of == FieldName.PHYSICKING:
-                    phys_levels = 4
+                phys_levels = self.player.levels_in(FieldName.PHYSICKING)
 
                 self.target.processing.insanity_bonus -= phys_levels
             # TODO cheating death
@@ -346,181 +315,6 @@ class Action:
                 # todo
                 pass
 
-
-
-                    
-
-
-
-# Everything after this point is untouched from haelbarde branch
-# could be out of date, not sure
-    # def perform_old(self):
-    #     if self.blocked:
-    #         Log.Action(self, LogOutcome.Blocked)
-    #         return
-    #     player_level = int(self.player.status.rank)
-    #     action_logged = False
-
-
-
-    #     # Item Creation Actions
-    #     # Artificery
-    #     if self.type == ActionType.CreateWard:
-    #         item = Item.Generate(ItemType.WARD,player_level)
-    #         self.player.add_item(item)
-    #     elif self.type == ActionType.CreateBloodless:
-    #         item = Item.Generate(ItemType.BLOODLESS,player_level)
-    #         self.player.add_item(item)
-    #     elif self.type == ActionType.CreateThievesLamp:
-    #         item = Item.Generate(ItemType.THIEVESLAMP,player_level)
-    #         self.player.add_item(item)
-    #     elif self.type == ActionType.CreateGram:
-    #         item = Item.Generate(ItemType.GRAM,player_level)
-    #         self.player.add_item(item)
-    #     # Alchemy
-    #     elif self.type == ActionType.CreateTenaculum:
-    #         item = Item.Generate(ItemType.TENACULUM,player_level)
-    #         self.player.add_item(item)
-    #     elif self.type == ActionType.CreateFirestop:
-    #         item = Item.Generate(ItemType.FIRESTOP,player_level)
-    #         self.player.add_item(item)
-    #     elif self.type == ActionType.CreatePlumbob:
-    #         item = Item.Generate(ItemType.PLUMBOB,player_level)
-    #         self.player.add_item(item)
-    #     elif self.type == ActionType.CreateBonetar:
-    #         item = Item.Generate(ItemType.BONETAR,player_level)
-    #         self.player.add_item(item)
-
-    #     # Mommet making may need aditional types, to distinguish level 1, 2, 3, 4
-    #     # Needs access to player list for level 1.
-    #     elif self.type == ActionType.MommetMaking: 
-    #         item = Item.Generate(ItemType.MOMMET,player_level, self.target)
-    #         self.player.add_item(item)
-
-    #     # Linguistics
-    #     elif self.type == ActionType.MysteriousBulletins:
-    #         # Appened string to WriteUp details.
-    #         pass
-    #     elif self.type == ActionType.BribeTheMessenger:
-    #         Log.NotifyGM(f"{self.player.info.name} spies on {self.target}'s PMs.")
-    #         action_logged = True
-    #     elif self.type == ActionType.LinguisticAnalysis:
-    #         Log.NotifyGM() 
-
-    #     # Arithmetics
-    #     elif self.type == ActionType.Pickpocket:
-    #         if self.player.status.master_of is not FieldName.ARITHMETICS:
-    #             #random Target
-    #             pass
-    #         if self.target.holds_item(ItemType.BODYGUARD):
-    #             Log.Action(self, LogOutcome.Failure)
-    #             action_logged = True
-    #         else:
-    #             money = self.target.status.money
-    #             proportion = 0.1
-    #             if player_level == Rank.RELAR:
-    #                 proportion = 0.2
-    #             elif player_level == Rank.ELTHE:
-    #                 proportion = 0.3
-    #             self.player.increase_money(money*proportion)
-    #             self.target.reduce_money(money*proportion)
-        
-    #     # Rhetoric & Logic
-    #     elif self.type == ActionType.LawOfContraposition:
-    #         pass
-    #     elif self.type == ActionType.ProficientInHyperbole:
-    #         if self.target is not None:
-    #             self.player.status.complaints.append(self.target)
-    #         if self.target_two is not None:
-    #             self.player.status.complaints.append(self.target_two)
-    #     elif self.type == ActionType.ArgumentumAdNauseam:
-    #         for complaint in self.target.status.complaints:
-    #             if complaint.target == self.target_two:
-    #                 complaint.blocked = True
-    #                 return
-    #     elif self.type == ActionType.PersuasiveArguments:
-    #         # Do I need 3 targets here?
-    #         pass
-
-    #     # Archives
-    #     elif self.type == ActionType.FaeLore:
-    #         if self.target.info.is_evil:
-    #             self.target.status.blocked = True
-    #     elif self.type == ActionType.OmenRecognition:
-    #         Log.NotifyGM()
-    #     elif self.type == ActionType.SchoolRecords:
-    #         out = ""
-    #         if self.player.status.is_enrolled:
-    #             count = len(self.target.status.elevations)
-    #             if count >= 1:
-    #                 out += "."
-    #             # Log this
-    #             # Output to Player PM
-    #     elif self.type == ActionType.BannedBooks:
-    #         pass
-        
-    #     # Sympathy
-    #     elif self.type == ActionType.MommetMaking:
-    #         pass
-    #     elif self.type == ActionType.MalfeasanceProtection:
-    #         pass
-
-    #     # Physicking
-    #     elif self.type == ActionType.MedicaEmergency:
-    #         pass
-    #     elif self.type == ActionType.MedicaDetainment:
-    #         pass
-    #     elif self.type == ActionType.PsychologicalCounselling:
-    #         self.target.status.IP -= int(player_level)
-    #         Log.Action()
-    #     elif self.type == ActionType.CheatingDeath:
-    #         pass
-
-    #     # Naming
-    #     elif self.type == ActionType.UseName:
-    #         # Tell the GMs what names to use.
-    #         Log.NotifyGM()
-
-        
-    #     # Item Usage
-    #     elif self.type == ActionType.UseTenaculumAction:
-    #         pass
-    #     elif self.type == ActionType.UseTenaculumItem:
-    #         pass
-    #     elif self.type == ActionType.UseFirestop:
-    #         pass
-    #     elif self.type == ActionType.UsePlumbob:
-    #         pass
-    #     elif self.type == ActionType.UseBonetar:
-    #         pass
-
-    #     elif self.type == ActionType.UseWard:
-    #         pass
-    #     elif self.type == ActionType.UseThievesLamp:
-    #         pass
-
-    #     elif self.type == ActionType.UseMommet:
-    #         pass
-        
-    #     elif self.type == ActionType.UseNahlrout:
-    #         pass
-
-    #     # Other Actions
-    #     # UseAssassin
-    #     # UseCourier
-    #     # GainEP
-
-    #     # Complaint
-    #     elif self.type == ActionType.Complaint:
-    #         if self.target is not None:
-    #             self.player.status.complaints.append(self.target)
-    #         if self.target_two is not None:
-    #             self.player.status.complaints.append(self.target_two)
-
-    #     if not action_logged:
-    #         Log.Action(self)
-        
-    
     def __str__(self) -> str:
         return f"{self.player.info.name}: {self.type} "
     
