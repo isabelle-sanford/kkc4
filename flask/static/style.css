@@ -1,0 +1,226 @@
+fieldset {
+  border: 3px solid #000;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+legend {
+  width: inherit;
+  /* Or auto */
+  padding: 0 10px;
+  /* To give a bit of padding on the left and right */
+  border-bottom: none;
+}
+
+.actions {
+  color: #4F0053;
+  background-color: #FFF6FF;
+}
+
+.apothecary {
+  color: #26580B;
+}
+
+.apothecary-input {
+  background-color:#fff;
+  border: 1px solid #91839B;
+}
+
+.apothecary-player-page {
+  padding-left: 20px;
+}
+
+.black-market-contract-player-page {
+  background-color: #EADCF2;
+  color: #4E3F59;
+}
+
+.black-market-contracts {
+  color: #0B4486;
+}
+
+.black-market-items {
+  color: #706A11;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  border: 4px solid #3C035F;
+  padding: 10px;
+}
+
+.cycle {
+  padding-top: 3px;
+  border: 4px solid #BCC500;
+  background-color: #FEFFE1;
+  color: #5B5D08;
+  margin-left: 1px;
+}
+
+.dice {
+  list-style-type: "\2684\0020";
+}
+
+.dice-input {
+  background-color:#fff;
+  border: 1px solid #91839B;
+}
+
+.distro-form {
+  box-sizing: border-box;
+  background-color: #F3F9F8;
+  border: 4px solid #015149;
+}
+
+.elevate {
+  background-color: #035659;
+  color: #E8F4F4;
+}
+
+.elevations {
+  border: 2px solid #06005B;
+  padding-left: 10px;
+}
+
+.ep-input {
+  background-color: #fff;
+}
+
+.fieldset-imre {
+  border: 3px solid #660271;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+.fieldset-uni {
+  border: 3px solid #024995;
+  padding-left: 10px;
+  padding-bottom: 10px;
+}
+
+.h1-field-info {
+  color: #759631;
+  text-align: center;
+}
+
+.h1-imre {
+  color: #670D79;
+  text-decoration: underline;
+  text-align: center;
+}
+
+.h1-input {
+  color: #5F7FA4;
+  text-align: center;
+}
+
+.h1-player-info {
+  color: #1D235D;
+}
+
+h2-field-info {
+  font-size:20px;
+  color: #2B517D;
+  font-weight: bold;
+}
+
+.h2-imre {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.h2-input {
+  font-size: 15px;
+}
+
+.h2-player-info {
+  font-size:20px;
+  color: #0D5F79;
+  font-weight: bold;
+}
+
+.h2-player-page {
+  text-align: center;
+  color: #660271;
+}
+
+.h3-input {
+  font-size: 15px;
+}
+
+.history {
+  border: 2px solid #06005B;
+  padding-left: 10px;
+}
+
+.info {
+  margin: auto;
+  width: 50%;
+}
+
+.input-group-text {
+  background-color: #fff;
+  font-size: 12px;
+  width: 80px;
+  margin: auto;
+}
+
+.insanity-modifier {
+  background-color: #EBDAEC;
+  color: #6A0C70;
+}
+
+.legend-imre {
+  color: #660271;
+}
+
+.legend-uni {
+  color: #024995;
+}
+
+.list-group-imre-players {
+  background-color: #E8B6F2;
+  color: #700985;
+  text-align: center;
+}
+
+.loaded-Dice {
+  padding-right: 30px;
+}
+
+.moneylenders {
+  color: #D62B71;
+}
+
+.musical {
+  background-color: #6A0C70;
+  color: #EBDAEC;
+}
+
+.player {
+  background-color: #F6F2F9;
+  color: #6E3491;
+}
+
+.player-actions {
+  color: #9F23B8;
+}
+
+.submit {
+  background-color: #000000;
+  color: #FFFFFF;
+  border-radius: 4px;
+  padding: 8px 16px;
+}
+
+.submit:hover{
+  background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, red);
+  animation:slidebg 3s linear infinite;
+}
+
+@keyframes slidebg {
+  to {
+    background-position:20vw;
+  }
+}
