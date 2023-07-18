@@ -1,0 +1,176 @@
+{% extends 'index.html' %} {% block body %}
+
+<div class="container pt-2" style="font-family: Luminari">
+  <div class="my-2">
+    <h1 class="h1-imre">Imre</h1>
+  </div>
+  <div class="row">
+    <div class="col-6">
+      <ul class="list-group my-2">
+        <li class="list-group-item list-group-imre-players">
+          <h4>Players in Imre</h4>
+        </li>
+        <li class="list-group-item player-imre">
+          [player 1]
+        </li>
+      </ul>
+    </div>
+    <div class="col-6">
+      <h2 style="text-decoration: underline" class="mt-2 player-actions h2-imre">
+        Player 1 Getting:
+      </h2>
+      <span>[player 1 apothecary/black market actions]</span>
+      <h2 style="text-decoration: underline" class="mt-2 player-actions h2-imre">
+        Player 2 Getting:
+      </h2>
+      <span>[player 2 apothecary/black market actions]</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 my-2">
+      <fieldset>
+        <legend align="center" style="color: #d62b71">Moneylenders</legend>
+        <div class="row">
+          <div class="col-6">
+            <h2 class="moneylenders h2-imre">Giles</h2>
+            <span
+              >[player - debt]
+              <br />
+              [player - debt]
+              <br />
+              [player - debt]
+            </span>
+          </div>
+          <div class="col-6">
+            <h2 class="moneylenders h2-imre">Devi</h2>
+            <span
+              >[player - debt]
+              <br />
+              [player - debt]
+            </span>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 my-2">
+      <fieldset>
+        <legend align="center" style="color: #428120">Apothecary</legend>
+        <div class="row">
+          <div class="col-4">
+            <h2 class="apothecary h2-imre">Items</h2>
+            <span
+              >Nahlrout
+              <br />
+              Courier
+              <br />
+              Bloodless
+              <br />
+              Gram
+            </span>
+          </div>
+          <div class="col-4">
+            <h2 class="apothecary h2-imre">Cost</h2>
+            <span
+              >[nahlrout cost]
+              <br />
+              [courier cost]
+              <br />
+              [bloodless cost]
+              <br />
+              [gram cost]</span
+            >
+          </div>
+          <div class="col-4">
+            <h2 class="apothecary h2-imre">Inventory</h2>
+            <span
+              >[nahlrout amount]
+              <br />
+              [courier amount]
+              <br />
+              [bloodless amount]
+              <br />
+              [gram amount]</span
+            >
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 my-2">
+      <fieldset>
+        <legend align="center" style="color: #aea634">
+          Black Market Items
+        </legend>
+        <div class="row">
+          <div class="col-4">
+            <h2 class="black-market-items h2-imre">Items</h2>
+            <span
+              >Assassin
+              <br />
+              Bodyguard
+              <br />
+              [other]
+              <br />
+              [other]
+            </span>
+          </div>
+          <div class="col-4">
+            <h2 class="black-market-items h2-imre">Cost</h2>
+            <span
+              >[assassin cost]
+              <br />
+              [bodyguard cost]
+              <br />
+              [other cost]
+              <br />
+              [other cost]</span
+            >
+          </div>
+          <div class="col-4">
+            <h2 class="black-market-items h2-imre"># Hired</h2>
+            <span
+              >[assassin]
+              <br />
+              [bodyguard]
+            </span>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 my-2">
+      <fieldset>
+        <legend align="center" style="color: #4473a9">
+          Black Market Contracts
+        </legend>
+        <div class="row">
+          <div class="col-2">
+            <h2 class="black-market-contracts h2-imre">Code</h2>
+            <span>[CODE]</span>
+          </div>
+          <div class="col-2">
+            <h2 class="black-market-contracts h2-imre">Boss</h2>
+            <span>[player]</span>
+          </div>
+          <div class="col-2">
+            <h2 class="black-market-contracts h2-irme">Contractor</h2>
+            <span>[player]</span>
+          </div>
+          <div class="col-6">
+            <h2 class="black-market-contracts h2-imre">Contract</h2>
+            <span
+              >[contract text in full testing to see if it will drop to the next
+              line if long enough]</span
+            >
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

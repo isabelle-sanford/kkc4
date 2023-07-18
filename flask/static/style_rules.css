@@ -1,0 +1,175 @@
+h2 {
+  color: #1D235D;
+}
+
+h1 {
+  color: darkred;
+  text-decoration: underline;
+  text-align: center;
+}
+
+.flavor {
+  color: #48A1D2;
+  font-size: small;
+}
+
+.example {
+  color: #004E5A;
+  outline: 2px solid #0F8094;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.example:hover {
+  outline: 4px solid #0F8094;
+}
+
+.note {
+  color: #595B03;
+  background-color: #F2F4B2;
+  border: 2px solid #BCC036;
+  padding-left: 20px;
+}
+
+.check {
+  list-style-type: "\2713\0020";
+}
+
+.star {
+  list-style-type: "\2726\0020";
+}
+
+.square {
+  list-style-type: "\25A1\0020";
+}
+
+.arrow {
+  list-style-type: "\2192\0020";
+  color: #980000;
+}
+
+.eighthnote {
+  list-style-type: "\1D160\0020";
+}
+
+.sharp {
+  list-style-type: "\266F\0020";
+}
+
+.apothecaryBullet {
+  list-style-type: "\269B\0020";
+}
+
+.LoadedDiceBullet {
+  list-style-type: "\2684\0020";
+}
+
+.BlackMarketBullet {
+  list-style-type: "\25A3\0020";
+}
+
+.water {
+  list-style-type: "\1F30A\0020";
+}
+
+.wind {
+  list-style-type: "\1F300\0020";
+}
+
+.earth {
+  list-style-type: "\1F30E\0020";
+}
+
+.fire {
+  list-style-type: "\1F525\0020";
+}
+
+.blood {
+  list-style-type: "\1FA78\0020";
+}
+
+.stone {
+  list-style-type: "\1F94C\0020";
+}
+
+.bone {
+  list-style-type: "\1F9B4\0020";
+}
+
+.holly {
+  list-style-type: "\1F332\0020"
+}
+
+.amber {
+  list-style-type: "\1F538\0020";
+}
+
+.iron {
+  list-style-type: "\1F529\0020";
+}
+
+.social-class:hover {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.lodging-uni {
+  background: #F7C1F1;
+  border: 2px solid #C680BF;
+}
+
+.lodging-uni:hover {
+  font-weight: bold;
+  color: #434343;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+.lodging-imre {
+  color: #FFFFFF;
+  background: #B90B9B;
+  border: 2px solid #7C0167;
+}
+
+.lodging-imre:hover {
+  font-weight: bold;
+  color: #C4C4C4;
+  text-decoration: underline;
+  font-style: italic;
+}
+
+.coins {
+  border: 2px solid #6B4675;
+}
+
+.coins:hover {
+  border: 3px solid #6B4675;
+}
+
+@import url(https://fonts.googleapis.com/css?family=Lato:400,900|Montez);
+
+$buttonBackground: #2c3e50;
+$buttonColor: rgba(255,255,255,1);
+
+.sparkley {
+
+  background: lighten( $buttonBackground , 10% );
+  color: $buttonColor;
+  border: none;
+
+  padding: 16px 36px;
+  font-weight: normal;
+  
+  border-radius: 5px;
+  transition: all 0.25s ease;
+  
+  box-shadow: 0 38px 32px -23px black;
+  margin: 0 1em 1em;
+  
+  &:hover {
+       
+  }
+  
+}

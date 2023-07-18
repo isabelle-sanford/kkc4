@@ -1,0 +1,176 @@
+{% extends 'index.html' %} {% block body %}
+
+<div class="container pt-2" style="font-family: Luminari">
+  <form class="row g-3 distro-form" id="kkc4">
+    <div class="col-md-6 mb-3">
+      <label for="playername" class="form-label">Player Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="playername"
+        name="playername"
+      />
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="RPname" class="form-label">RP Name</label>
+      <input type="text" class="form-control" id="RPname" name="RPname" />
+    </div>
+    <div class="col-md-2">
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="alignment"
+          id="student"
+          value="Student"
+        />
+        <label class="form-check-label" for="student" style="color: #158801">
+          Student
+        </label>
+      </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="radio"
+          name="alignment"
+          id="skindancer"
+          value="Skindancer"
+        />
+        <label class="form-check-label" for="skindancer" style="color: #ff0000">
+          Skindancer
+        </label>
+      </div>
+    </div>
+    <div class="col-md-5 pt-3">
+      <label for="SocialClass" class="form-label">Social Class</label>
+      <select class="form-select" id="SocialClass" name="SocialClass">
+        <option value="Vintish-Nobleman">Vintish Nobleman</option>
+        <option value="Aturan-Nobleman">Aturan Nobleman</option>
+        <option value="Yllish-Commoner">Yllish Commoner</option>
+        <option value="Cealdish-Commoner">Cealdish Commoner</option>
+        <option value="Edema-Ruh">Edema Ruh</option>
+      </select>
+    </div>
+    <div class="col-md-5 pt-3">
+      <label for="Lodging" class="form-label">Lodging</label>
+      <select class="form-select" id="Lodging" name="Lodging">
+        <option value="Anker's">Anker's</option>
+        <option value="King's-Drab">The King's Drab</option>
+        <option value="Golden-Pony">The Golden Pony</option>
+        <option value="Windy-Tower">The Windy Tower</option>
+        <option value="Horse-and-Four">The Horse and Four</option>
+        <option value="Spindle-and-Draft">The Spindle and Draft</option>
+      </select>
+    </div>
+    <div
+      class="col-md-12"
+      style="text-align: center; color: #8a0098; text-decoration: underline"
+      id="basestats"
+    >
+      <h3>Base Stats</h3>
+    </div>
+    <div class="col-md-2 mb-3" style="text-align: center">
+      <label for="musical" class="form-label">Musical</label>
+      <input type="number" class="form-control" id="musical" name="musical" />
+    </div>
+    <div class="col-md-7 mb-3">
+      <p id="fieldprof" style="text-align: center">Field Proficiency</p>
+      <div class="input-group">
+        <span
+          class="input-group-text"
+          style="color: #9fc8e9; background: #023864"
+          >EP and Field</span
+        >
+        <input
+          type="Number"
+          class="form-control input-group-text ep-input"
+          name="ep1"
+        />
+        <select class="form-select" id="fieldep1" name="field1">
+          <option value="Linguistics">Linguistics</option>
+          <option value="Arithmetics">Arithmetics</option>
+          <option value="RhetoricLogic">Rhetoric/Logic</option>
+          <option value="Archives">Archives</option>
+          <option value="Sympathy">Sympathy</option>
+          <option value="Physicking">Phsysicking</option>
+          <option value="Alchemy">Alchemy</option>
+          <option value="Artificery">Artificery</option>
+          <option value="Naming">Naming</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <span
+          class="input-group-text"
+          style="color: #9fc8e9; background: #023864"
+          >EP and Field</span
+        >
+        <input
+          type="Number"
+          class="form-control input-group-text ep-input"
+          name="ep2"
+        />
+        <select class="form-select" id="fieldep2" name="field2">
+          <option value="Linguistics">Linguistics</option>
+          <option value="Arithmetics">Arithmetics</option>
+          <option value="RhetoricLogic">Rhetoric/Logic</option>
+          <option value="Archives">Archives</option>
+          <option value="Sympathy">Sympathy</option>
+          <option value="Physicking">Phsysicking</option>
+          <option value="Alchemy">Alchemy</option>
+          <option value="Artificery">Artificery</option>
+          <option value="Naming">Naming</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-2 mb-3" style="text-align: center">
+      <label for="inventory" class="form-label">Inventory</label>
+      <select class="form-select" id="inventory" name="inventory">
+        <option value="nothing">Nothing</option>
+        <option value="1nahlrout">1 nahlrout</option>
+        <option value="2nahlrout">2 nahlrout</option>
+        <option value="ward">1 Ward</option>
+        <option value="tenaculum">1 Tenaculum</option>
+        <option value="bloodless">1 Bloodless</option>
+        <option value="gram">1 Gram</option>
+        <option value="bonetar">1 Bone-tar</option>
+      </select>
+    </div>
+    <div class="col-12 my-3">
+      <button type="submit" class="btn btn-info" id="done" name="done">
+        Done
+      </button>
+    </div>
+  </form>
+
+  <!-- TODO -->
+  <div class="row mt-3">
+    <table border="3">
+      <thead>
+        <tr>
+          <th colspan="11" style="text-align: center">KKC4 Players</th>
+        </tr>
+        <tr>
+          <th>Player Name</th>
+          <th>RP Name</th>
+          <th>Alignment</th>
+          <th>Social Class</th>
+          <th>Lodging</th>
+          <th>Musical</th>
+          <th># EP 1</th>
+          <th>Field 1</th>
+          <th># EP 2</th>
+          <th>Field 2</th>
+          <th>Inventory</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="11">footer</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

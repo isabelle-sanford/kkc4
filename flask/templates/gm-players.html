@@ -1,0 +1,76 @@
+{% extends 'index.html' %} {% block body %}
+
+<div class="container pt-2" style="font-family: Luminari">
+  <div class="row">
+    <h1 class="h1-player-info">KKC4 Player Information</h1>
+  </div>
+
+  { % for p in players %}
+
+  <div class="row">
+    <div class="col-3">
+      <h2 class="h2-player-info">{{ p.info.name }}</h2>
+      <span>{{p.info.rp_name}}</span>
+      <ul class="list-group my-2">
+        <li class="list-group-item">{{p.status.short_status()}}</li>
+        <li class="list-group-item">
+          {% if p.info.is_evil %}Skindancer {% else %}Student {% endif %}
+        </li>
+        <li class="list-group-item">{{p.info.social_class.fullname}}</li>
+      </ul>
+      <ul class="list-group my-2">
+        <li class="list-group-item musical">{{p.status.musical_stat}}</li>
+        <!-- ? -->
+        <li class="list-group-item insanity-modifier">
+          {{p.processing.insanity_bonus}}
+        </li>
+      </ul>
+      <ul class="list-group my-2">
+        <li class="list-group-item">{{p.status.lodging.fullname}}</li>
+        <li class="list-group-item">{{p.status.money}}</li>
+      </ul>
+    </div>
+    <div class="col-3">
+      <ul class="list-group my-2">
+        <li class="list-group-item">
+          {% if p.choices.imre_next %}Imre Next {% endif %}
+        </li>
+      </ul>
+      <ul class="list-group my-2">
+        <li class="list-group-item list-group-item-warning">
+          <h4>Current Actions</h4>
+        </li>
+        {% for a in p.choices.actions %}
+        <li class="list-group-item actions">{{a}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-3">
+      <ul class="list-group my-2">
+        <li class="list-group-item list-group-item-info">
+          <h4>Items</h4>
+        </li>
+        <!-- todo -->
+        {% for i in p.status.inventory %}
+        <li class="list-group-item inventory">{{i}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-3">
+      <ul class="list-group my-2">
+        <li class="list-group-item">{{p.status.rank}}</li>
+      </ul>
+      <ul class="list-group my-2">
+        <li class="list-group-item list-group-item-success">
+          <h4>Fields</h4>
+        </li>
+
+        {% for f in p.status.elevations %}
+        <li class="list-group-item fields">{{f}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <hr />
+  { % endfor %} { % endblock %}
+</div>
