@@ -1,0 +1,1035 @@
+{% extends 'base_rules.html' %} {% block rules %}
+<div class="container" style="font-family: Luminari">
+  <div id="UniversityBasics" class="my-3">
+    <h1>University Basics</h1>
+  </div>
+  <div class="row pt-2">
+    <p>
+      This section entails basics that are related directly to this game and the
+      University. These include the <a href="#Currency">currency system</a>,
+      <a href="#SocialClasses">social classes</a>,
+      <a href="#Lodging">lodging</a>, <a href="#Admissions">admissions</a>,
+      <a href="#Insanity">insanity/The Crockery</a>, and
+      <a href="#TheHorns">discipline points/The Horns</a>.
+    </p>
+  </div>
+  <div class="row" id="Currency">
+    <h2>Currency System</h2>
+  </div>
+  <div class="row">
+    <p>
+      The University uses Cealdish money, and each student gets a stipend every
+      term, determined by their class. At the beginning of each cycle/term, the
+      GM will PM each player to tell them how much money they have after
+      admissions, stipend renewal, and any items they may have purchased/sold
+      the previous cycle.
+    </p>
+  </div>
+  <div class="row">
+    <p>Coins are not transferable to other players.</p>
+  </div>
+  <div class="row coins">
+    <div class="col-12">
+      <strong style="text-decoration: underline">Coins:</strong>
+    </div>
+    <div>
+      <ul>
+        <li class="square">
+          <em>Iron Drab</em>: lowest denomination. worth 1/10 of a copper jot
+        </li>
+        <li class="square">
+          <em>Copper Jot</em>: worth 10 iron drabs and 1/10 of a silver talent
+        </li>
+        <li class="square">
+          <em>Silver Talent</em>: highest denomination. worth 10 copper jots or
+          100 iron drabs
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div id="SocialClasses" class="row my-2">
+    <h2>Social Classes</h2>
+  </div>
+  <div class="row">
+    <p>
+      At the beginning of the game, categories of social class will be
+      announced: that is, the player list will show whether you are a Noble,
+      Commoner, or Ruh, but will not distinguish further.
+    </p>
+  </div>
+  <div class="accordion" id="class accordion">
+    <div class="accordion-item">
+      <div class="row">
+        <h5 class="accordion-header" id="Vintish">
+          <button
+            class="accordion-button social-class"
+            style="background: #ed6d0f; border: 2px solid #b75309"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseVintish"
+          >
+            Vintish Nobleman
+          </button>
+        </h5>
+        <div
+          id="collapseVintish"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            You start with 20 talents and staying at either
+            <em>The Horse and Four</em> or <em>The Spindle and Draft</em>. You
+            also have a 30 talent stipend per term, which puts you among the
+            richest students at the University.
+            <ul>
+              <li class="star">
+                Unfortunately, no one really likes you, including the Masters,
+                so your admissions tend to be higher than most (33% higher than
+                they should be, to be exact - i.e. after inflations and
+                reductions). Still, you can afford it, so it’s not a bother.
+                Right?
+              </li>
+              <li class="star">
+                Since you’re so important, you <em>also</em> might be called
+                back to Vintas temporarily by your family (25% chance of being
+                roleblocked per turn and having all actions targeting them
+                (excluding the Horns) delayed until they return to the
+                University).
+              </li>
+              <li class="star">
+                As a nobleman who takes pride in the image they present to
+                others, you will not allow yourself to live among the dregs of
+                humanity unless you must. You choose to stay in 1 of the top 2
+                locations you can afford. (Imre lodgings do not count for this
+                requirement, but when in Imre you must stay in the Pearl of Imre
+                if you can afford it.)
+              </li>
+              <li class="star">
+                If you are expelled, your family back in Vintas is unhappy with
+                you and your stipend drops to 20 talents per term.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="row">
+        <h5 class="accordion-header" id="Aturan">
+          <button
+            class="accordion-button social-class"
+            style="background: #6a77e6; border: 2px solid #434da4"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseAturan"
+          >
+            Aturan Nobleman
+          </button>
+        </h5>
+      </div>
+      <div
+        id="collapseAturan"
+        class="accordion-collapse collapse"
+        data-bs-parent="#accordionExample"
+      >
+        <div class="accordion-body">
+          You start with 13 talents, 3 jots, and 4 drabs and staying at either
+          <em>The Windy Tower</em> or <em>The Horse and Four</em>. You have a 20
+          talent stipend per term, and you’ve also made sure to not make enemies
+          of any of the Masters, which means your admissions aren’t horribly
+          inflated unlike those <em>other</em> noblemen around. Your admissions
+          accurately reflect your skill and knowledge.
+          <ul>
+            <li class="star">
+              You just tend to lack a little skill and knowledge when it comes
+              to the arcane arts. Your superstitious nature makes you hesitant
+              to <em>really</em> dedicate time to them. (25% chance you’ll back
+              out if elevated in Sympathy, Naming, Alchemy, or Artificery).
+            </li>
+            <li class="star">
+              Similar to the Vintish Noblemen, you also have a small chance your
+              family will need you to return, temporarily, to Atur (10% chance
+              of being roleblocked per turn and having all actions targeting
+              them (excluding the Horns) delayed until they return to the
+              University).
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="row">
+        <h5 class="accordion-header" id="Yllish">
+          <button
+            class="accordion-button social-class"
+            style="background: #e8e500; border: 2px solid #bab801"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseYllish"
+          >
+            Yllish Commoner
+          </button>
+        </h5>
+      </div>
+      <div
+        id="collapseYllish"
+        class="accordion-collapse collapse"
+        data-bs-parent="#accordionExample"
+      >
+        <div class="accordion-body">
+          You start with 7 talents, 4 jots, and 9 drabs and staying at either
+          <em>The Golden Pony</em> or <em>The Windy Tower</em>. You have a
+          stipend of 11 talents, 2 jots, and 3 drabs per term. You’re the
+          average student, with an average stipend, and no real bonuses or
+          drawbacks to speak of based on your status. And you’re okay with that.
+          <ul>
+            <li class="star">
+              If you are on the streets and you have less than 6 talents, you
+              are less of a target to mercenaries (your chance of dying to the
+              mercenary attack reduces to 10%).
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="row">
+        <h5 class="accordion-header" id="Cealdish">
+          <button
+            class="accordion-button social-class"
+            style="background: #00a4c5; border: 2px solid #00748b"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseCealdish"
+          >
+            Cealdish Commoner
+          </button>
+        </h5>
+      </div>
+      <div
+        id="collapseCealdish"
+        class="accordion-collapse collapse"
+        data-bs-parent="#accordionExample"
+      >
+        <div class="accordion-body">
+          You start with 6 talents, 5 jots, and 8 drabs and staying at either
+          <em>The King's Drab</em> or <em>The Golden Pony</em>. You have a
+          stipend of 9 talents, 8 jots, and 7 drabs per term, which can
+          sometimes get a little tight, but you’ve never had a problem balancing
+          your finances, so you make it work.
+          <ul>
+            <li class="star">
+              In fact, you’re so good with money, you tend to get a little extra
+              when you sell or purchase items (20% increase when selling, and
+              20% decrease when purchasing), and you know how to make the odds
+              work in your favor when gambling (use 1d6 in
+              <a href="#LoadedDice">The Loaded Dice</a>).
+            </li>
+            <li class="star">
+              If you are on the streets and you have less than 6 talents, you
+              are less of a target to mercenaries (your chance of dying to the
+              mercenary attack reduces to 10%).
+            </li>
+            <li class="star">
+              Thanks to your Cealdish heritage, you have family connections
+              among the moneylenders and can go to
+              <a href="#Giles">Giles’</a> even if you are not staying in
+              <em>The Grey Man</em>.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <div class="row">
+        <h5 class="accordion-header" id="EdemaRuh">
+          <button
+            class="accordion-button social-class"
+            style="background: #9802cd; border: 2px solid #6d0193"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseRuh"
+          >
+            Edema Ruh
+          </button>
+        </h5>
+      </div>
+      <div
+        id="collapseRuh"
+        class="accordion-collapse collapse"
+        data-bs-parent="#accordionExample"
+      >
+        <div class="accordion-body">
+          Edema Ruh start with 3 talents and 4 drabs and staying at either
+          <em>Anker's</em> or <em>The King's Drab</em>. The poorest of the poor,
+          you have a stipend of 5 talents, 6 jots, and 7 drabs.
+          <ul>
+            <li class="star">
+              Fortunately, you’ve grown up playing music and entertaining
+              crowds, so you’re able to reduce your room rentals through your
+              playing. Your rooms are half-price.
+            </li>
+            <li class="star">
+              You’re able to charm the house at The Loaded Dice, giving you
+              better odds when gambling (use 1d12).
+            </li>
+            <li class="star">
+              If you are on the streets and you have less than 6 talents, you
+              are less of a target to mercenaries (your chance of dying to the
+              mercenary attack reduces to 10%, and your actions only have a 25%
+              chance of failing).
+            </li>
+            <li class="star">
+              Due to your musical experience, your Musical Base Stat is modified
+              by +2.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="Lodging" class="row pt-2">
+    <h2>Lodging</h2>
+  </div>
+  <div class="row">
+    <p class="my-1">
+      There are multiple places at the University and in the town around the
+      University where students can lodge. All players not in the Crockery must
+      have lodging, even if they are expelled or not attending the University
+      for that term. Where you lodge can either positively or negatively affect
+      students. Each location has a set cost (per term, not per month) that
+      varies from location to location. In the last month of each term, players
+      should PM the GM to say where they are lodging for the next term. If
+      players fail to send in a lodging location, they will spend that cycle
+      living On the Streets.
+    </p>
+    <p class="my-2">
+      Lodging is paid after tuition, unless otherwise specified (students can
+      say that if they can’t afford tuition <strong>and</strong> the location
+      they’ve chosen, they choose not to attend the University that term). If a
+      student cannot afford their chosen lodging after tuition, they will be
+      moved to the most expensive location they can afford.
+    </p>
+  </div>
+  <div class="row">
+    <div class="example my-3">
+      <strong>Example</strong>: Striker chooses to lodge at The Golden Pony for
+      the next term. However, after his high tuition, he only has 6 talents. He
+      will lodge at Anker’s instead. If he only had 4 talents, he would be
+      lodging in the Mews. If he instead sent an order to the GM saying “I will
+      lodge at The Golden Pony next term, and if my tuition is too high to stay
+      there, I’ll skip term,” he would stay at the Golden Pony and keep the
+      money that would’ve been paid for tuition.
+    </div>
+  </div>
+  <div class="row pt-3">
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="Streets">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseStreets"
+          >
+            On the Streets
+          </button>
+        </h5>
+        <div
+          id="collapseStreets"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>No cost</em>
+            </p>
+            <p class="flavor mb-1">
+              Living out on the rough streets, anything can happen to you. And
+              thanks to the sleep (or lack thereof), even your own actions are
+              sketchy at best. You might even end up dead in the gutter, killed
+              by a rogue mercenary just for looking at him (or her) the wrong
+              way.
+            </p>
+            <p class="mb-1">
+              All actions against you succeed. Positive actions (like protection
+              or being given an item) have a 50% chance of failing. Your own
+              actions have a 50% chance of failing. There is a 25% chance you
+              will be killed.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="Underthing">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseUnderthing"
+          >
+            The Underthing
+          </button>
+        </h5>
+        <div
+          id="collapseUnderthing"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>No cost</em>
+            </p>
+            <p class="mb-1">
+              This location is only accessible by those who have escaped the
+              Crockery. Unfortunately, as long as you live in the Underthing,
+              your actions are severely reduced. As no one can find you, actions
+              done to you have no effect, but since you are in the Underthing,
+              you are unable to make any actions yourself. You cannot send nor
+              receive PMs, impress a Master (file EP), go to Imre, or even talk
+              in a doc (if you’re a Skindancer). You still collect money from
+              your stipend. If you are still enrolled at the University, you
+              have to pay tuition.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="Mews">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseMews"
+          >
+            The Mews
+          </button>
+        </h5>
+        <div
+          id="collapseMews"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>1 talent</em>
+            </p>
+            <p class="mb-1">
+              Having to constantly deal with other students gives you a (+2)
+              bonus to Insanity rolls.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="Ankers">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseAnkers"
+          >
+            Anker's
+          </button>
+        </h5>
+        <div
+          id="collapseAnkers"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>4 talents</em>
+            </p>
+            <p class="mb-1">
+              Rough living gives you a 15% chance that one of your actions will
+              fail.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="KingsDrab">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseKingsDrab"
+          >
+            The King's Drab
+          </button>
+        </h5>
+        <div
+          id="collapseKingsDrab"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>6 talents</em>
+            </p>
+            <p class="mb-1">
+              A lack of security gives you a 5% chance of having an item stolen,
+              if you have an item.
+              <button
+                type="button"
+                class="btn rounded-pill btn-sm bg-info"
+                data-bs-toggle="popover"
+                data-bs-placement="top"
+                data-bs-trigger="focus"
+                data-bs-content="If you have multiple items, one will be chosen at random."
+              >
+                2
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="GoldenPony">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseGoldenPony"
+          >
+            The Golden Pony
+          </button>
+        </h5>
+        <div
+          id="collapseGoldenPony"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>8 talents</em>
+            </p>
+            <p class="mb-1">
+              Students staying here have enough money that they've got an in
+              with the Masters. You will have up to 2 complaints on you canceled
+              out, before the Master DP distribution.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="WindyTower">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseWindyTower"
+          >
+            The Windy Tower
+          </button>
+        </h5>
+        <div
+          id="collapseWindyTower"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>9 talents</em>
+            </p>
+            <p class="mb-1">
+              Being so close to the University gives you more chances to impress
+              the Masters. You get an additional EP to spend each turn that you
+              stay there.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="HorseAnd4">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseHorseAnd4"
+          >
+            The Horse and Four
+          </button>
+        </h5>
+        <div
+          id="collapseHorseAnd4"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>10 talents</em>
+            </p>
+            <p class="mb-1">
+              The highest security available on this side of the river, any
+              sabotage or kill has a 50% chance of failing.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="SpindleAndDraft">
+          <button
+            class="accordion-button lodging-uni collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseSpindle"
+          >
+            The Spindle and Draft
+          </button>
+        </h5>
+        <div
+          id="collapseSpindle"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>12 talents</em>
+            </p>
+            <p class="mb-1">
+              This luxurious inn is sure to make all your cares and concerns
+              melt away. You have -2 insanity points as long as you lay your
+              head on the softest pillows in the Commonwealth.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="GreyMan">
+          <button
+            class="accordion-button lodging-imre collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseGreyMan"
+          >
+            The Grey Man
+          </button>
+        </h5>
+        <div
+          id="collapseGreyMan"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>7 talents</em>
+            </p>
+            <p class="flavor mb-1">
+              The owners of The Grey Man are friends with Giles, a cautious
+              moneylender in town, and don’t mind passing a good word along to
+              him about their guests.
+            </p>
+            <p class="mb-1">
+              <a href="#Giles">Giles</a> is only accessible to those staying at
+              The Grey Man.
+            </p>
+            <p class="mb-1">
+              Additionally, as an Imre lodging, staying here allows a player to
+              be in Imre for a whole term. It may only be used by players who
+              have been expelled from the University or are not attending it
+              this term.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h5 class="accordion-header" id="PearlOfImre">
+          <button
+            class="accordion-button lodging-imre collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapsePearl"
+          >
+            The Pearl of Imre
+          </button>
+        </h5>
+        <div
+          id="collapsePearl"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div class="accordion-body">
+            <p class="mb-1">
+              <em>11 talents</em>
+            </p>
+            <p class="flavor mb-1">
+              As the best lodging in Imre, those
+              with...<em>specialized</em>...skills tend to stay here. Even when
+              it’s next to impossible to find a contract for assassins or
+              bodyguards on the Black Market, you can always seem to find
+              someone to hire here.
+            </p>
+            <p class="mb-1">
+              <a href="#BlackMarket">Assassin and bodyguard contracts</a> are
+              always available even when they would be out of stock for anyone
+              else. When contracts are in stock, the price for lodgers at The
+              Pearl is reduced by 25%.
+            </p>
+            <p class="mb-1">
+              Additionally, as an Imre lodging, staying here allows a player to
+              be in Imre for a whole term. It may only be used by players who
+              have been expelled from the University or are not attending it
+              this term.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="Admissions" class="row pt-2">
+    <h2>Admissions</h2>
+  </div>
+  <div class="row">
+    <p class="my-2">
+      Every term/cycle, students must go through admissions and pay tuition if
+      they want to continue studying at the University. Tuition varies on a
+      student-by-student basis, as well as a term-by-term basis. If a student
+      cannot pay tuition, they cannot attend the University for that term. They
+      can continue using abilities or items previously acquired, but they cannot
+      impress a Master or be elevated.
+    </p>
+    <p class="my-2">
+      Students who cannot/do not attend a term do not go through admissions
+      again, so they retain the tuition cost given to them until they have
+      enough to attend another term. Players who fail to attend the University
+      for a term will be required to tell the GM when they would like to return
+      to their studies. The GM will not automatically enroll them when they have
+      enough to pay.
+    </p>
+    <p class="my-2">
+      Each player’s tuition is determined through various game elements. By
+      participating in these elements, players can reduce their tuition, making
+      it easier on their pocketbooks to attend. Reductions and Inflations are
+      calculated <strong>per month</strong>. The starting tuition per term for
+      each student is <strong>10 talents</strong>.
+    </p>
+  </div>
+  <div class="row mb-2" id="TuitionReductions">
+    <strong style="color: #12610b; text-decoration: underline"
+      >Tuition Reductions</strong
+    >
+  </div>
+  <div class="row">
+    <ul>
+      <li class="star">Post once in the thread: 5 jots</li>
+      <li class="star">
+        Quality thread participation: at least 1 jot per quality post
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="200 or more words of game-related discussion in a post counts as ‘quality’ and will receive 1 jot. More words will receive a higher reduction, but this cannot reduce your tuition by more than 2 talents within a given term."
+        >
+          3
+        </button>
+        (max 2 talent reduction per term)
+      </li>
+      <li class="star">
+        Quality RP: 5 jots per post
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="By ‘quality RP’ we mean over 200 words in a post. (Both to remain impartial and so you can track yourselves, we don’t judge the quality of the RP.)"
+        >
+          4
+        </button>
+      </li>
+      <li class="star">Impress a Master (regardless of elevation): 5 jots</li>
+      <li class="star">
+        File one or more complaint(s)
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="That is, you get 3 jots off for filing a complaint for each month. You don’t get more for filing more complaints. 
+"
+        >
+          5
+        </button>
+        : 3 jots per month
+      </li>
+      <li class="star">Send or reply to at least one PM: 3 jots per month</li>
+      <li class="star">Selling an item in Imre: 5 drabs</li>
+      <li class="star">
+        Purchasing an item from the Apothecary: 5 drabs-1 talent (depends on the
+        item purchased)
+      </li>
+      <li class="star">
+        Placing a request on the Black Market: 5 jots-2 talents (depends on the
+        request and amount placed with it)
+      </li>
+      <li class="star">Trying for Talent Pipes: 1 talent</li>
+      <li class="star">
+        Fulfilling a Black Market contract: 5 jots per contract
+      </li>
+    </ul>
+  </div>
+  <div class="row mb-2" id="TuitionInflations">
+    <strong style="color: #94162b; text-decoration: underline"
+      >Tuition Inflations</strong
+    >
+    <ul>
+      <li class="star">
+        Participate heavily in messages but very little in the thread: 1-4
+        talents (75-85% of the communication being in PMs, as opposed to in the
+        thread, is 1 talent; 86-90% is 2 talents; 91-95% is 3 talents; and 96%
+        or higher is 4 talents)
+      </li>
+      <li class="star">
+        Have complaints filed against you: 1 jot per complaint
+      </li>
+      <li class="star">Being brought On the Horns: 2 talents per time</li>
+      <li class="star">Not RPing a public apology: 2 talents</li>
+      <li class="star">Re’lar: 5 jots</li>
+      <li class="star">El’the: 1 talent</li>
+    </ul>
+    <div class="col-12" style="border: 2px solid #7a1224">
+      <strong style="color: #5a0312"><em>For Masters:</em></strong>
+      <ul>
+        <li class="star">Fail to post in the thread: 3 talents</li>
+        <li class="star">Don’t elevate a student: 1 talent</li>
+        <li class="star">
+          Fail to use any actions for the entire term (role-blocks do not
+          count): 4 talents
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div id="Insanity" class="row my-2">
+    <h2>Insanity and the Crockery</h2>
+  </div>
+  <div class="row">
+    <p>
+      All players in the Arcanum have a chance of going crazy and being sent to
+      The Crockery, the University’s famed insane asylum. This “cracking” can
+      happen through either sabotage by the Skindancers or actual cracking.
+      Depending on the field(s) a player chooses to study and their rank in the
+      field(s), each player’s chances of going insane could increase — sometimes
+      drastically.
+    </p>
+  </div>
+  <div class="row">
+    <strong style="text-decoration: underline">Insanity Points</strong>
+  </div>
+  <div class="row">
+    <p>
+      Players accrue Insanity Points (IP), which are reset every turn. A player
+      goes insane when they accrue at least 12 IP in a single turn. Each turn,
+      all non-insane players will have an Insanity Roll which will determine if
+      they go insane. Insanity Rolls start with a d10, with additional IP gained
+      through Arcane Arts added to the Roll as a sort of “bonus”.
+    </p>
+  </div>
+  <div class="row">
+    <div class="example my-3">
+      <strong>Example</strong>: Joe is a Re’lar studying Alchemy and Artificery.
+      Both of these fields have 2 IP for Re’lars. Joe will have 4 IP added to
+      his Insanity Roll, making it all that much more likely that he will go
+      insane.
+    </div>
+  </div>
+  <div class="row">
+    <p>
+      When a person goes insane, they cannot use any abilities or items they
+      had. Their stipend is put frozen and they will not have access to their
+      coins. Their tuition is also frozen at the amount it would’ve been had the
+      player not gone insane. They do not have to worry about lodging, as the
+      Crockery is their home now. They cannot communicate through thread or PMs,
+      since they are trapped in their rooms.
+    </p>
+    <p>
+      Sabotages on the insane function as a kill, and they cannot be blocked. No
+      action targeting the insane can be blocked, regardless of bodyguards or
+      Medica/item actions.
+    </p>
+  </div>
+  <div class="row" id="InsanityReduction">
+    <p>
+      <strong>Reducing Insanity</strong>: Elevation Points can be used to reduce
+      a player’s Insanity Points. Any EP they have in a field may be removed and
+      used instead to reduce their IP by 1 for each 4 EP they sacrifice.
+    </p>
+  </div>
+  <div class="row">
+    <div class="example my-3">
+      <strong>Example</strong>: Bard is an El'the in Sympathy. He uses
+      Malfeasance Protection and would have +3 Insanity Points this turn.
+      However, he decides to use 2 EP in Rhetoric and Logic and 2 EP in Archives
+      to reduce his IP. Now, his IP bonus is +2, and he has a lower chance of
+      going insane.
+    </div>
+  </div>
+
+  <div class="row" id="Breakout">
+    <strong style="text-decoration: underline">Breakout</strong>
+  </div>
+  <div class="row">
+    <p>
+      There is a small chance that those in the Crockery can escape, returning
+      to the game. All players in the Crockery will have a Breakout Roll once
+      per turn, using a d20 dice. If a player has a background in Naming,
+      knowing at least 5 Names, the Breakout Roll will use a d10. There is a
+      1/20 chance players with no (or little) background in Naming will break
+      out. There is a 1/10 chance an experienced Namer will break out.
+    </p>
+    <p>
+      If a player breaks out from the Crockery, they will return to the game.
+      However, they will return 1 rank lower than they were when they went
+      insane, and they will have 1 random power less than they had when they
+      entered. Their stipend and coins will unfreeze, and they will resume
+      studies at the University using the same orders they had in place before
+      they went insane. If they went insane during the first turn of a cycle and
+      therefore didn’t have lodging orders placed, they will lodge in their
+      previous lodgings if they can afford it. If they cannot, they’ll be placed
+      in the most expensive lodging they <em>can</em> afford.
+    </p>
+    <p>
+      Players who break out from the Crockery can no longer
+      <a href="#ElevationPoints">impress a Master (file EP)</a> and be elevated.
+      Players who break out have access to a new lodging,
+      <a href="#Underthing">The Underthing</a>.
+    </p>
+  </div>
+  <div id="TheHorns" class="row my-2">
+    <h2>The Horns and Discipline Points</h2>
+  </div>
+  <div class="row">
+    <p>
+      The Horns is the disciplinary system of The University. Every turn,
+      students will accrue Discipline Points (DP) through both the lynch and
+      from the Masters. Each Master has a total of 5 DP per turn that they can
+      give to students. While Masters are NPC-controlled, their DP will be
+      distributed randomly over all students brought On the Horns, proportional
+      to the number of complaints they received (i.e. any student with a
+      complaint has a chance of receiving DP; more complaints means a higher
+      chance of getting DP)
+      <button
+        type="button"
+        class="btn rounded-pill btn-sm bg-info"
+        data-bs-toggle="popover"
+        data-bs-placement="top"
+        data-bs-trigger="focus"
+        data-bs-content=" This DP distribution occurs after complaint-related actions and The Golden Pony effect."
+      >
+        6</button
+      >. If a player becomes Master, they have total control of their DP (they
+      can place it on anyone, regardless of whether complaints have been filed).
+    </p>
+    <p>
+      <a href="#ElevationPoints">Elevation Points</a> can be used to reduce the
+      number of DP a Master gives to a student, but this is not an active choice
+      by the player. If a Master uses any of their DP on a student that has EP
+      in their field, the EP in that field will be used up before any DP is
+      finalized on the player. This can lower the chances of punishment.
+    </p>
+  </div>
+  <div class="row">
+    <div class="example my-2">
+      <strong>Example</strong>: If Burnt has 5 EP in Naming and the Master Namer
+      places 3 DP on Burnt, 3 of Burnt’s EP in Naming will be used to reduce the
+      Master Namer’s DP to 0. If she has no EP in Naming, she cannot substitute
+      EP from a different field.
+    </div>
+  </div>
+  <div class="row">
+    <p>
+      If a student accrues 5 or more Discipline Points on them in any turn, they
+      will be brought On the Horns and potentially face punishment. Students
+      with 11 or more DP on them will risk expulsion from the University.
+    </p>
+    <p>
+      There are a number of malfeasance charges possible, each with their own
+      form of punishment. Charges are determined by how many DP a student
+      accrues. There is a chance that all forms of malfeasance will be dropped;
+      however, this chance disappears when a student has 11 DP. The more DP a
+      student has, the higher the risk of expulsion.
+    </p>
+  </div>
+  <div class="row">
+    <ul>
+      <li class="star">
+        5-7 DP: 60% charges dropped, 30% Undignified Mischief (apology), 10%
+        Reckless Use of Sympathy (lashings)
+      </li>
+      <li class="star">
+        8-10 DP: 20% charges dropped, 30% Undignified Mischief (apology), 30%
+        Reckless Use of Sympathy (lashings), 20% Conduct Unbecoming a Member of
+        the Arcanum (lashings)
+      </li>
+      <li class="star">
+        11-12 DP: 20% Undignified Mischief (apology), 20% Reckless Use of
+        Sympathy (lashings), 50% Conduct Unbecoming a Member of the Arcanum
+        (lashings), 10% Conduct Unbecoming a Member of the Arcanum (expulsion)
+      </li>
+      <li class="star">
+        13-14 DP: 10% Undignified Mischief (apology), 20% Reckless Use of
+        Sympathy (lashings), 40% Conduct Unbecoming a Member of the Arcanum
+        (lashings), 30% Conduct Unbecoming a Member of the Arcanum (expulsion)
+      </li>
+      <li class="star">
+        15-16 DP: 5% Undignified Mischief (apology), 5% Reckless Use of Sympathy
+        (lashings), 25% Conduct Unbecoming a Member of the Arcanum (lashings),
+        65% Conduct Unbecoming a Member of the Arcanum (expulsion)
+      </li>
+      <li class="star">
+        17-18 DP: 20% Conduct Unbecoming a Member of Arcanum (lashings), 80%
+        Conduct Unbecoming a Member of Arcanum (expulsion)
+      </li>
+      <li class="star">
+        19 DP: 10% Conduct Unbecoming a Member of the Arcanum (lashings), 90%
+        Conduct Unbecoming a Member of the Arcanum (expulsion)
+      </li>
+      <li class="star">
+        20+ DP: 100% Conduct Unbecoming a Member of the Arcanum (expulsion)
+      </li>
+    </ul>
+  </div>
+  <div class="row">
+    <strong style="text-decoration: underline" id="Punishments"
+      >Punishments</strong
+    >
+  </div>
+  <div class="row">
+    <ul>
+      <li class="star mb-2">
+        <em>Formal Apology</em>: Player must apologize in-thread, making up a
+        misdemeanor—RPing the apology is a must. Failure to do so warrants 2 DP
+        the next turn and a (+2) talent tuition increase.
+      </li>
+      <li class="star my-2">
+        <em>Public Lashing</em>: Cannot take action for X amount of turns,
+        unless they have nahlrout. Reckless Use: 1 turn. Conduct Unbecoming: 3
+        turns. You can still file complaints and EP, but you cannot be elevated.
+        Even the Master Physicker isn’t around the Medica enough to be
+        impressed.
+      </li>
+      <li class="star my-2">
+        <em>Expulsion</em>: Student is kicked out of the University. They also
+        lose their ability to speak in PMs with students attending the
+        University, but can speak in and start PMs with other expelled players
+        (or players who are intentionally not attending the University).
+        Expelled students can still talk in the main thread (and in a doc, if
+        applicable). They cannot lodge complaints. They must still arrange
+        boarding each term, but they cannot sleep in the Mews, since that’s an
+        option available only for University students. Expelled students can
+        continue using any field ability they may have had and any items they
+        created. They cannot gain any more abilities (unless they leveled up at
+        least once in Naming). They can continue creating items. Expelled
+        students can only successfully target other expelled students or people
+        visiting Imre. Players still in the Arcanum can affect them, even if
+        they are not in Imre. Sabotages kill expelled students, if they are
+        unprotected.
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

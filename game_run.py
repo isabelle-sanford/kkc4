@@ -24,6 +24,8 @@ class Game:
         self.apothecary = Apothecary()
         self.blackmarket = BlackMarket()
 
+        self.fields = FIELDS
+
 
     def add_player(self, input):
         p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])

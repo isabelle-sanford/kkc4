@@ -1,0 +1,6 @@
+
+
+- update ALL links between rules pages to be correct 
+- figure out how to get forms out of flask for distro input 
+- sql
+- figure out how to use the JS thingy - DONE
