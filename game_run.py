@@ -2,12 +2,13 @@ import copy
 import random
 from field import FieldStatus, FIELDS
 from horns import Horns
+from imre import Apothecary, BlackMarket
 from items import Item, ItemType
 from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import Background, Lodging, Rank
+from statics import Background, FieldName, Lodging, Rank
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -20,10 +21,11 @@ class Game:
         self.turns: list[Turn] = []
         # this is where field status init should go
 
+        self.apothecary = Apothecary()
+        self.blackmarket = BlackMarket()
+
 
     def add_player(self, input):
-        
-
         p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
         p.id = self.num_players
 
@@ -99,7 +101,7 @@ class Game:
 # could put this inside game, idk
 class Turn:
 
-    def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]"):
+    def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]", apothecary: Apothecary, blackmarket: BlackMarket):
         self.players = playerlist
         self.gm_input = gm_input
         self.month = month
@@ -111,9 +113,12 @@ class Turn:
         self.offensive_actions: list[Action] = []
 
         self.fields = fields
+        self.apothecary: Apothecary = apothecary
+        self.blackmarket: BlackMarket = blackmarket
 
         self.sane_players: list[int] = [] # just ids 
         self.living_players: list[int] = [] # just ids 
+        self.imre_players: list[int] = [] # just ids
 
         for p in playerlist:
             if p.status.is_alive:
@@ -126,13 +131,15 @@ class Turn:
 
                 self.actions.append(a)
             
+            if p.choices.imre_next: # is this good?
+                self.imre_players.append(p.id)
+
             # TUITION FROM CHOICES
             if len(self.choices.filing_EP) > 0:
                 p.tuition.times_filed_EP += 1
             # todo imre tuition things (once imre is done)
 
             
-
 
         # other lists? imre? 
 
@@ -154,12 +161,56 @@ class Turn:
     
     def start_term(self):
 
+        # pay off interest to devi / giles (any further payment is in process_imre)
+        # todo LOG
+        for pid in self.sane_players:
+            p = self.players[pid] # idk why I'm even using pid at this point
+
+            if p.status.IMRE_INFO["DEVI_amt_owed"] > 0:
+                paying = p.choices.pay_devi 
+                owed = p.status.IMRE_INFO["DEVI_amt_owed"]
+                arit_reduction = p.levels_in(FieldName.ARITHMETICS) * 10 + 10
+                interest_owed = owed * 0.3 * (1 - arit_reduction / 100)
+
+                p.status.IMRE_INFO["DEVI_amt_owed"] += interest_owed
+
+                if paying < interest_owed:
+                    # DEFAULT
+                    p.IMRE_INFO["DEVI_defaulted"] = True
+
+                    # TODO: add mommet to black market 
+                else:
+                    p.status.IMRE_INFO["DEVI_amt_owed"] -= interest_owed
+                    p.choices.pay_devi -= interest_owed # rest of payment happens later
+
+            if p.status.IMRE_INFO["GILES_amt_owed"] > 0:
+                paying = p.choices.pay_giles
+                owed = p.status.IMRE_INFO["GILES_amt_owed"]
+                arit_reduction = p.levels_in(FieldName.ARITHMETICS) * 10 + 10
+                interest_owed = owed * 0.15 * (1 - arit_reduction / 100)
+
+                p.status.IMRE_INFO["GILES_amt_owed"] += interest_owed
+
+                if paying < interest_owed:
+                    # DEFAULT
+                    p.IMRE_INFO["GILES_defaulted"] = True
+                    # blacklist from grey man
+
+                else:
+                    p.status.IMRE_INFO["GILES_amt_owed"] -= interest_owed
+                    p.choices.pay_giles -= interest_owed # rest of payment happens later
+
+
         self.log.add_section("NEW TERM", "Starting new term.")
         
         # GIVE STIPENDS
         for pid in self.sane_players:
             p = self.players[pid]
+            # could use p.increase_money() instead ig
             p.status.money += p.initial_status.stipend
+
+            if p.status.has_talent_pipes: # todo make sure this works
+                p.status.money += 10
 
 
             # DO TUITION STUFF
@@ -366,6 +417,7 @@ class Turn:
 
     # todo somewhere: remember to account for fields being destroyed
     # this is Yikes
+    # todo: PC masters take precedence; first tiebreaker is # of EP in field
     def do_elevations(self):
 
         to_elevate = {} # player: field
@@ -647,6 +699,64 @@ class Turn:
 
         # TODO LOGGING / RESULTS
         return
+    
+    def process_imre(self):
+        apoth_orders = {
+            "nahlrout": [],
+            "courier": [],
+            "bloodless": [],
+            "gram": []
+        }
+
+        # pay giles/devi
+        # note: interest payoff (if it occurred) will have already happened
+        # and what's left in choices.pay_whoever does NOT include the amount already taken out
+        # this is kinda pointless / weird tbh 
+        for pid in self.sane_players:
+            p = self.players[pid]
+
+            if p.choices.pay_giles > 0:
+                p.pay_giles()
+            
+            if p.choices.pay_devi > 0:
+                p.pay_devi()
+
+        for pid in self.imre_players:
+            p = self.players[pid]
+            pchoices = p.choices.IMRE_CHOICES
+
+            # TODO: blocks stuff
+
+            p.visit_eolian()
+
+            p.gamble_loadeddice()
+
+            p.visit_devi()
+            p.visit_giles()
+
+            apoth = pchoices["Apothecary"]
+
+            # todo: check this works
+            apoth_orders["nahlrout"] += [p] * apoth["nahlrout"]
+            apoth_orders["courier"] += [p] * apoth["courier"]
+            apoth_orders["bloodless"] += [p] * apoth["bloodless"]
+            apoth_orders["gram"] += [p] * apoth["gram"]
+
+            bm = pchoices["Black Market"]
+            # todo
+
+
+        # BLACK MARKET
+
+        # resolve apothecary orders
+        # why is this two functions? idk, it probably shouldn't be
+        valid_orders = self.apothecary.take_orders(apoth_orders)
+        self.apothecary.give_out_sold_items(valid_orders)
+
+        # todo
+
+        return
+
 
     def PROCESS_TURN(self):
         # update field statuses to new month (?)
@@ -718,6 +828,8 @@ class Turn:
         self.log.add_section("Offensive Actions", "Processing offensive actions...")
         self.process_offensive_actions()
         self.log.log("Offensive actions processed!")
+
+        # TODO give players any items they received
 
         self.log.add_section("Final", "Turn is processed! blah blah blah")
 

@@ -127,9 +127,12 @@ class PlayerStatus:
             "GILES_defaulted": False,
             "GILES_amt_owed": 0.0,
             "DEVI_defaulted": False,
+            "DEVI_amt_owed": 0.0,
             "DEVI_collateral": [],
             "BLACKMARKET_Contractlog": []
+            # TODO blacklistings probs
         }
+        s.has_talent_pipes = True # todo
 
         return s
     
@@ -218,7 +221,7 @@ class PlayerProcessing:
         # protect / attack info, maybe? 
 
         self.items_received: list[Item] = []
-        # todo remember to add this ^ to next_status
+        # todo remember to add this ^ to next_status (AFTER everything else is processed)
 
         self.getting_elevated_in: FieldName = None
 
@@ -274,32 +277,39 @@ class PlayerChoices:
         self.to_elevate: list[Player] = [] # ordered preference list
 
         # IMRE (check if player is there?)
-        # also again maybe change to dict, this is really messy
-        self.IMRE_EOLIAN_audition: bool = False
-        self.IMRE_EOLIAN_practice: bool = False
+        self.IMRE_CHOICES = {
+            "Eolian": {
+                "audition": False,
+                "practice": False
+            },
+            "Devi": {
+                "acquire_loan": False,
+                "give_collateral": [], # item list
+                "loan_amount": 0.0
+            }, "Giles": {
+                "acquire_loan": False,
+                "loan_amount": 0.0
+            }, "Loaded Dice": {
+                "place_bet": False,
+                "bet_amt": 0.0,
+                "numbers": []
+            }, "Apothecary": {
+                "nahlrout": 0,
+                "courier": 0, # does this need target?
+                "bloodless": 0,
+                "gram": 0
+            }, "Black Market": {
+                "mommet": [], # items
+                "bodyguard": [], # player targets
+                "assassin": [], # player targets
+                "take_contract": [], # contract ids
+                "place_contract": [] # contract info
+            }
+        }
 
-        self.IMRE_DEVI_acquire_loan: bool = False
-        self.IMRE_DEVI_give_collateral: list[Item] = []
-        self.IMRE_DEVI_loan_amount: float =  0.0
-        # Do you actively choose to pay the loan or is it direct debit?
-
-        self.IMRE_GILES_acquire_loan: bool = False
-        self.IMRE_GILES_loan_amount: float =  0.0
-
-        self.IMRE_LOADEDDICE_placed_bet: bool = False
-        self.IMRE_LOADEDDICE_bet_amount: float = 0.0
-        self.IMRE_LOADEDDICE_numbers: list[int] = []
-
-        self.IMRE_APOTHECARY_nahlrout: int = 0
-        self.IMRE_APOTHECARY_couriers: list[str] = []
-        self.IMRE_APOTHECARY_bloodless: int = 0
-        self.IMRE_APOTHECARY_gram: int = 0
-
-        self.IMRE_BLACKMARKET_mommet: list[Item] = []
-        self.IMRE_BLACKMARKET_bodyguard: int = 0
-        self.IMRE_BLACKMARKET_assassin: list[Player] = []
-        self.IMRE_BLACKMARKET_take_contract: list[Item] = []
-        self.IMRE_BLACKMARKET_place_contract: list[Item] = []
+        # probably automatically have interest here, if start of term + relevant? 
+        self.pay_giles = 0
+        self.pay_devi = 0
 
         self.offset_IP = 0
  
@@ -488,11 +498,8 @@ class Player:
 
         # TODO add new accessible abilities
 
-    def calculate_tuition(self, gm_input):
-        # TODO
-        return
-        # remember to check masters, social class, arithmetics
-        # probs have Tuition object that can be updated over turns?
+        # todo aturan chance of backing out of arcane fields
+
 
     def go_insane(self, fields: "list[FieldStatus]"):
         # TODO
@@ -516,7 +523,7 @@ class Player:
     def die(self, fields: "list[FieldStatus]"):
         self.status.is_alive = False
         self.status.can_take_actions = False
-        self.status.can_be_targeted = False
+        self.status.can_be_targeted = False #no
         self.status.can_be_elevated = False 
         self.status.is_enrolled = False
         self.status.can_file_complaints = False
@@ -553,7 +560,7 @@ class Player:
 
 
     def add_item(self, item: Item):
-        self.status.inventory.append(Item)
+        self.processing.items_received.append(item)
 
     def holds_item(self, item_type: ItemType) -> bool:
         count = 0
@@ -580,8 +587,178 @@ class Player:
                     list.append(item)
         return list
 
+    # not sure if to do imre stuff here or in process_imre tbh
+    def visit_eolian(self):
+        if self.status.IMRE_INFO["EOLIAN_auditioned"]:
+            # cannot re-audition
+            return
+        
+        if self.choices.IMRE_CHOICES["Eolian"]["practice"]:
+            self.status.musical_stat += 0.5
+            return 
+        
+        if self.choices.IMRE_CHOICES["Eolian"]["audition"]:
+            mstat = self.status.musical_stat
+            pipes = False
+            # TODO
+
+            if pipes:
+                self.status.inventory.append(Item.Generate(ItemType.TALENTPIPES))
+                self.status.has_talent_pipes = True
+            
+            return
+
+    def gamble_loadeddice(self):
+        # todo check blacklisting
+        if not self.choices.IMRE_CHOICES["Loaded Dice"]["place_bet"]:
+            return
+        houseroll = random.randint(1,20)
+        if self.info.social_class == Background.Ceald:
+            houseroll = random.randint(1, 6)
+        elif self.info.social_class == Background.Ruh:
+            houseroll = random.randint(1,12)
+        
+        nums = self.choices.IMRE_CHOICES["Loaded Dice"]["numbers"]
+        bet_amt = self.choices.IMRE_CHOICES["Loaded Dice"]["bet_amt"] 
+
+        if houseroll in nums: # win! 
+            
+            numlen = len(nums)
+
+            if numlen == 1:
+                multiplier = 20
+            elif numlen == 2:
+                multiplier = 15
+            elif numlen == 3:
+                multiplier = 10
+            elif numlen == 4:
+                multiplier = 5
+            elif numlen == 5:
+                multiplier = 2
+            else: 
+                # error
+                print(" uh oh")
+            
+            winnings = bet_amt * multiplier
+
+            self.increase_money(winnings)
+        
+        else: # lost
+            self.reduce_money(bet_amt)
+    
+    def visit_devi(self):
+        if self.status.IMRE_INFO["DEVI_defaulted"]:
+            return 
+        # maybe check for prev loan too? 
+
+        d = self.choices.IMRE_CHOICES["Devi"]
+
+        if not d["acquire_loan"]:
+            return
+        
+        if d["loan_amount"] < 4:
+            # minimum is 4 talents 
+            # should also have this check on webpage
+            return
+
+        income = 0
+        if self.holds_item(ItemType.TALENTPIPES):
+            # ! this talent pipes check should be post stealing stuff
+            # (which i thiiiink it is?)
+            income += 10
+        income += self.status.stipend
+
+        # TODO collateral 
+
+        if d["loan_amount"] > income / 2:
+            # loan must be no more than half your income
+            # (plus collateral)
+            # return or just do highest you can afford? 
+            return
+
+        # if you get the loan:
+
+        self.increase_money(d["loan_amount"])
+        # todo take collateral
+        self.status.IMRE_INFO["DEVI_amt_owed"] = d["loan_amount"]
+
+    def visit_giles(self):
+        if self.status.IMRE_INFO["GILES_defaulted"]:
+            return 
+        # maybe check for prev loan too? 
 
 
+
+        d = self.choices.IMRE_CHOICES["Giles"]
+
+        if not d["acquire_loan"]:
+            return
+        
+        if self.status.lodging != Lodging.GreyMan and self.info.social_class != Background.Ceald:
+            # must be a ceald or at the grey man
+            # should also be checked on webpage
+            return
+
+        if d["loan_amount"] > 2:
+            # maximum is 2 talents 
+            # should also have this on webpage
+            return
+
+
+        # if you get the loan:
+
+        self.increase_money(d["loan_amount"])
+        self.status.IMRE_INFO["GILES_amt_owed"] = d["loan_amount"]
+
+    def pay_devi(self):
+        owed = self.status.IMRE_INFO["DEVI_amt_owed"]
+        paying = self.choices.pay_devi
+        if owed <= 0:
+            return 
+        
+        if self.status.IMRE_INFO["DEVI_defaulted"]:
+            # you defaulted, you can't do anything now
+            return
+        
+        if paying <= 0:
+            return
+        
+        if paying > owed:
+            paying = owed
+
+        self.status.IMRE_INFO["DEVI_amt_owed"] -= paying
+        self.reduce_money(paying)
+
+        # return collateral if loan is entirely paid off
+        if self.status.IMRE_INFO["DEVI_amt_owed"] <= 0:
+            for item in self.status.IMRE_INFO["DEVI_collateral"]:
+                self.add_item(item)
+        
+    def pay_giles(self):
+        owed = self.status.IMRE_INFO["GILES_amt_owed"]
+        paying = paying
+        if owed <= 0:
+            return 
+        
+        if self.status.IMRE_INFO["GILES_defaulted"]:
+            # you defaulted, you can't do anything now
+            return
+        
+        if paying <= 0:
+            return
+        
+        if paying > owed:
+            paying = owed 
+
+        self.status.IMRE_INFO["GILES_amt_owed"] -= paying
+        self.reduce_money(paying)
+
+    def apoth_orders(self):
+        # check in imre or whatever
+        o = self.choices.IMRE_CHOICES["Apothecary"]
+
+    # todo place_contract? (to remove the thing that's the reward)
+    
     # todo use_item()
 
     def increase_money(self, amount: float):
