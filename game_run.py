@@ -130,6 +130,9 @@ class Turn:
         if gm_input["complaints"]:
             for v in range(len(gm_input["complaints"])):
                 self.players[v].choices.complaints = gm_input["complaints"][v]
+        
+        # TODO: tuition stuff from GM input
+
     
     def start_term(self):
 
@@ -147,7 +150,8 @@ class Turn:
                 if not p.status.is_enrolled:
                     tuition = p.status.tuition # from last enrollment
                 else:
-                    tuition = p.calculate_tuition(self.gm_input) # TODO
+                    tuition = p.tuition.calculate_tuition(self.gm_input) # TODO
+                    # todo then remake tuition object
                 
                 if p.status.money >= tuition:
                     # todo check for the preferences thingy
@@ -155,6 +159,7 @@ class Turn:
                     p.status.is_enrolled = True
                 else:
                     p.status.is_enrolled = False
+
 
 
         # DO LODGING STUFF
