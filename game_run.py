@@ -8,7 +8,7 @@ from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import Background, Lodging, Rank
+from statics import Background, FieldName, Lodging, Rank
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -142,16 +142,56 @@ class Turn:
     
     def start_term(self):
 
-        # TODO devi / giles interest increase + payoff
+        # pay off interest to devi / giles (any further payment is in process_imre)
+        # todo LOG
+        for pid in self.sane_players:
+            p = self.players[pid] # idk why I'm even using pid at this point
+
+            if p.status.IMRE_INFO["DEVI_amt_owed"] > 0:
+                paying = p.choices.pay_devi 
+                owed = p.status.IMRE_INFO["DEVI_amt_owed"]
+                arit_reduction = p.levels_in(FieldName.ARITHMETICS) * 10 + 10
+                interest_owed = owed * 0.3 * (1 - arit_reduction / 100)
+
+                p.status.IMRE_INFO["DEVI_amt_owed"] += interest_owed
+
+                if paying < interest_owed:
+                    # DEFAULT
+                    p.IMRE_INFO["DEVI_defaulted"] = True
+
+                    # TODO: add mommet to black market 
+                else:
+                    p.status.IMRE_INFO["DEVI_amt_owed"] -= interest_owed
+                    p.choices.pay_devi -= interest_owed # rest of payment happens later
+
+            if p.status.IMRE_INFO["GILES_amt_owed"] > 0:
+                paying = p.choices.pay_giles
+                owed = p.status.IMRE_INFO["GILES_amt_owed"]
+                arit_reduction = p.levels_in(FieldName.ARITHMETICS) * 10 + 10
+                interest_owed = owed * 0.15 * (1 - arit_reduction / 100)
+
+                p.status.IMRE_INFO["GILES_amt_owed"] += interest_owed
+
+                if paying < interest_owed:
+                    # DEFAULT
+                    p.IMRE_INFO["GILES_defaulted"] = True
+                    # blacklist from grey man
+
+                else:
+                    p.status.IMRE_INFO["GILES_amt_owed"] -= interest_owed
+                    p.choices.pay_giles -= interest_owed # rest of payment happens later
+
 
         self.log.add_section("NEW TERM", "Starting new term.")
         
         # GIVE STIPENDS
         for pid in self.sane_players:
             p = self.players[pid]
+            # could use p.increase_money() instead ig
             p.status.money += p.initial_status.stipend
 
-            # TODO talent pipes
+            if p.status.has_talent_pipes: # todo make sure this works
+                p.status.money += 10
 
 
         # DO TUITION STUFF
@@ -642,6 +682,19 @@ class Turn:
             "gram": []
         }
 
+        # pay giles/devi
+        # note: interest payoff (if it occurred) will have already happened
+        # and what's left in choices.pay_whoever does NOT include the amount already taken out
+        # this is kinda pointless / weird tbh 
+        for pid in self.sane_players:
+            p = self.players[pid]
+
+            if p.choices.pay_giles > 0:
+                p.pay_giles()
+            
+            if p.choices.pay_devi > 0:
+                p.pay_devi()
+
         for pid in self.imre_players:
             p = self.players[pid]
             pchoices = p.choices.IMRE_CHOICES
@@ -658,10 +711,10 @@ class Turn:
             apoth = pchoices["Apothecary"]
 
             # todo: check this works
-            apoth_orders["nahlrout"] += [pid] * apoth["nahlrout"]
-            apoth_orders["courier"] += [pid] * apoth["courier"]
-            apoth_orders["bloodless"] += [pid] * apoth["bloodless"]
-            apoth_orders["gram"] += [pid] * apoth["gram"]
+            apoth_orders["nahlrout"] += [p] * apoth["nahlrout"]
+            apoth_orders["courier"] += [p] * apoth["courier"]
+            apoth_orders["bloodless"] += [p] * apoth["bloodless"]
+            apoth_orders["gram"] += [p] * apoth["gram"]
 
             bm = pchoices["Black Market"]
             # todo
@@ -670,7 +723,10 @@ class Turn:
         # BLACK MARKET
 
         # resolve apothecary orders
+        # why is this two functions? idk, it probably shouldn't be
         valid_orders = self.apothecary.take_orders(apoth_orders)
+        self.apothecary.give_out_sold_items(valid_orders)
+
         # todo
 
         return
@@ -746,6 +802,8 @@ class Turn:
         self.log.add_section("Offensive Actions", "Processing offensive actions...")
         self.process_offensive_actions()
         self.log.log("Offensive actions processed!")
+
+        # TODO give players any items they received
 
         self.log.add_section("Final", "Turn is processed! blah blah blah")
 

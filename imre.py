@@ -5,6 +5,8 @@
 from dataclasses import dataclass
 import random
 
+from items import Item, ItemType
+
 
 class Apothecary:
 
@@ -22,7 +24,9 @@ class Apothecary:
     
     
     def take_orders(self, orders):
-        # orders = {nahlrout: pids, grams: pids, etc}
+        # looks at all orders and if there are more than items in stock, removes orders until there are enough
+        
+        # orders = {nahlrout: players, grams: players, etc}
 
         if len(orders["nahlrout"]) > self.num_nahlrout:
             too_many = len(orders["nahlrout"]) - self.num_nahlrout
@@ -36,14 +40,30 @@ class Apothecary:
                 to_remove = random.choice(orders["bloodless"])
                 orders["bloodless"].remove(to_remove)
 
-        if len(orders["grams"]) > self.num_grams:
-            too_many = len(orders["grams"]) - self.num_grams
+        if len(orders["gram"]) > self.num_grams:
+            too_many = len(orders["gram"]) - self.num_grams
             for i in range(too_many):
-                to_remove = random.choice(orders["grams"])
-                orders["grams"].remove(to_remove)
+                to_remove = random.choice(orders["gram"])
+                orders["gram"].remove(to_remove)
         
         return orders # I guess??
+    
+    def give_out_sold_items(self, orders):
+        # orders = {nahlrout: players}
+
+        for player in orders["nahlrout"]:
+            n = Item.Generate(ItemType.NAHLROUT)
+            player.add_item(n)
         
+        for player in orders["bloodless"]:
+            b = Item.Generate(ItemType.BLOODLESS)
+            player.add_item(b)
+        
+        for player in orders["gram"]:
+            g = Item.Generate(ItemType.GRAM, level = 3) # level 3 has 2 uses
+            player.add_item(g)
+        
+        # TODO couriers 
         
 
 

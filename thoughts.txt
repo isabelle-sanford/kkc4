@@ -58,8 +58,8 @@ stuff not in ooa
 
 particularly notable todos 
 - accessible_abilities
-- tuition 
-- imre
+- tuition (MOSTLY DONE)
+- imre (IN PROGRESS)
 - action period stuff
 - item stuff (use_item, ids, half items, master-level alchemy items being 2-use)
 - results
@@ -111,3 +111,13 @@ small
 - loaded dice: make sure cealds/ruh only have option to bet on numbers up thru 6/12 
 - talent pipe stipend
 - masters can unbecome masters if they don't enroll/can't pay tuition, but retain abilities, action periods, whatever
+
+- pipes can be given but not stolen
+- moneylenders should probably not accrue interest while you're insane
+
+small questions
+- if you ask devi for a loan that's more than half your income (maybe unexpectedly), do you get nothing or just the highest loan you can still do? 
+- if you buy a gram does it protect you that same turn? (assuming no)
+- say you have a 3 talent loan to giles, and it's the last month of a turn. you put in an order to pay giles 2 talents. does that mean you pay your interest first (3 * .15) and the rest is used to pay back part of the original? (currently yes, and the rest of the payback is post stipend recipience)
+- if you break out do you count as 'expelled' (or just having-gone-insane) for the purpose of the win conditions
+- if you play for your pipes and succeed during the last month of a term, do you get the +10 talents immediately or not until the term after rolls around? 

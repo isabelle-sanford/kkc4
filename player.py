@@ -132,6 +132,7 @@ class PlayerStatus:
             "BLACKMARKET_Contractlog": []
             # TODO blacklistings probs
         }
+        s.has_talent_pipes = True # todo
 
         return s
     
@@ -211,7 +212,7 @@ class PlayerProcessing:
         # protect / attack info, maybe? 
 
         self.items_received: list[Item] = []
-        # todo remember to add this ^ to next_status
+        # todo remember to add this ^ to next_status (AFTER everything else is processed)
 
         self.getting_elevated_in: FieldName = None
 
@@ -296,6 +297,10 @@ class PlayerChoices:
                 "place_contract": [] # contract info
             }
         }
+
+        # probably automatically have interest here, if start of term + relevant? 
+        self.pay_giles = 0
+        self.pay_devi = 0
 
         self.offset_IP = 0
  
@@ -382,11 +387,6 @@ class Player:
 
         # todo aturan chance of backing out of arcane fields
 
-    def calculate_tuition(self, gm_input):
-        # TODO
-        return
-        # remember to check masters, social class, arithmetics
-        # probs have Tuition object that can be updated over turns?
 
     def go_insane(self, fields: "list[FieldStatus]"):
         # TODO
@@ -447,7 +447,7 @@ class Player:
 
 
     def add_item(self, item: Item):
-        self.status.inventory.append(Item)
+        self.processing.items_received.append(item)
 
     def holds_item(self, item_type: ItemType) -> bool:
         count = 0
@@ -491,6 +491,7 @@ class Player:
 
             if pipes:
                 self.status.inventory.append(Item.Generate(ItemType.TALENTPIPES))
+                self.status.has_talent_pipes = True
             
             return
 
@@ -544,12 +545,13 @@ class Player:
         
         if d["loan_amount"] < 4:
             # minimum is 4 talents 
-            # should also have this on webpage
+            # should also have this check on webpage
             return
 
         income = 0
         if self.holds_item(ItemType.TALENTPIPES):
             # ! this talent pipes check should be post stealing stuff
+            # (which i thiiiink it is?)
             income += 10
         income += self.status.stipend
 
@@ -558,6 +560,7 @@ class Player:
         if d["loan_amount"] > income / 2:
             # loan must be no more than half your income
             # (plus collateral)
+            # return or just do highest you can afford? 
             return
 
         # if you get the loan:
@@ -594,8 +597,48 @@ class Player:
         self.increase_money(d["loan_amount"])
         self.status.IMRE_INFO["GILES_amt_owed"] = d["loan_amount"]
 
-    # todo pay_giles / pay_devi
-    # ? can you pay more than interest? can you pay partway thru term? do you need to be in imre? 
+    def pay_devi(self):
+        owed = self.status.IMRE_INFO["DEVI_amt_owed"]
+        paying = self.choices.pay_devi
+        if owed <= 0:
+            return 
+        
+        if self.status.IMRE_INFO["DEVI_defaulted"]:
+            # you defaulted, you can't do anything now
+            return
+        
+        if paying <= 0:
+            return
+        
+        if paying > owed:
+            paying = owed
+
+        self.status.IMRE_INFO["DEVI_amt_owed"] -= paying
+        self.reduce_money(paying)
+
+        # return collateral if loan is entirely paid off
+        if self.status.IMRE_INFO["DEVI_amt_owed"] <= 0:
+            for item in self.status.IMRE_INFO["DEVI_collateral"]:
+                self.add_item(item)
+        
+    def pay_giles(self):
+        owed = self.status.IMRE_INFO["GILES_amt_owed"]
+        paying = paying
+        if owed <= 0:
+            return 
+        
+        if self.status.IMRE_INFO["GILES_defaulted"]:
+            # you defaulted, you can't do anything now
+            return
+        
+        if paying <= 0:
+            return
+        
+        if paying > owed:
+            paying = owed 
+
+        self.status.IMRE_INFO["GILES_amt_owed"] -= paying
+        self.reduce_money(paying)
 
     def apoth_orders(self):
         # check in imre or whatever
