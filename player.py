@@ -169,6 +169,15 @@ class PlayerStatus:
     
     # TODO string / print func 
 
+    # yes this is redundant no I am not happy about it
+    def levels_in(self, field: FieldName):
+        # error check?
+        count = self.status.elevations.count(field)
+        if self.status.master_of == field:
+            count = 4
+        return count
+
+
     
 # working variables for processing turn
 class PlayerProcessing:
@@ -310,6 +319,108 @@ class PlayerChoices:
         
     #     return line1 + line2 + line3
 
+@dataclass
+class Tuition:
+    pid: int
+    quality_thread = 0.0 # 0.1 per post, ish
+    quality_rp = 0 # 0.5 per post
+    times_filed_EP = 0 # .5 per turn # done
+    times_filed_complaints = 0 # 0.3 per turn
+    items_sold = 0 # 0.05 per item
+    apothecary_items = [] # depends on item 
+    contracts_placed = [] # depends on contract amt
+    tried_for_pipes: bool = False
+    filled_contracts = 0.0 # .5 per contract
+    num_posts_m1 = 0
+    num_pms_m1 = 0
+    num_posts_m2 = 0
+    num_pms_m2 = 0
+    num_posts_m3 = 0
+    num_pms_m3 = 0
+    num_complaints_received = 0 # post manip
+    times_on_horns = 0
+    no_public_apology = 0
+    master_didnt_elevate = 0 # per turn
+    master_didnt_act: bool = False # todo
+
+    def calc_tuition(self, player: PlayerStatus):
+        t = 5 if player.rank == Rank.MASTER else 10
+        
+        reductions = self.quality_thread + self.quality_rp * 0.5 # should already be calculated on entry
+        reductions += self.times_filed_EP * 0.5
+        reductions += self.times_filed_complaints * 0.3
+        reductions += self.items_sold * 0.05
+        # todo apoth items and contracts
+        reductions += self.filled_contracts * 0.5
+        reductions += 1 if self.tried_for_pipes else 0
+         
+        if self.num_posts_m1 > 0:
+            reductions += 0.5
+        if self.num_posts_m2 > 0:
+            reductions += 0.5
+        if self.num_posts_m3 > 0:
+            reductions += 0.5
+        
+        if self.num_pms_m1 > 0:
+            reductions += 0.3
+        if self.num_pms_m2 > 0:
+            reductions += 0.3
+        if self.num_pms_m3 > 0:
+            reductions += 0.3
+        
+        inflations = 0
+        # todo: care div by 0 probably
+        m1_ratio = self.num_pms_m1 / (self.num_pms_m1 + self.num_posts_m1)
+        m2_ratio = self.num_pms_m2 / (self.num_pms_m2 + self.num_posts_m2)
+        m3_ratio = self.num_pms_m3 / (self.num_pms_m3 + self.num_posts_m3)
+        for ratio in [m1_ratio, m2_ratio, m3_ratio]:
+            if ratio >= 0.75:
+                inflations += 1
+            if ratio > 0.85:
+                inflations += 1
+            if ratio > 0.9:
+                inflations += 1
+            if ratio > 0.95:
+                inflations += 1
+        
+        inflations += self.num_complaints_received * 0.1
+        inflations += self.times_on_horns * 2
+        inflations += self.no_public_apology * 2
+        inflations += 0.5 if player.rank == Rank.RELAR else 0
+        inflations += 1 if player.rank == Rank.ELTHE else 0
+
+        if player.rank == Rank.MASTER:
+            if self.num_posts_m1 == 0:
+                inflations += 3
+            if self.num_posts_m2 == 0:
+                inflations += 3
+            if self.num_posts_m3 == 0:
+                inflations += 3
+            
+            inflations += self.master_didnt_elevate * 1
+
+            if self.master_didnt_act:
+                inflations += 4
+
+        # log total inflation / reduction
+
+        t = t + inflations - reductions
+
+        if player.info.social_class == Background.Vint:
+            t *= 1.33
+        
+        arit_levels = player.levels_in(FieldName.ARITHMETICS)
+
+        if arit_levels > 0:
+            decrease = 0.05 * arit_levels
+            t = t - t * decrease
+        
+        return t
+        
+    # todo reset_tuition thingy probably?
+
+
+
 class Player:
     # start of game constructor 
     def __init__(self, player_static: PlayerStatic, player_status: PlayerStatus, player_choices: PlayerChoices = None, player_process: PlayerProcessing = None):
@@ -332,6 +443,8 @@ class Player:
         if player_process is None:
             player_process = PlayerProcessing(player_static, player_status, player_choices, self.month)
         self.processing: PlayerProcessing = player_process
+
+        self.tuition = Tuition(self.id)
 
     def __str__(self):
 
@@ -518,6 +631,7 @@ class Player:
 
     def assign_EP(self, field: FieldName, total = 1):
         self.status.EP.vals[field] += total
+
 
 # maybe put this elsewhere - a test.py file? 
 class PlayerRandom:
