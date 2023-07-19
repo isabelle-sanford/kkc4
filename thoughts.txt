@@ -109,3 +109,5 @@ small
 - need to figure out what items are worth as collateral in actuality tho 
 - blacklisting loaded dice stuff
 - loaded dice: make sure cealds/ruh only have option to bet on numbers up thru 6/12 
+- talent pipe stipend
+- masters can unbecome masters if they don't enroll/can't pay tuition, but retain abilities, action periods, whatever

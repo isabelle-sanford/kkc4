@@ -18,6 +18,8 @@ class Apothecary:
         self.num_nahlrout = 5
         self.num_grams = 5
         self.num_bloodless = 5
+
+    
     
     def take_orders(self, orders):
         # orders = {nahlrout: pids, grams: pids, etc}

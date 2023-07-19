@@ -72,6 +72,7 @@ class FieldStatus:
         self.elevatedThrice: list[int] = []
         self.next_masters: list[Player] = []
         self.DP = [] # todo
+        # todo: prev masters always have highest priority
     
     def add_EP(self, player, num: int = 1):
         if player in self.EP:

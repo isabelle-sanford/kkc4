@@ -127,6 +127,7 @@ class PlayerStatus:
             "GILES_defaulted": False,
             "GILES_amt_owed": 0.0,
             "DEVI_defaulted": False,
+            "DEVI_amt_owed": 0.0,
             "DEVI_collateral": [],
             "BLACKMARKET_Contractlog": []
             # TODO blacklistings probs
@@ -531,6 +532,76 @@ class Player:
         else: # lost
             self.reduce_money(bet_amt)
     
+    def visit_devi(self):
+        if self.status.IMRE_INFO["DEVI_defaulted"]:
+            return 
+        # maybe check for prev loan too? 
+
+        d = self.choices.IMRE_CHOICES["Devi"]
+
+        if not d["acquire_loan"]:
+            return
+        
+        if d["loan_amount"] < 4:
+            # minimum is 4 talents 
+            # should also have this on webpage
+            return
+
+        income = 0
+        if self.holds_item(ItemType.TALENTPIPES):
+            # ! this talent pipes check should be post stealing stuff
+            income += 10
+        income += self.status.stipend
+
+        # TODO collateral 
+
+        if d["loan_amount"] > income / 2:
+            # loan must be no more than half your income
+            # (plus collateral)
+            return
+
+        # if you get the loan:
+
+        self.increase_money(d["loan_amount"])
+        # todo take collateral
+        self.status.IMRE_INFO["DEVI_amt_owed"] = d["loan_amount"]
+
+    def visit_giles(self):
+        if self.status.IMRE_INFO["GILES_defaulted"]:
+            return 
+        # maybe check for prev loan too? 
+
+
+
+        d = self.choices.IMRE_CHOICES["Giles"]
+
+        if not d["acquire_loan"]:
+            return
+        
+        if self.status.lodging != Lodging.GreyMan and self.info.social_class != Background.Ceald:
+            # must be a ceald or at the grey man
+            # should also be checked on webpage
+            return
+
+        if d["loan_amount"] > 2:
+            # maximum is 2 talents 
+            # should also have this on webpage
+            return
+
+
+        # if you get the loan:
+
+        self.increase_money(d["loan_amount"])
+        self.status.IMRE_INFO["GILES_amt_owed"] = d["loan_amount"]
+
+    # todo pay_giles / pay_devi
+    # ? can you pay more than interest? can you pay partway thru term? do you need to be in imre? 
+
+    def apoth_orders(self):
+        # check in imre or whatever
+        o = self.choices.IMRE_CHOICES["Apothecary"]
+
+    # todo place_contract? (to remove the thing that's the reward)
     
     # todo use_item()
 

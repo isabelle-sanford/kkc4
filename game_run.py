@@ -101,7 +101,7 @@ class Game:
 # could put this inside game, idk
 class Turn:
 
-    def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]"):
+    def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]", apothecary: Apothecary, blackmarket: BlackMarket):
         self.players = playerlist
         self.gm_input = gm_input
         self.month = month
@@ -113,6 +113,8 @@ class Turn:
         self.offensive_actions: list[Action] = []
 
         self.fields = fields
+        self.apothecary: Apothecary = apothecary
+        self.blackmarket: BlackMarket = blackmarket
 
         self.sane_players: list[int] = [] # just ids 
         self.living_players: list[int] = [] # just ids 
@@ -140,12 +142,16 @@ class Turn:
     
     def start_term(self):
 
+        # TODO devi / giles interest increase + payoff
+
         self.log.add_section("NEW TERM", "Starting new term.")
         
         # GIVE STIPENDS
         for pid in self.sane_players:
             p = self.players[pid]
             p.status.money += p.initial_status.stipend
+
+            # TODO talent pipes
 
 
         # DO TUITION STUFF
@@ -629,10 +635,16 @@ class Turn:
         return
     
     def process_imre(self):
-        loaded_dice_roll = random.randint(1,20)
+        apoth_orders = {
+            "nahlrout": [],
+            "courier": [],
+            "bloodless": [],
+            "gram": []
+        }
 
         for pid in self.imre_players:
             p = self.players[pid]
+            pchoices = p.choices.IMRE_CHOICES
 
             # TODO: blocks stuff
 
@@ -640,12 +652,26 @@ class Turn:
 
             p.gamble_loadeddice()
 
+            p.visit_devi()
+            p.visit_giles()
 
-        # APOTHECARY
+            apoth = pchoices["Apothecary"]
 
-        # MONEYLENDERS
+            # todo: check this works
+            apoth_orders["nahlrout"] += [pid] * apoth["nahlrout"]
+            apoth_orders["courier"] += [pid] * apoth["courier"]
+            apoth_orders["bloodless"] += [pid] * apoth["bloodless"]
+            apoth_orders["gram"] += [pid] * apoth["gram"]
+
+            bm = pchoices["Black Market"]
+            # todo
+
 
         # BLACK MARKET
+
+        # resolve apothecary orders
+        valid_orders = self.apothecary.take_orders(apoth_orders)
+        # todo
 
         return
 
