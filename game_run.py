@@ -5,7 +5,7 @@ from horns import Horns
 from imre import Apothecary, BlackMarket
 from items import Item, ItemType
 from outcome import ProcessLog, Result
-from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices
+from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
 from statics import Background, FieldName, Lodging, Rank
@@ -134,11 +134,30 @@ class Turn:
             if p.choices.imre_next: # is this good?
                 self.imre_players.append(p.id)
 
+            # TUITION FROM CHOICES
+            if len(self.choices.filing_EP) > 0:
+                p.tuition.times_filed_EP += 1
+            # todo imre tuition things (once imre is done)
+
+            
+
         # other lists? imre? 
 
         if gm_input["complaints"]:
             for v in range(len(gm_input["complaints"])):
+                # accessing id here is a little dubious but ok
                 self.players[v].choices.complaints = gm_input["complaints"][v]
+                if len(gm_input["complaints"][v]) > 0:
+                    self.players[v].tuition.times_filed_complaints += 1
+        
+        # TODO: other tuition stuff from GM input
+            # public apology
+            # num posts
+            # num PMs
+            # num quality rp / game-related
+
+
+
     
     def start_term(self):
 
@@ -194,13 +213,19 @@ class Turn:
                 p.status.money += 10
 
 
-        # DO TUITION STUFF
-        # remember to check for masters, social class
+            # DO TUITION STUFF
+            # remember to check for masters, social class
+
+            # if currently enrolled, calculate tuition for next term
+            # (otherwise keep the value of whatever the previous one was)
+            if p.status.is_enrolled and not p.status.is_expelled:
+                tuition = p.tuition.calculate_tuition(p.status) 
+                p.status.current_tuition = tuition
+                p.tuition = Tuition(pid) # new obj for next term
+
+            # if enrolling next term, get tuition and try to pay it
             if p.choices.enroll_next and not p.status.is_expelled:
-                if not p.status.is_enrolled:
-                    tuition = p.status.tuition # from last enrollment
-                else:
-                    tuition = p.calculate_tuition(self.gm_input) # TODO
+                tuition = p.status.current_tuition 
                 
                 if p.status.money >= tuition:
                     # todo check for the preferences thingy
@@ -208,6 +233,7 @@ class Turn:
                     p.status.is_enrolled = True
                 else:
                     p.status.is_enrolled = False
+
 
 
         # DO LODGING STUFF

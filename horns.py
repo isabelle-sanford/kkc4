@@ -111,6 +111,8 @@ class Charges:
                 f"{target.info.name} charged with Conduct Unbecoming a Member of the Arcanum and will be expelled.")
         else:
             self.log.log(f"Error. Outcome provided was '{outcome}'.")
+
+        # return outcome ? 
         
         
 
@@ -204,7 +206,13 @@ class Horns:
             if count > 1:
                 complaints.remove(p)
 
+        # TODO dissolve complaints on masters
+
         log.log("Complaints handled.")
+
+        # add complaints on players to tuition as inflations
+        for c in complaints:
+            c.tuition.num_complaints_received += 1
 
         # By passing assign_DP the field of the Master assigning DP,
         #  it handles offsetting the DP gain with related EP.
@@ -213,7 +221,6 @@ class Horns:
         for field in all_fields:
             if field.master is not None: # pc master
                 for d in field.master.choices.assigned_DP:
-                    # todo understand
                     d.assign_DP(master_of=field.master.status.master_of)
             else: # npc master
                 for count in range(5):
@@ -234,6 +241,7 @@ class Horns:
         log.log("Determining charges...")
         charges = Charges(log, all_fields)
         for p in players_on_the_horns:
+            p.tuition.times_on_horns += 1
             charges.determine_punishment(p)
 
         # for i in Weightings.tier_weights:
