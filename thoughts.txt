@@ -59,11 +59,10 @@ stuff not in ooa
 particularly notable todos 
 - accessible_abilities
 - tuition (MOSTLY DONE)
-- imre (IN PROGRESS)
+- imre (MOSTLY DONE EXCEPT BLACK MARKET)
 - action period stuff
 - item stuff (use_item, ids, half items, master-level alchemy items being 2-use)
 - results
-- destroying locations/fields
 - naming (sigh)
 - customization of results
 - sql 
@@ -83,6 +82,7 @@ abilities
 - banned books (incl. getting caught)
 
 small
+- destroying locations/fields
 - remove createitem category? 
 - add target type specific-item?
 - more str / more detailed str (action, actioninfo, playerstatus, ...)

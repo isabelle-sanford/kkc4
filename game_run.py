@@ -63,9 +63,9 @@ class Game:
 
         if not p.status.can_take_actions:
             print("Player cannot take actions!") # log, and better
-        elif action["action_type"] not in p.status.accessible_abilities:
+        elif action["action_type"].info not in p.status.accessible_abilities:
             # log, not print
-            print("Player cannot take this action!")
+            print(f"Player {p.name} cannot take action {action}!")
         # anything else?
 
         # this bit can probably be much better (get func maybe?)
@@ -135,7 +135,7 @@ class Turn:
                 self.imre_players.append(p.id)
 
             # TUITION FROM CHOICES
-            if len(self.choices.filing_EP) > 0:
+            if len(p.choices.filing_EP) > 0:
                 p.tuition.times_filed_EP += 1
             # todo imre tuition things (once imre is done)
 

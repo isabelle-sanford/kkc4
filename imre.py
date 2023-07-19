@@ -92,7 +92,7 @@ class Contract:
     turn_placed: int
     prize_int: int = None # if it's actually money
     current_taker: int = -1
-    prev_takers: list[int] = []
+    prev_takers = []
     # anything else?
 
     # funcs for taking, completing? 
