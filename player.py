@@ -54,11 +54,13 @@ class EP:
         return all_EP
     
     def __str__(self) -> str:
-        #hmm
-        out = f"| Lin | Ari | R&L | Arc | Sym | Phy | Alc | Art | Nam |\n|"
-        for v in self.vals.values():
-            out += f"{v: >3}  |"
-        return out
+        ret = ""
+       
+        for k in self.vals.keys():
+            if self.vals[k] > 0:
+                ret += f"({k}: {self.vals[k]}) "
+            
+        return ret
 
 class PlayerStatus:
 
@@ -179,6 +181,16 @@ class PlayerStatus:
         if self.status.master_of == field:
             count = 4
         return count
+    
+    
+    def short_status(self):
+        ret = "" 
+        ret += "Alive" if self.is_alive else "Dead"
+        ret += ", "
+        ret += "Sane" if self.is_sane else "Insane"
+        ret += " (Expelled)" if self.is_expelled else ""
+
+        return ret
 
 
     
@@ -228,14 +240,6 @@ class PlayerProcessing:
         self.insanity_bonus = 0 # might want to take something from prev status?
         # and check mews / spindle & draft
 
-    def short_status(self):
-        ret = "" 
-        ret += "Alive" if self.is_alive else "Dead"
-        ret += ", "
-        ret += "Sane" if self.is_sane else "Insane"
-        ret += " (Expelled)" if self.is_expelled else ""
-
-        return ret
 
     def print_money(self):
         # this can probs be better / nicer 
@@ -807,6 +811,7 @@ class Player:
             self.processing.DP += total
 
     def assign_EP(self, field: FieldName, total = 1):
+        # todo add to field's ep listing? 
         self.status.EP.vals[field] += total
 
 

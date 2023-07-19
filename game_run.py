@@ -8,7 +8,7 @@ from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import Background, FieldName, Lodging, Rank
+from statics import Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -28,22 +28,28 @@ class Game:
 
 
     def add_player(self, input):
-        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
+        background = BACKGROUNDS[input["background"]]
+        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], background)
         p.id = self.num_players
 
         inventory = []
         if input["inventory"] is not None:
+            # TODO
             inventory.append(Item.Generate(input["inventory"])) # does this work or do you need to do something different bc 2 nahlrout? 
-        ps = PlayerStatus.distro_init(p, input["lodging"], input["musical_stat"], inventory)
+        lodging = LODGINGS[input["lodging"]]
+        ps = PlayerStatus.distro_init(p, lodging, input["musical_stat"], inventory)
 
         player = Player(p, ps)
 
         if input["ep1"] is not None:
-            player.assign_EP(FIELDS[input["ep1"][0]].name, input["ep1"][1])
+            ep_field = FIELDS[input["ep1"][0]].name
+            ep_num = input["ep1"][1]
+            player.assign_EP(ep_field, ep_num)
             FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
 
         
         if input["ep2"] is not None:
+            print(input["ep2"])
             player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
             FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
 

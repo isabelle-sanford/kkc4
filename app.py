@@ -1,11 +1,12 @@
 from field import FieldStatus
 from game_run import Game
 from player import Player
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for, flash, redirect
 
 # sql connection goes here
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your secret key'
 
 # hmm
 fields: "list[FieldStatus]" = []
@@ -19,6 +20,47 @@ g = Game()
 @app.route("/")
 def index():
     return render_template('index.html')
+
+@app.route("/distro", methods=['GET', 'POST'])
+def distro():
+    if request.method == 'POST':
+        playername = request.form['playername']
+        RPname = request.form['RPname']
+        skindancer = request.form['alignment']
+        socialclass = request.form['socialclass']
+        lodging = request.form['lodging']
+        musical = request.form['musical']
+        ep1 = request.form['ep1']
+        fieldep1 = request.form['field1']
+        ep2 = request.form['ep2']
+        fieldep2 = request.form['field2']
+        inventory = request.form['inventory']
+
+        if ep2 == "":
+            ep2 = 0
+
+        alignment = True if skindancer == "skindancer" else False
+
+        player_info = {
+            "player_name": playername,
+            "player_rpname": RPname,
+            "is_evil": alignment, # i guess?
+            "background": socialclass,
+            "inventory": inventory,
+            "lodging": lodging,
+            "musical_stat": musical,
+            "ep1": [int(fieldep1), int(ep1)],
+            "ep2": [int(fieldep2), int(ep2)]
+        }
+
+        # TODO error check for missing info
+
+        g.add_player(player_info)
+        return redirect(url_for('distro'))
+
+    print(g.num_players)
+    return render_template('distro.html', g=g)
+
 
 # not sure if we do this or just random strings
 @app.route("/player")
@@ -37,15 +79,14 @@ def gm():
 
 @app.route("/gm/fields")
 def gm_fields():
+    #print("fields: ", g.fields)
     return render_template('gm-fields.html', fields=g.fields)
 
 @app.route("/gm/players")
 def gm_players():
-    return render_template('gm-players.html', players=players)
+    print(g.players)
+    return render_template('gm-players.html', players=g.players)
 
-@app.route("/distro")
-def distro():
-    return render_template('distro.html', g=g)
 
 @app.route("/rules-game-basics")
 def rules_game_basics():
