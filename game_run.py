@@ -26,6 +26,8 @@ class Game:
 
         self.fields = FIELDS
 
+        self.player_list = {}
+
 
     def add_player(self, input):
         background = BACKGROUNDS[input["background"]]
@@ -33,28 +35,43 @@ class Game:
         p.id = self.num_players
 
         inventory = []
-        if input["inventory"] is not None:
-            # TODO
-            inventory.append(Item.Generate(input["inventory"])) # does this work or do you need to do something different bc 2 nahlrout? 
+        if input["inventory"] is not None: # is it ever? 
+            match input["inventory"]:
+                case "1nahlrout":
+                    inventory.append(Item.Generate(ItemType.NAHLROUT))
+                case "2nahlrout":
+                    inventory.append(Item.Generate(ItemType.NAHLROUT))
+                    inventory.append(Item.Generate(ItemType.NAHLROUT))
+                case "ward":
+                    inventory.append(Item.Generate(ItemType.WARD))
+                case "tenaculum":
+                    inventory.append(Item.Generate(ItemType.TENACULUM))
+                case "bloodless":
+                    inventory.append(Item.Generate(ItemType.BLOODLESS))
+                case "gram":
+                    inventory.append(Item.Generate(ItemType.GRAM))
+                case "bonetar":
+                    inventory.append(Item.Generate(ItemType.BONETAR))
         lodging = LODGINGS[input["lodging"]]
         ps = PlayerStatus.distro_init(p, lodging, input["musical_stat"], inventory)
 
         player = Player(p, ps)
 
         if input["ep1"] is not None:
-            ep_field = FIELDS[input["ep1"][0]].name
+            ep_field = FIELDS[input["ep1"][0]].fullname
             ep_num = input["ep1"][1]
             player.assign_EP(ep_field, ep_num)
             FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
 
         
         if input["ep2"] is not None:
-            print(input["ep2"])
-            player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
+            player.assign_EP(FIELDS[input["ep2"][0]].fullname, input["ep2"][1])
             FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
 
 
         self.players.append(player)
+
+        self.player_list[p.name] = p.id
 
         self.num_players += 1
 

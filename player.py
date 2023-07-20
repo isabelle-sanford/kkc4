@@ -85,7 +85,7 @@ class PlayerStatus:
         s.current_tuition = 10
 
         s.musical_stat = musical_stat
-        s.inventory: list[Item] = [inventory] # questionable
+        s.inventory: list[Item] = inventory # questionable
         # should bodyguard be in inventory or separate?
 
         s.EP: EP = EP() 

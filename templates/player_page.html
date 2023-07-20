@@ -6,8 +6,8 @@
       <h1 style="text-align: center">{{ player.info.name }}</h1>
     </div>
     <div class="col-2 cycle">
-      <h4 style="text-align: center">Term []</h4>
-      <h4 style="text-align: center">Month []</h4>
+      <h4 style="text-align: center">Term {{player.month // 3 + 1}}</h4>
+      <h4 style="text-align: center">Month {{player.month + 1}}</h4>
     </div>
   </div>
   <div class="row">
@@ -24,7 +24,7 @@
         {{player.status.elevations}}. You are staying in
         {{player.status.lodging.fullname}}.<br />
         Your stipend is {{ player.status.stipend }} talents and your tuition
-        this term was [].
+        this term was {{player.status.current_tuition}}.
       </p>
       <p>[performance flavor text]</p>
       <p>
@@ -88,16 +88,16 @@
               <option value="Windy-Tower">The Windy Tower</option>
               <option value="Horse-and-Four">The Horse and Four</option>
               <option value="Spindle-and-Draft">The Spindle and Draft</option>
-              <option value="grey-man" style="color: #c30b7f">
+              <option value="Grey-Man" style="color: #c30b7f">
                 The Grey Man
               </option>
-              <option value="pearl-of-imre" style="color: #c30b7f">
+              <option value="Pearl-of-Imre" style="color: #c30b7f">
                 The Pearl of Imre
               </option>
             </select>
           </div>
           <div class="col-md-12">
-            {% if not player.status.is_expelled % }
+            {% if not player.status.is_expelled %}
             <div class="form-check">
               <input
                 class="form-check-input"
@@ -145,7 +145,7 @@
             <select class="form-select" id="action1" name="action1">
               {% for a in player.status.accessible_abilities %}
               <option value="{{a}}">{{a}}</option>
-              { % endfor %}
+              {% endfor %}
             </select>
             <select class="form-select" id="target1" name="target1">
               <!-- TODO -->
@@ -208,8 +208,10 @@
           <legend align="center" class="legend-uni">Elevation Points</legend>
           <div class="row">
             <div class="col-5">
+              {% for n in range(player.status.available_EP) %}
               <div class="input-group">
-                <select class="form-select" id="fieldep1" name="field1">
+                <select class="form-select" id="fieldep{{n}}" name="field{{n}}">
+                  <option value="None">--</option>
                   <option value="Linguistics">Linguistics</option>
                   <option value="Arithmetics">Arithmetics</option>
                   <option value="RhetoricLogic">Rhetoric/Logic</option>
@@ -221,71 +223,8 @@
                   <option value="Naming">Naming</option>
                 </select>
               </div>
-              <div class="input-group">
-                <select class="form-select" id="fieldep2" name="field2">
-                  <option value="Linguistics">Linguistics</option>
-                  <option value="Arithmetics">Arithmetics</option>
-                  <option value="RhetoricLogic">Rhetoric/Logic</option>
-                  <option value="Archives">Archives</option>
-                  <option value="Sympathy">Sympathy</option>
-                  <option value="Physicking">Phsysicking</option>
-                  <option value="Alchemy">Alchemy</option>
-                  <option value="Artificery">Artificery</option>
-                  <option value="Naming">Naming</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <select class="form-select" id="fieldep3" name="field3">
-                  <option value="Linguistics">Linguistics</option>
-                  <option value="Arithmetics">Arithmetics</option>
-                  <option value="RhetoricLogic">Rhetoric/Logic</option>
-                  <option value="Archives">Archives</option>
-                  <option value="Sympathy">Sympathy</option>
-                  <option value="Physicking">Phsysicking</option>
-                  <option value="Alchemy">Alchemy</option>
-                  <option value="Artificery">Artificery</option>
-                  <option value="Naming">Naming</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <select class="form-select" id="fieldep4" name="field4">
-                  <option value="Linguistics">Linguistics</option>
-                  <option value="Arithmetics">Arithmetics</option>
-                  <option value="RhetoricLogic">Rhetoric/Logic</option>
-                  <option value="Archives">Archives</option>
-                  <option value="Sympathy">Sympathy</option>
-                  <option value="Physicking">Phsysicking</option>
-                  <option value="Alchemy">Alchemy</option>
-                  <option value="Artificery">Artificery</option>
-                  <option value="Naming">Naming</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <select class="form-select" id="fieldep5" name="field5">
-                  <option value="Linguistics">Linguistics</option>
-                  <option value="Arithmetics">Arithmetics</option>
-                  <option value="RhetoricLogic">Rhetoric/Logic</option>
-                  <option value="Archives">Archives</option>
-                  <option value="Sympathy">Sympathy</option>
-                  <option value="Physicking">Phsysicking</option>
-                  <option value="Alchemy">Alchemy</option>
-                  <option value="Artificery">Artificery</option>
-                  <option value="Naming">Naming</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <select class="form-select" id="fieldep6" name="field6">
-                  <option value="Linguistics">Linguistics</option>
-                  <option value="Arithmetics">Arithmetics</option>
-                  <option value="RhetoricLogic">Rhetoric/Logic</option>
-                  <option value="Archives">Archives</option>
-                  <option value="Sympathy">Sympathy</option>
-                  <option value="Physicking">Phsysicking</option>
-                  <option value="Alchemy">Alchemy</option>
-                  <option value="Artificery">Artificery</option>
-                  <option value="Naming">Naming</option>
-                </select>
-              </div>
+              {% endfor %}
+
               <div class="col-12 my-3">
                 <button
                   type="submit"
@@ -301,9 +240,7 @@
               <!-- TODO -->
               <span
                 >You currently have EP in: <br />
-                {% for f in player.status.EP.get_list() %} {% if f > 0 %} {{ f}}
-                <br />
-                {% endif %} {% endfor %}
+                {{player.status.EP}}
                 <br />
               </span>
               <span style="text-decoration: underline"

@@ -79,13 +79,17 @@ class Lodging(Enum):
         return f"{self.fullname} ({self.price} talents)"
 
 LODGINGS = {
-    # todo add non-starting lodgings
     "Anker's": Lodging.Ankers,
     "King's-Drab": Lodging.KingsDrab,
     "Golden-Pony": Lodging.GoldenPony,
     "Windy-Tower": Lodging.WindyTower,
     "Horse-and-Four": Lodging.HorseAndFour,
-    "Spindle-and-Draft": Lodging.SpindleAndDraft
+    "Spindle-and-Draft": Lodging.SpindleAndDraft,
+    "Streets": Lodging.Streets,
+    "Underthing": Lodging.Underthing,
+    "Mews": Lodging.Mews,
+    "Grey-Man": Lodging.GreyMan,
+    "Pearl-of-Imre": Lodging.PearlOfImre
 }
 
 

@@ -70,12 +70,10 @@ def player_login():
 # PLAYER PAGES
 @app.route("/player/<name>")
 def player(name):
-    # need to actually get PLAYER object
-    return render_template('player_page.html', player=name)
+    # todo POST method for choice submissions
+    player = g.player_list[name]
+    return render_template('player_page.html', player=player)
 
-@app.route("/gm")
-def gm():
-    return render_template('gm.html')
 
 @app.route("/gm/fields")
 def gm_fields():
@@ -87,28 +85,29 @@ def gm_players():
     print(g.players)
     return render_template('gm-players.html', players=g.players)
 
+@app.route("/gm/imre")
+def gm_imre():
+    return render_template('gm-imre.html', players=g.players) # TODO
 
-@app.route("/rules-game-basics")
+@app.route("/rules/game-basics")
 def rules_game_basics():
     return render_template('rules-game-basics.html')
 
-@app.route("/rules-uni-basics")
+@app.route("/rules/uni-basics")
 def rules_uni_basics():
     return render_template('rules-university-basics.html')
 
-@app.route("/rules-arcanum-basics")
+@app.route("/rules/arcanum-basics")
 def rules_arcanum_basics():
     return render_template('rules-arcanum-basics.html')
 
-@app.route("/rules-arcanum-fields")
+@app.route("/rules/arcanum-fields")
 def rules_arcanum_fields():
     return render_template('rules-arcanum-fields.html')
 
-@app.route("/rules-imre")
+@app.route("/rules/imre")
 def rules_imre():
     return render_template('rules-imre.html')
-
-
 
 
 @app.route("/gm/input")
