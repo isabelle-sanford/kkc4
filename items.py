@@ -101,3 +101,5 @@ class Item:
         if self.uses > 1:
             ret += f" ({self.uses} use(s))"
         
+        return ret
+        

@@ -19,16 +19,15 @@
         </strong>
         currently {% if player.status.is_enrolled %}enrolled at the University.
         {% elif player.status.is_expelled %}expelled from the University. {%
-        else %}unenrolled at the University. {% endif %}. You have
-        {{len(player.status.elevations)}} of elevation(s) in
-        {{player.status.elevations}}. You are staying in
+        else %}unenrolled at the University. {% endif %}. You have [TODO] of
+        elevation(s) in {{player.status.elevations}}. You are staying in
         {{player.status.lodging.fullname}}.<br />
         Your stipend is {{ player.status.stipend }} talents and your tuition
         this term was {{player.status.current_tuition}}.
       </p>
       <p>[performance flavor text]</p>
       <p>
-        <a href="{{ url_for('rules') }}">Rules</a>
+        <a href="{{ url_for('rules_game_basics') }}">Rules</a>
       </p>
     </div>
     <div class="col-2">[countdown]</div>
@@ -58,7 +57,7 @@
         <legend align="center">Inventory</legend>
         <div>
           <p>You have {{player.status.print_money()}}.</p>
-          <p>You have {{len(player.status.inventory)}} item(s).</p>
+          <p>You have [TODO] item(s).</p>
           <p>You have [] debts.</p>
           <p>You have [] contracts</p>
         </div>
@@ -267,7 +266,7 @@
     </div>
   </div>
 
-  {% if player.status.master_of is not None %}
+  {% if player.status.master_of %}
   <!-- TODO -->
   <form class="row">
     <div class="col-12 pt-2">

@@ -1,3 +1,13 @@
+/* TEMP FOR MY EYES IN THE DARK */
+body {
+  background-color: black;
+}
+
+.container {
+  background-color: black;
+  color: white;
+}
+
 fieldset {
   border: 3px solid #000;
   padding-left: 10px;
@@ -13,17 +23,17 @@ legend {
 }
 
 .actions {
-  color: #4F0053;
-  background-color: #FFF6FF;
+  color: #4f0053;
+  background-color: #fff6ff;
 }
 
 .apothecary {
-  color: #26580B;
+  color: #26580b;
 }
 
 .apothecary-input {
-  background-color:#fff;
-  border: 1px solid #91839B;
+  background-color: #fff;
+  border: 1px solid #91839b;
 }
 
 .apothecary-player-page {
@@ -31,30 +41,30 @@ legend {
 }
 
 .black-market-contract-player-page {
-  background-color: #EADCF2;
-  color: #4E3F59;
+  background-color: #eadcf2;
+  color: #4e3f59;
 }
 
 .black-market-contracts {
-  color: #0B4486;
+  color: #0b4486;
 }
 
 .black-market-items {
-  color: #706A11;
+  color: #706a11;
 }
 
 .center {
   margin: auto;
   width: 50%;
-  border: 4px solid #3C035F;
+  border: 4px solid #3c035f;
   padding: 10px;
 }
 
 .cycle {
   padding-top: 3px;
-  border: 4px solid #BCC500;
-  background-color: #FEFFE1;
-  color: #5B5D08;
+  border: 4px solid #bcc500;
+  background-color: #feffe1;
+  color: #5b5d08;
   margin-left: 1px;
 }
 
@@ -63,23 +73,24 @@ legend {
 }
 
 .dice-input {
-  background-color:#fff;
-  border: 1px solid #91839B;
+  background-color: #fff;
+  border: 1px solid #91839b;
 }
 
 .distro-form {
   box-sizing: border-box;
-  background-color: #F3F9F8;
+  /* TEMP FOR CONVENIENCE */
+  background-color: darkslategrey;
   border: 4px solid #015149;
 }
 
 .elevate {
   background-color: #035659;
-  color: #E8F4F4;
+  color: #e8f4f4;
 }
 
 .elevations {
-  border: 2px solid #06005B;
+  border: 2px solid #06005b;
   padding-left: 10px;
 }
 
@@ -105,23 +116,23 @@ legend {
 }
 
 .h1-imre {
-  color: #670D79;
+  color: #670d79;
   text-decoration: underline;
   text-align: center;
 }
 
 .h1-input {
-  color: #5F7FA4;
+  color: #5f7fa4;
   text-align: center;
 }
 
 .h1-player-info {
-  color: #1D235D;
+  color: #1d235d;
 }
 
 h2-field-info {
-  font-size:20px;
-  color: #2B517D;
+  font-size: 20px;
+  color: #2b517d;
   font-weight: bold;
 }
 
@@ -135,8 +146,8 @@ h2-field-info {
 }
 
 .h2-player-info {
-  font-size:20px;
-  color: #0D5F79;
+  font-size: 20px;
+  color: #0d5f79;
   font-weight: bold;
 }
 
@@ -150,7 +161,7 @@ h2-field-info {
 }
 
 .history {
-  border: 2px solid #06005B;
+  border: 2px solid #06005b;
   padding-left: 10px;
 }
 
@@ -167,8 +178,8 @@ h2-field-info {
 }
 
 .insanity-modifier {
-  background-color: #EBDAEC;
-  color: #6A0C70;
+  background-color: #ebdaec;
+  color: #6a0c70;
 }
 
 .legend-imre {
@@ -180,7 +191,7 @@ h2-field-info {
 }
 
 .list-group-imre-players {
-  background-color: #E8B6F2;
+  background-color: #e8b6f2;
   color: #700985;
   text-align: center;
 }
@@ -190,37 +201,46 @@ h2-field-info {
 }
 
 .moneylenders {
-  color: #D62B71;
+  color: #d62b71;
 }
 
 .musical {
-  background-color: #6A0C70;
-  color: #EBDAEC;
+  background-color: #6a0c70;
+  color: #ebdaec;
 }
 
 .player {
-  background-color: #F6F2F9;
-  color: #6E3491;
+  background-color: #f6f2f9;
+  color: #6e3491;
 }
 
 .player-actions {
-  color: #9F23B8;
+  color: #9f23b8;
 }
 
 .submit {
   background-color: #000000;
-  color: #FFFFFF;
+  color: #ffffff;
   border-radius: 4px;
   padding: 8px 16px;
 }
 
-.submit:hover{
-  background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, red);
-  animation:slidebg 3s linear infinite;
+.submit:hover {
+  background-image: linear-gradient(
+    to right,
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    indigo,
+    red
+  );
+  animation: slidebg 3s linear infinite;
 }
 
 @keyframes slidebg {
   to {
-    background-position:20vw;
+    background-position: 20vw;
   }
 }

@@ -58,20 +58,20 @@ class Game:
         player = Player(p, ps)
 
         if input["ep1"] is not None:
-            ep_field = FIELDS[input["ep1"][0]].fullname
+            ep_field = FIELDS[input["ep1"][0]].name
             ep_num = input["ep1"][1]
             player.assign_EP(ep_field, ep_num)
             FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
 
         
-        if input["ep2"] is not None:
-            player.assign_EP(FIELDS[input["ep2"][0]].fullname, input["ep2"][1])
-            FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
+        if input["ep2"] is not None and input["ep2"][1] > 0:
+            player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
+            FIELDS[input["ep2"][0]].add_EP(player, input["ep2"][1])
 
 
         self.players.append(player)
 
-        self.player_list[p.name] = p.id
+        self.player_list[p.name] = player
 
         self.num_players += 1
 

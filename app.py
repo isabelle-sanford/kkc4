@@ -72,6 +72,7 @@ def player_login():
 def player(name):
     # todo POST method for choice submissions
     player = g.player_list[name]
+    print(player)
     return render_template('player_page.html', player=player)
 
 

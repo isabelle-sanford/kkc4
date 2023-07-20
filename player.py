@@ -30,20 +30,21 @@ class PlayerStatic:
         ret += "\n"
         return ret
 
-@dataclass
 class EP:
     # TODO figure out what's going on here
-    vals = {
-            FieldName.LINGUISTICS: 0, 
-            FieldName.ARITHMETICS: 0, 
-            FieldName.RHETORICLOGIC: 0,
-            FieldName.ARCHIVES: 0, 
-            FieldName.SYMPATHY: 0,
-            FieldName.PHYSICKING: 0,
-            FieldName.ALCHEMY: 0,
-            FieldName.ARTIFICERY: 0,
-            FieldName.NAMING: 0
-            }
+    def __init__(self):
+
+        self.vals = {
+                FieldName.LINGUISTICS: 0, 
+                FieldName.ARITHMETICS: 0, 
+                FieldName.RHETORICLOGIC: 0,
+                FieldName.ARCHIVES: 0, 
+                FieldName.SYMPATHY: 0,
+                FieldName.PHYSICKING: 0,
+                FieldName.ALCHEMY: 0,
+                FieldName.ARTIFICERY: 0,
+                FieldName.NAMING: 0
+                }
     
     def get_list(self): # [rhet, rhet, ling, ling, ling, ...]
         all_EP: list[FieldName] = []
@@ -191,6 +192,13 @@ class PlayerStatus:
         ret += " (Expelled)" if self.is_expelled else ""
 
         return ret
+    
+    def print_money(self):
+        # this can probs be better / nicer 
+        m = self.money # 30.14
+        ret = f"{int(m // 1)} talent(s), {int((m * 10) // 1) % 10} jot(s), and {int(m * 100) % 10} drab(s)" 
+
+        return ret
 
 
     
@@ -241,14 +249,7 @@ class PlayerProcessing:
         # and check mews / spindle & draft
 
 
-    def print_money(self):
-        # this can probs be better / nicer 
-        m = self.money # 3.14
-        m *= 100 # 314
-        m = str(m) # "314"
-        ret = f"{m[0]} talent(s), {m[1]} jot(s), and {m[2]} drab(s)" 
 
-        return ret
 
 
 class PlayerChoices:
