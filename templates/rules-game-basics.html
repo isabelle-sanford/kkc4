@@ -43,12 +43,12 @@
       <p class="my-1">
         Skindancers have access to a Google doc to plan and conspire. They start
         the game mixed with the students, and they are able to do anything a
-        student can, including <a href="#Masters">becoming a Master</a>.
+        student can, including <a href="{{ url_for('rules_arcanum_basics') }}#Masters">becoming a Master</a>.
       </p>
       <p class="my-1">
         Skindancers can sabotage 1 person per turn. Sabotages appear as if the
         person simply cracked, and they are sent to
-        <a href="#Insanity">the Crockery</a>. If the Skindancers sabotage
+        <a href="{{ url_for('rules_uni_basics') }}#Insanity">the Crockery</a>. If the Skindancers sabotage
         someone already in the Crockery or an expelled student, that player
         dies, unless they are protected.
       </p>
@@ -84,21 +84,38 @@
   <div class="row">
     <strong>Turn Event Order</strong>
   </div>
+  <p class="my-2">
+    In a general sense, the order of actions is: tuition/lodging (if the first 
+    month of a term), passive roleblocks, active roleblocks and stealing items, 
+    all other non-offensive actions, mechanical effects (the horns, filing EP, etc), 
+    and then offensive actions. The following is a much more detailed and specific list:
+  </p>
   <div class="row">
     <ul>
+      <li class="star">Passive Protects (Horse & Four, Bloodless, Gram, Bodyguard, 
+        Firestop)</li>
       <li class="star">
-        <a href="#Voting">Complaint-Filing</a> (including complaint-relevant
-        actions)
+        Passive Roleblocks (Vint/Aturan homecoming, Streets blocks, Ankers; lashing, 
+       volatile firestop, and <em>Medica Emergency</em> from previous turns)</li>
+      <li class="star"><a href="{{ url_for('rules_uni_basics') }}#KingsDrab">King’s Drab</a> (item steal)</li>
+      <li class="star">Mommet (non-Master level)</li>
+      <li class="star"><em>Law of Contraposition</em></li>
+      <li class="star">Malfeasance Protection (3rd and Master levels)</li>
+      <li class="star">
+        Active Roleblocks/Item Steals (Medica Detainment, Fae Lore, using Nahlrout 
+        or Tenaculum, Pickpocket, Thieves Lamp, Malfeasance Protection I and II)       
       </li>
-      <li class="star"><a href="#TheHorns">The Horns</a></li>
       <li class="star">
         All Non-Offensive Role and Item Actions, including Imre actions
       </li>
-      <li class="star">All Offensive Actions</li>
-      <li class="star"><a href="#Insanity">Insanity Roll</a></li>
-      <li class="star"><a href="#Elevations">Elevations</a></li>
+      <li class="star"><a href="{{ url_for('rules_uni_basics') }}#TheHorns">
+        The Horns</a> (filing complaints, complaint-relevant actions, assigning DP, 
+        and punishments including expulsion)
+      </li>
+      <li class="star"><a href="{{ url_for('rules_arcanum_basics') }}#Elevations">Elevations</a></li>
+      <li class="star">Offsetting IP with EP</li>      
       <li class="star">
-        <a href="#ElevationPoints">Filing EP</a>
+        <a href="{{ url_for('rules_arcanum_basics') }}#ElevationPoints">Filing EP</a>
         <button
           type="button"
           class="btn rounded-pill btn-sm bg-info"
@@ -109,6 +126,11 @@
         >
           1
         </button>
+      </li>      
+      <li class="star">Breakout Roll</li>
+      <li class="star">
+        All Offensive Actions (Sabotage, <a href="{{ url_for('rules_uni_basics') }}#Insanity">Insanity Roll</a>, 
+        Master Mommet, Bonetar, Streets kill, Assassin)
       </li>
     </ul>
   </div>
@@ -119,18 +141,18 @@
   </div>
   <div class="row">
     <ul>
-      <li class="star"><a href="#SocialClasses">Stipend Payout</a></li>
-      <li class="star"><a href="#Admissions">Admissions and Tuition</a></li>
+      <li class="star"><a href="{{ url_for('rules_uni_basics') }}#SocialClasses">Stipend Payout</a></li>
+      <li class="star"><a href="{{ url_for('rules_uni_basics') }}#Admissions">Admissions and Tuition</a></li>
       <ul>
         <li class="check">Masters halved</li>
         <li class="check">Inflations and Reductions</li>
         <li class="check">Vint increase</li>
         <li class="check">
-          <a href="#DecreasedTuition"><em>Decreased Tuition</em></a> from
+          <a href="{{ url_for('rules_arcanum_fields') }}#DecreasedTuition"><em>Decreased Tuition</em></a> from
           Arithmetics
         </li>
       </ul>
-      <li class="star"><a href="#Lodging">Lodging</a></li>
+      <li class="star"><a href="{{ url_for('rules_uni_basics') }}#Lodging">Lodging</a></li>
     </ul>
   </div>
   <div id="Voting" class="row my-2">
@@ -143,8 +165,8 @@
       <strong>2 votes</strong> each turn. Each vote counts as a complaint lodged
       against that student, and every 2 complaints counts as 1 Discipline Point
       against the player, which could result in students being put
-      <a href="#TheHorns">On the Horns</a>. Votes on
-      <a href="#Insanity">insane players</a> do not count (including for the
+      <a href="{{ url_for('rules_uni_basics') }}#TheHorns">On the Horns</a>. Votes on
+      <a href="{{ url_for('rules_uni_basics') }}#Insanity">insane players</a> do not count (including for the
       purpose of tuition reduction).
     </p>
   </div>
@@ -154,7 +176,7 @@
   <div class="row">
     <p class="my-1">
       All students have <strong>one (1) general action period</strong> (unless
-      in <a href="#Imre">Imre</a>) which they can use for any ability they have
+      in <a href="{{ url_for('rules_imre') }}#Imre">Imre</a>) which they can use for any ability they have
       access to, including the sabotage. Some fields provide additional action
       periods upon elevation. These action periods might be general or specific
       to the field, and might be provided on each elevation or only upon
@@ -163,16 +185,16 @@
     <p class="my-1">
       There are a maximum of four (4) action periods available. Depending on the
       number of elevations a player may have and in what
-      <a href="#ArcanumFields">arcanum field</a>, some players may have only 1
+      <a href="{{ url_for('rules_arcanum_fields') }}#ArcanumFields">arcanum field</a>, some players may have only 1
       or 2 action periods, while others may have 3 or 4 action periods.
     </p>
     <p class="my-1">
       While in Imre, you <strong>do not</strong> have access to the general
       action period or any field-specific action periods. Instead, you have
       access to all the Imre actions. There are
-      <a href="#Imre">five Imre locations</a> and you are able to go to each
+      <a href="{{ url_for('rules_imre') }}#Imre">five Imre locations</a> and you are able to go to each
       location each time you are in Imre (until you try for your Talent Pipes,
-      and the <a href="#Eolian">The Eolian</a> is no longer available). This
+      and the <a href="{{ url_for('rules_imre') }}#Eolian">The Eolian</a> is no longer available). This
       includes expelled students visiting Imre.
     </p>
     <p class="my-1">
@@ -200,7 +222,7 @@
     <p class="my-2">
       Writeups will announce elevations, but not in which field a particular
       student was elevated.This includes elevations to Master. The
-      <a href="#SkindancerMasters">destruction of a field</a> will also be
+      <a href="{{ url_for('rules_arcanum_basics') }}#SkindancerMasters">destruction of a field</a> will also be
       announced, including which field was destroyed.
     </p>
   </div>
@@ -241,7 +263,7 @@
         this stat by recording yourself singing or playing an instrument (or
         both!) and submitting this recording to the GMs. Doing this will
         increase your odds of winning the Pipes at
-        <a href="#Eolian">The Eolian</a>.
+        <a href="{{ url_for('rules_imre') }}#Eolian">The Eolian</a>.
       </p>
     </li>
     <li class="list-group-item">
@@ -252,7 +274,7 @@
       </div>
       <p class="mb-1">
         All players will start the game with 2
-        <a href="#ElevationPoints">Elevation Points</a> in a random field.
+        <a href="{{ url_for('rules_arcanum_basics') }}#ElevationPoints">Elevation Points</a> in a random field.
         However, you can increase the amount of EP you start the game with and
         control which field it goes in by writing an essay about a subject at
         the University that you wish to study. Be as creative as you like.
