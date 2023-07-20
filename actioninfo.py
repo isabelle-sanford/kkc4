@@ -32,6 +32,7 @@ class Ability2():
     field: FieldName
     min_rank: Rank = Rank.ELIR
     has_level_effects: bool = False
+    #name: str = ""
 
 @dataclass
 class ActionInfo:
@@ -48,7 +49,10 @@ class ActionInfo:
     is_passive: bool = False # only for field abilities tbh
 
 
-hand_delivery = ActionInfo(1, "Hand Delivery", ActionCategory.OTHER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.ELIR), is_passive=True)
+
+hd_ability = Ability2(FieldName.LINGUISTICS, Rank.ELIR, 1)
+hand_delivery = ActionInfo(1, "Hand Delivery", ActionCategory.OTHER, field_ability=hd_ability, is_passive=True)
+
 myst_bulletins = ActionInfo(2, "Mysterious Bulletins", ActionCategory.OTHER, Target.NONE, field_ability=Ability2(FieldName.LINGUISTICS, Rank.RELAR))
 bribe_messenger = ActionInfo(3, "Bribe the Messenger", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.ELTHE))
 linguistic_analysis = ActionInfo(4, "Linguistic Analysis", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.MASTER))
@@ -76,6 +80,18 @@ medica_emergency = ActionInfo(16, "Medica Emergency", ActionCategory.OTHER, fiel
 medica_detainment = ActionInfo(17, "Medica Detainment", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
 psych_counselling = ActionInfo(18, "Psychological Counselling", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
 cheating_death = ActionInfo(19, "Cheating Death", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=Ability2(FieldName.PHYSICKING,Rank.ELIR, True))
+
+# Alchemy
+create_tenaculum = ActionInfo(36, "Create Tenaculum", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=1)
+create_firestop = ActionInfo(37, "Create Firestop", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.RELAR, True), insanity_bonus=2)
+create_plumbob = ActionInfo(38, "Create Plumbob", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=3)
+create_bonetar = ActionInfo(39, "Create Bonetar", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.ELTHE, True), insanity_bonus=3)
+
+# Artificery
+create_ward = ActionInfo(40, "Create Ward", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.ELIR, True), insanity_bonus=1)
+create_bloodless = ActionInfo(41, "Create Bloodless", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.RELAR, True), insanity_bonus=2)
+create_thieveslamp = ActionInfo(42, "Create Thieves Lamp", ActionCategory.CREATEITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.RELAR, True), insanity_bonus=2)
+create_gram = ActionInfo(43, "Create Gram", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.ELTHE, True), insanity_bonus=3)
 
 create_item = ActionInfo(20, "Create Item", ActionCategory.CREATEITEM, Target.ITEM)
 create_half_item = ActionInfo(21, "Create Half Item", ActionCategory.CREATEITEM, Target.ITEM)
@@ -121,14 +137,6 @@ class ActionType(Enum):
     # what if single CreateItem action type, target is item
     CreateItem = 20, create_item
     CreateHalfItem = 21, create_half_item
-    # CreateTenaculum = 20
-    # CreateFirestop = 21
-    # CreatePlumbob = 22
-    # CreateBonetar = 23
-    # CreateWard = 24
-    # CreateBloodless = 25
-    # CreateThievesLamp = 27
-    # CreateGram = 28
     
     UseName = 22, use_name
 
@@ -150,6 +158,16 @@ class ActionType(Enum):
     ReducedInterest = 33, reduced_interest
     GreatDeals = 34, great_deals
     DecreasedTuition = 35, decreased_tuition
+
+    # kinda need for accessible abilities stuff
+    CreateTenaculum = 36
+    CreateFirestop = 37
+    CreatePlumbob = 38
+    CreateBonetar = 39
+    CreateWard = 40
+    CreateBloodless = 41
+    CreateThievesLamp = 42
+    CreateGram = 43
 
 
     def __new__(cls, value, info):

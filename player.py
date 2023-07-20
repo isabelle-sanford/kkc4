@@ -6,7 +6,7 @@ from actioninfo import ActionInfo
 
 from statics import Background, Lodging, FieldName, Rank
 from actions import ActionType, Action
-from field import FieldStatus
+from field import FieldStatus, FIELDS
 from items import ItemType, Item
 
 class BaseStat(Enum):
@@ -64,65 +64,48 @@ class PlayerStatus:
 
     def __init__(self, player_static):
         self.info = player_static
-
-
-    # input from GM distribution 
-    @classmethod
-    def distro_init(
-        cls, player_static, current_lodging, musical_stat, inventory
-        #current_funds
-    ):
-        s = PlayerStatus(player_static)
-        s.month =  -1 #??
-        s.available_EP = 5
-        s.rank = Rank.NONE
-
-        s.lodging: Lodging = current_lodging
-        s.money = player_static.social_class.initial_funds 
-        s.stipend = player_static.social_class.stipend
-        s.current_tuition = 10
-
-        s.musical_stat = musical_stat
-        s.inventory: list[Item] = [inventory] # questionable
-        # should bodyguard be in inventory or separate?
-
-        s.EP: EP = EP() 
-        s.elevations: list[FieldName] = []
-        s.master_of: FieldName = None # 4th elevation is equivalent I guess?
-
-        s.is_alive = True 
-        s.is_sane = True
-        s.is_expelled = False 
-        s.is_enrolled = True 
-        s.in_Imre = False
-        s.broke_out = False # for underthing
-
+        self.accessible_actions: set[ActionType] = set() # TODO
+        if player_static.is_evil:
+            self.accessible_actions.add(ActionType.Sabotage)
+        self.month =  -1 #??
+        self.rank = Rank.NONE
+        self.money = player_static.social_class.initial_funds 
+        self.stipend = player_static.social_class.stipend
+        self.current_tuition = 10
+        
+        self.EP: EP = EP() 
+        self.elevations: list[FieldName] = []
+        self.master_of: FieldName = None # 4th elevation is equivalent I guess?
+        self.is_alive = True 
+        self.is_sane = True
+        self.is_expelled = False 
+        self.is_enrolled = True 
+        self.in_Imre = False
+        self.broke_out = False # for underthing
+        
         # things the player knows / happened prev turn
         # so their page can have invalid stuff grayed out or whatever
-        s.can_take_actions = True # why is this blue
-        s.can_file_complaints = True 
-        s.can_file_EP = True 
-        s.can_be_targeted = True # medica emergency, vint/aturan
-        s.can_elevate = True
-        s.can_be_elevated = True
+        self.can_take_actions = True # why is this blue
+        self.can_file_complaints = True 
+        self.can_file_EP = True 
+        self.can_be_targeted = True # medica emergency, vint/aturan
+        self.can_elevate = True
+        self.can_be_elevated = True
         # is lashed? 
 
-        s.accessible_abilities: list[ActionInfo] = [] # TODO
-        if player_static.is_evil:
-            s.accessible_abilities.append(ActionType.Sabotage.info)
-        s.known_names = [] # ? (for breakout roll)
+        self.known_names = [] 
 
         # are there any other prev turn effects? 
         # this is the best way I could come up with to have effects into future turns
-        s.last_reckless_use = -2 # successful - nahlrout protected doesn't count here
-        s.last_conduct_unbecoming = -2
-        s.last_volatile_firestop = -2
-        s.last_medica_emergency = -2 # 
-        s.last_in_medica = -2 # for bonetar ig
+        self.last_reckless_use = -2 # successful - nahlrout protected doesn't count here
+        self.last_conduct_unbecoming = -2
+        self.last_volatile_firestop = -2
+        self.last_medica_emergency = -2 # 
+        self.last_in_medica = -2 # for bonetar ig
 
         # IMRE
         # hmmmm - could make own class? 
-        s.IMRE_INFO = {
+        self.IMRE_INFO = {
             "EOLIAN_auditioned": False,
             "GILES_defaulted": False,
             "GILES_amt_owed": 0.0,
@@ -132,7 +115,26 @@ class PlayerStatus:
             "BLACKMARKET_Contractlog": []
             # TODO blacklistings probs
         }
-        s.has_talent_pipes = True # todo
+        self.has_talent_pipes = False # todo
+
+        self.action_periods = [FieldName.GENERAL] # this is when NOT in imre
+
+
+    # input from GM distribution 
+    @classmethod
+    def distro_init(
+        cls, player_static, current_lodging, musical_stat, inventory
+        #current_funds
+    ):
+        s = PlayerStatus(player_static)
+        s.available_EP = 5 # check windy tower?
+
+        s.lodging: Lodging = current_lodging
+
+        s.musical_stat = musical_stat
+        s.inventory: list[Item] = [inventory] # questionable
+        # should bodyguard be in inventory or separate?
+        
 
         return s
     
@@ -469,9 +471,8 @@ class Player:
         ret += f" {self.status.rank})"
         return ret
 
-    # todo become_master(field)
 
-    # todo action period stuff (sigh)
+    # todo somewhere use_name (to roll for new name)
 
     def levels_in(self, field: FieldName):
         # error check?
@@ -480,26 +481,91 @@ class Player:
             count = 4
         return count
 
-    def elevate_in(self, field: FieldName):
+    def elevate_in(self, field: FieldName): # todo fix arg
         self.status.elevations.append(field)
         num_EP = self.status.EP.vals[field]
         if num_EP < 5:
             self.status.EP.vals[field] = 0
         else:
             self.status.EP.vals[field] -= 5
+
+        if self.info.social_class == Background.Aturan:
+            if field == FieldName.SYMPATHY or field == FieldName.ALCHEMY or field == FieldName.ARTIFICERY or field == FieldName.NAMING:
+                roll = random.randint(1,4)
+
+                if roll == 1:
+                    print(f"{self.name} backed out of {field}")
+                    return
         
         self.status.rank = self.status.rank.get_next()
         self.status.available_EP -= 1
 
-        # TODO if elthe + only studied in one field, add 5 EP
+        curr_rank = self.status.rank
 
-        # anything else here? 
-        # TODO more stuff if master (probs)
+        # if you only study in one rank, get an extra 5 ep when reaching elthe
+        if curr_rank == Rank.ELTHE and self.levels_in(field) == 3:
+            self.status.EP.vals[field] += 5
 
-        # TODO add new accessible abilities
+        # add relevant ability/abilities (assumming not master, that's later)
+        if field == FieldName.LINGUISTICS or field == FieldName.RHETORICLOGIC or field == FieldName.ARCHIVES:
+            # need to add just the ability at that elevation level
+            for ability in FIELDS[field].info.abilities:
+                if ability.field_ability.min_rank == curr_rank:
+                    self.status.accessible_actions.add(ability)
+        elif field == FieldName.ARITHMETICS or field == FieldName.SYMPATHY or field == FieldName.PHYSICKING:
+            # all ranks have access to all abilities 
+            # maybe don't add passive arithmetics abilities?
+            for ability in FIELDS[field].info.abilities:
+                self.status.accessible_actions.add(ability)
 
-        # todo aturan chance of backing out of arcane fields
 
+        # if know any alchemy, add any new alchemy abilities
+        if FieldName.ALCHEMY in self.status.elevations:
+            for ability in FIELDS[FieldName.ALCHEMY].info.abilities:
+                if ability.info.field_ability.min_rank <= self.status.rank:
+                     self.status.accessible_actions.add(ability)
+        # same for artificery
+        if FieldName.ARTIFICERY in self.status.elevations:
+            for ability in FIELDS[FieldName.ARTIFICERY].info.abilities:
+                if ability.info.field_ability.min_rank <= self.status.rank:
+                    self.status.accessible_actions.add(ability)
+
+        if field == FieldName.NAMING:
+             self.status.accessible_actions.add(ActionType.UseName)
+        
+        # if get an action period at that level, add it
+        num_elevs = self.levels_in(field) 
+        if FIELDS[field].info[num_elevs - 1] is not None:
+            self.status.action_periods.append(FIELDS[field].info[num_elevs - 1])
+
+        # TODO more stuff if master (probs) (down in become_master)
+
+        # anything else? 
+
+
+    def become_master(self, field: FieldName):
+        # checks (like already master? idk)
+
+        self.status.master_of = field
+
+        fieldinfo = FIELDS[field].info
+
+        # add all abilities
+        for ability in fieldinfo.abilities:
+            self.status.accessible_actions.add(ability)
+        
+        for i, elev in self.status.elevations:
+            if elev != field:
+                # add the AP from that elevation, if relevant
+                if fieldinfo.APbylevel[i + 1] is not None:
+                    self.status.action_periods.append(fieldinfo.APbylevel[i + 1])
+        
+        # add master AP
+        self.status.elevations.append(field)
+        if fieldinfo.APbylevel[3] is not None:
+            self.status.action_periods.append(fieldinfo.APbylevel[3])
+
+        
 
     def go_insane(self, fields: "list[FieldStatus]"):
         # TODO
@@ -561,6 +627,14 @@ class Player:
 
     def add_item(self, item: Item):
         self.processing.items_received.append(item)
+        if item.type.using_action is not None:
+            self.status.accessible_actions.add(item.type.using_action)
+        
+        self.status.accessible_actions.add(ActionType.GiveItem)
+        # todo make sure to take away when inventory is empty
+        # add tenaculum.item here, idk
+    
+    # todo remove_item (to take away relevant action ability)
 
     def holds_item(self, item_type: ItemType) -> bool:
         count = 0

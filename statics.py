@@ -11,8 +11,6 @@ class FieldName(IntEnum):
     ARTIFICERY = 7
     NAMING = 8
     GENERAL = 9  # ? # gotta remember this when iterating thru
-# maybe separate out action periods, bc Item Creation and all
-
 
 
 class Rank(Enum):

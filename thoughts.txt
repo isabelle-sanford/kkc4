@@ -83,7 +83,7 @@ abilities
 
 small
 - destroying locations/fields
-- remove createitem category? 
+- remove createitem category? (probs not)
 - add target type specific-item?
 - more str / more detailed str (action, actioninfo, playerstatus, ...)
 - go over block cycle stuff ffs
@@ -96,7 +96,7 @@ small
     - also, pc master choice takes precedence over npc
 - underthing (cannot be targeted or take actions)
 - IP offset is 1 IP per FOUR EP
-- breakout removes 1 random power
+- breakout removes 1 random power (need to get one that's actually a field ability, not using an item)
 - failure to do formal apology means 2 DP next turn
 - expelled students can only target ppl in Imre or other expelled students
 - sabotages kill expelled students unless protected
@@ -109,8 +109,8 @@ small
 - need to figure out what items are worth as collateral in actuality tho 
 - blacklisting loaded dice stuff
 - loaded dice: make sure cealds/ruh only have option to bet on numbers up thru 6/12 
-- talent pipe stipend
 - masters can unbecome masters if they don't enroll/can't pay tuition, but retain abilities, action periods, whatever
+- courier use is immediate (and not an action but does require target + message)
 
 - pipes can be given but not stolen
 - moneylenders should probably not accrue interest while you're insane
@@ -121,3 +121,16 @@ small questions
 - say you have a 3 talent loan to giles, and it's the last month of a turn. you put in an order to pay giles 2 talents. does that mean you pay your interest first (3 * .15) and the rest is used to pay back part of the original? (currently yes, and the rest of the payback is post stipend recipience)
 - if you break out do you count as 'expelled' (or just having-gone-insane) for the purpose of the win conditions
 - if you play for your pipes and succeed during the last month of a term, do you get the +10 talents immediately or not until the term after rolls around? 
+- the arcane fields (for aturan breaking out) are sympathy, alchemy, artificery, and naming, right? no physicking?
+- do aturans still have a chance of backing out when becoming master?
+
+
+action period things:
+- anything can be used in a general action period slot 
+- any action with an associated field ability can be used in a slot for said field 
+- using mommets can take a sympathy action slot 
+- anything with create item category can use a createitem AP 
+- ??
+- how to show UI for that? 
+
+

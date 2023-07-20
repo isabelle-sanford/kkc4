@@ -8,7 +8,22 @@ from statics import FieldName, Rank
 if TYPE_CHECKING:
     from player import Player
 from enum import Enum, IntEnum
-from actioninfo import Target
+from actioninfo import Target, ActionType
+
+class ActionPeriod(Enum):
+    LINGUISTICS = 0
+    ARITHMETICS = 1
+    RHETORICLOGIC = 2
+    ARCHIVES = 3
+    SYMPATHY = 4
+    PHYSICKING = 5
+    
+    NAMING = 8
+    GENERAL = 9 
+    ITEMCREATION = 10
+    # any others?
+
+
 
 # want to use Ability2 (currently in actioninfo)
 class Ability:
@@ -17,8 +32,6 @@ class Ability:
         ability_name,
         field,
         min_rank: Rank,
-        #is_passive,
-        #is_negative,
         has_level_effects: bool,
         target1: Target, # TYPE
         target2 = Target.NONE,
@@ -44,20 +57,14 @@ class FieldInfo:
         field: FieldName,
         name: str,
         # these should just be a list[Ability]
-        abilities: list[Ability] = [],
-        level1_AP = None,
-        level2_AP = None,
-        level3_AP = None,
-        master_AP = None
+        abilities: list[ActionType] = [],
+        APbylevel = [None, None, None, None]
     ):
         self.name = name
         self.field_id = field
         self.abilities = abilities
 
-        self.level1_AP = level1_AP
-        self.level2_AP = level2_AP
-        self.level3_AP = level3_AP
-        self.master_AP = master_AP
+        self.APbylevel = APbylevel
 
 class FieldStatus:
     def __init__(self, field: FieldName, info: FieldInfo):
@@ -160,330 +167,101 @@ class FieldStatus:
     
 
 
-mysterious_bulletins = Ability(
-    "Mysterious Bulletins", FieldName.LINGUISTICS, Rank.RELAR, False, Target.NONE)
-hand_delivery = Ability(
-    "Hand Delivery",
-    FieldName.LINGUISTICS,
-    Rank.ELIR,
-    False,
-    Target.NONE,
-    is_passive=True
-)
-bribe_messenger = Ability(
-    "Bribe Messenger",
-    FieldName.LINGUISTICS,
-    Rank.ELTHE,
-    False, Target.PLAYER,
-    is_negative=True # ??
-)
-linguistic_analysis = Ability(
-    "Linguistic Analysis",
-    FieldName.LINGUISTICS,
-    Rank.MASTER,
-    False,
-    Target.PLAYER,
-    is_negative=True #??
-)
-
 linguistics = FieldInfo(
     FieldName.LINGUISTICS,
     "Linguistics",
-    [mysterious_bulletins,
-    hand_delivery,
-    bribe_messenger,
-    linguistic_analysis],
-    None,
-    FieldName.GENERAL,
-    FieldName.GENERAL,
-    FieldName.GENERAL,
-)
-
-reduced_interest = Ability(
-    "Reduced Interest",
-    FieldName.ARITHMETICS,
-    Rank.ELIR,
-    True,
-    Target.NONE,
-    is_passive=True
-)
-pickpocket = Ability(
-    "Pickpocket", FieldName.ARITHMETICS, Rank.ELIR, True, Target.PLAYER,
-    is_negative=True
-)  # only requires target at master level
-great_deals = Ability(
-    "Great Deals", FieldName.ARITHMETICS, Rank.ELIR, 
-    True, 
-    Target.NONE,
-    is_passive=True
-)
-decreased_tuition = Ability(
-    "Decreased Tuition",
-    FieldName.ARITHMETICS,
-    Rank.ELIR,
-    True,
-    Target.NONE,
-    is_passive=True
+    [ActionType.HandDelivery,
+     ActionType.MysteriousBulletins,
+     ActionType.BribeTheMessenger,
+     ActionType.LinguisticAnalysis],
+    [None,
+    ActionPeriod.GENERAL,
+    ActionPeriod.GENERAL,
+    ActionPeriod.GENERAL],
 )
 
 arithmetics = FieldInfo(
     FieldName.ARITHMETICS,
     "Arithmetics",
-    [reduced_interest,
-    pickpocket,
-    great_deals,
-    decreased_tuition],
-    master_AP=FieldName.ARITHMETICS,
+    [ActionType.ReducedInterest,
+     ActionType.GreatDeals,
+     ActionType.Pickpocket,
+     ActionType.DecreasedTuition],
+    [None, None, None, ActionPeriod.GENERAL],
 )
 
-law_of_contraposition = Ability(
-    "Law of Contraposition",
-    FieldName.RHETORICLOGIC,
-    Rank.MASTER,
-    False,
-    Target.ACTION,
-    target2=Target.PLAYER,
-    # is_negative?
-)
-proficient_in_hyperbole = Ability(
-    "Proficient in Hyperbole",
-    FieldName.RHETORICLOGIC,
-    Rank.RELAR,
-    False,
-    Target.PLAYER,
-    Target.PLAYER
-)
-argumentum_ad_nauseam = Ability(
-    "Argumentum Ad Nauseam",
-    FieldName.RHETORICLOGIC,
-    Rank.ELIR,
-    False,
-    Target.PLAYER
-    # is_negative? 
-)
-persuasive_arguments = Ability(
-    "Persuasive Arguments",
-    FieldName.RHETORICLOGIC,
-    Rank.ELTHE,
-    False,
-    Target.PLAYER,
-    Target.PLAYER,
-    # is_negative?
-)
+
 
 rhetoriclogic = FieldInfo(
     FieldName.RHETORICLOGIC,
     "Rhetoric & Logic",
-    [law_of_contraposition,
-    proficient_in_hyperbole,
-    argumentum_ad_nauseam,
-    persuasive_arguments],
-    None,
-    FieldName.RHETORICLOGIC,
-    FieldName.RHETORICLOGIC,
-    FieldName.RHETORICLOGIC,
+    [ActionType.ArgumentumAdNauseam,
+     ActionType.ProficientInHyperbole,
+     ActionType.PersuasiveArguments,
+     ActionType.LawOfContraposition],
+    [None,
+    ActionPeriod.RHETORICLOGIC,
+    ActionPeriod.RHETORICLOGIC,
+    ActionPeriod.RHETORICLOGIC]
 )
 
-fae_lore = Ability(
-    "Fae Lore",
-    FieldName.ARCHIVES,
-    Rank.MASTER,
-    False,
-    Target.PLAYER, # ?
-    is_negative=True
-)
-omen_recognition = Ability(
-    "Omen Recognition",
-    FieldName.ARCHIVES,
-    Rank.ELIR,
-    False,
-    Target.EVENT
-)
-school_records = Ability( #Requires being at Uni
-    "School Records",
-    FieldName.ARCHIVES,
-    Rank.RELAR,
-    False,
-    Target.PLAYER
-)
-banned_books = Ability(
-    "Banned Books",
-    FieldName.ARCHIVES,
-    Rank.ELTHE,
-    True, # not caught if master
-    Target.FIELD,
-    Target.ABILITY, # if field known
-
-)
 
 archives = FieldInfo(
     FieldName.ARCHIVES,
     "Archives",
-    [fae_lore,
-    omen_recognition,
-    school_records,
-    banned_books],
-    None,
-    FieldName.ARCHIVES,
-    FieldName.ARCHIVES,
-    FieldName.ARCHIVES,
-)
-
-mommet_making = Ability(
-    "Mommet-making",
-    FieldName.SYMPATHY,
-    Rank.ELIR,
-    True,
-    Target.PLAYER, # DEAD player, only if 3rd level
-    # is_negative?
-)
-malfeasance_protection = Ability(
-    "Malfeasance Protection",
-    FieldName.SYMPATHY,
-    Rank.ELIR,
-    True,
-    Target.PLAYER,
-    is_positive=True, # IF 3rd level though. oof.
-    is_negative=True, # if not third level
+    [ActionType.OmenRecognition,
+     ActionType.SchoolRecords,
+     ActionType.BannedBooks,
+     ActionType.FaeLore],
+    [None,
+    ActionPeriod.ARCHIVES,
+    ActionPeriod.ARCHIVES,
+    ActionPeriod.ARCHIVES],
 )
 
 sympathy = FieldInfo(
     FieldName.SYMPATHY,
     "Sympathy",
-    [mommet_making,
-    malfeasance_protection],
-    FieldName.SYMPATHY,
-    False,
-    False,
-    FieldName.SYMPATHY,
-)
-
-medica_emergency = Ability(
-    "Medica Emergency",
-    FieldName.PHYSICKING,
-    Rank.ELIR,
-    True,
-    Target.NONE
-)
-medica_detainment = Ability(
-    "Medica Detainment",
-    FieldName.PHYSICKING,
-    Rank.ELIR,
-    True,
-    Target.PLAYER,
-    is_negative=True
-)
-psychological_counselling = Ability(
-    "Psychological Counselling",
-    FieldName.PHYSICKING,
-    Rank.ELIR,
-    False,
-    False,
-    True,
-    True,
-    False,
-)
-cheating_death = Ability(
-    "Cheating Death",
-    FieldName.PHYSICKING,
-    Rank.ELIR,
-    True,
-    Target.PLAYER,
-    is_positive=True
+    [ActionType.MommetMaking,
+     ActionType.MalfeasanceProtection],
+    [ActionPeriod.SYMPATHY,
+    None,
+    None,
+    ActionPeriod.SYMPATHY],
 )
 
 physicking = FieldInfo(
     FieldName.PHYSICKING,
     "Physicking",
-    [medica_emergency,
-    medica_detainment,
-    psychological_counselling,
-    cheating_death],
-    master_AP=FieldName.PHYSICKING
+    [ActionType.MedicaEmergency,
+     ActionType.MedicaDetainment,
+     ActionType.PsychologicalCounselling,
+     ActionType.CheatingDeath],
+     [None, None, None, ActionPeriod.PHYSICKING],
 )
 
-tenaculum_creation = Ability(
-    "Tenaculum",
-    FieldName.ALCHEMY,
-    Rank.ELIR,
-    False,
-    Target.ITEM, # kinda
-)
-firestop_creation = Ability(
-    "Firestop",
-    FieldName.ALCHEMY,
-    Rank.RELAR,
-    False,
-    Target.ITEM, # kinda
-)
-plum_bob_creation = Ability(
-    "Plum bob",
-    FieldName.ALCHEMY,
-    Rank.ELTHE,
-    False,
-    Target.ITEM, # kinda
-)
-bone_tar_creation = Ability(
-    "Bone-tar",
-    FieldName.ALCHEMY,
-    Rank.ELTHE,
-    False,
-    Target.ITEM, # kinda
-)
+
 
 alchemy = FieldInfo(
     FieldName.ALCHEMY,
     "Alchemy",
-    [tenaculum_creation,
-    firestop_creation,
-    plum_bob_creation,
-    bone_tar_creation],
-    False, # item creation period
-    False,
-    False,
-    False,
+    [ActionType.CreateTenaculum,
+     ActionType.CreateFirestop,
+     ActionType.CreatePlumbob,
+     ActionType.CreateBonetar],
+    [ActionPeriod.ITEMCREATION, None, None, None]
 )
 
-ward_creation = Ability(
-    "Ward",
-    FieldName.ARTIFICERY,
-    Rank.ELIR,
-    True,
-    Target.ITEM
-)
-bloodless_creation = Ability(
-    "Bloodless",
-    FieldName.ARTIFICERY,
-    Rank.RELAR,
-    True,
-    Target.ITEM
-)
-thieves_lamp_creation = Ability(
-    "Thieves Lamp",
-    FieldName.ARTIFICERY,
-    Rank.RELAR,
-    True,
-    Target.ITEM
-)
-gram_creation = Ability(
-    "Gram",
-    FieldName.ARTIFICERY,
-    Rank.ELTHE,
-    True,
-    Target.ITEM
-)
+
 
 artificery = FieldInfo(
     FieldName.ARTIFICERY,
     "Artificery",
-    [ward_creation,
-    bloodless_creation,
-    thieves_lamp_creation,
-    gram_creation],
-    FieldName.ARTIFICERY, # hm
-    False,
-    False,
-    False,
+    [ActionType.CreateWard,
+     ActionType.CreateBloodless,
+     ActionType.CreateThievesLamp,
+     ActionType.CreateGram],
+    [ActionPeriod.ITEMCREATION, None, None, None]
 )
 
 # Dunno what to do with all the names. Don't seem quite appropriate as abilities? 
@@ -491,11 +269,11 @@ artificery = FieldInfo(
 naming = FieldInfo(
     FieldName.NAMING,
     "Naming",
-    [], # ? 
-    False,
+    [ActionType.UseName], # ? 
+    [None,
     FieldName.NAMING,
     FieldName.NAMING,
-    FieldName.NAMING,
+    FieldName.NAMING],
 )
 
 # not sure where this should go (or if fieldInfo should even be separate)
