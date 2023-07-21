@@ -102,4 +102,15 @@ class Item:
             ret += f" ({self.uses} use(s))"
         
         return ret
+    
+    def __repr__(self):
+        ret = f"{self.name}"
+
+        if self.target is not None:
+            # mommet only
+            ret += f" on {self.target} "
+        if self.uses > 1:
+            ret += f" ({self.uses} use(s))"
+        
+        return ret
         

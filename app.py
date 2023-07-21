@@ -1,5 +1,5 @@
 from field import FieldStatus
-from game_run import Game
+from game_run import Game, Turn
 from player import Player
 from flask import Flask, render_template, request, url_for, flash, redirect
 
@@ -15,6 +15,8 @@ players: "list[Player]" = []
 living_players = [] # seems useful, idk
 
 g = Game()
+
+t1: Turn = None
 
 # main public game page
 @app.route("/")
@@ -68,13 +70,22 @@ def player_login():
     return render_template('player_login.html')
 
 # PLAYER PAGES
-@app.route("/player/<name>")
+@app.route("/player/<name>", methods=['GET', 'POST'])
 def player(name):
-    # todo POST method for choice submissions
     player = g.player_list[name]
-    print(player)
+    if request.method == 'POST':
+        print(request.form)
+        g.update_player_choices(request.form, player)
+    # todo POST method for choice submissions
+    
+    #print(player)
     return render_template('player_page.html', player=player)
 
+@app.route("/gm/start")
+def start_game():
+    t1 = Turn(g.players, {}, 0, fields, g.apothecary, g.blackmarket)
+    # does this stay like this once start_game is done? 
+    return render_template('gm-start.html')
 
 @app.route("/gm/fields")
 def gm_fields():
@@ -88,7 +99,7 @@ def gm_players():
 
 @app.route("/gm/imre")
 def gm_imre():
-    return render_template('gm-imre.html', players=g.players) # TODO
+    return render_template('gm-imre.html', imre_players=[t1.players[id] for id in t1.imre_players]) # TODO
 
 @app.route("/rules/game-basics")
 def rules_game_basics():

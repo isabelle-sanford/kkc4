@@ -19,7 +19,7 @@
         </strong>
         currently {% if player.status.is_enrolled %}enrolled at the University.
         {% elif player.status.is_expelled %}expelled from the University. {%
-        else %}unenrolled at the University. {% endif %}. You have [TODO] of
+        else %}unenrolled at the University. {% endif %}You have [TODO] of
         elevation(s) in {{player.status.elevations}}. You are staying in
         {{player.status.lodging.fullname}}.<br />
         Your stipend is {{ player.status.stipend }} talents and your tuition
@@ -60,11 +60,19 @@
           <p>You have [TODO] item(s).</p>
           <p>You have [] debts.</p>
           <p>You have [] contracts</p>
+          <ul>
+            {% for item in player.status.inventory %}
+            <li>
+              {{item.name}} {% if item.uses > 0 %} - {{item.uses}} use(s) {%
+              endif %}
+            </li>
+            {% endfor %}
+          </ul>
         </div>
         <!-- TODO inventory list -->
       </fieldset>
     </div>
-    <form class="col-6">
+    <form class="col-6" method="post">
       <div>
         <fieldset class="mt-2">
           <legend align="center">Next Term</legend>
@@ -115,11 +123,13 @@
               <input
                 class="form-check-input"
                 type="radio"
-                name="nextterm"
-                id="imre"
-                value="imre"
+                name="imre_next"
+                id="imre_next"
+                value="imre_next"
               />
-              <label class="form-check-label" for="imre"> Go to Imre </label>
+              <label class="form-check-label" for="imre_next">
+                Go to Imre
+              </label>
             </div>
           </div>
           <div class="col-12 my-3">
@@ -135,15 +145,18 @@
         </fieldset>
       </div>
     </form>
-    <form class="col-6 mt-2">
+    <form class="col-6 mt-2" method="post">
       <div>
         <fieldset class="fieldset-uni">
           <legend align="center" class="legend-uni">Actions</legend>
           <div class="input-group">
+            <!-- TODO only show possible # of action periods etc -->
             <span class="input-group-text actions">General</span>
             <select class="form-select" id="action1" name="action1">
+              <option value="None">--</option>
               {% for a in player.status.accessible_abilities %}
-              <option value="{{a}}">{{a}}</option>
+              <!-- TODO a.info.name when status changes -->
+              <option value="{{a}}">{{a.name}}</option>
               {% endfor %}
             </select>
             <select class="form-select" id="target1" name="target1">
@@ -200,7 +213,7 @@
         </fieldset>
       </div>
     </form>
-    <form class="col-6 pt-2">
+    <form class="col-6 pt-2" method="post">
       <div>
         <fieldset class="fieldset-uni">
           <!-- todo if can_file_EP (else gray) -->
@@ -208,6 +221,7 @@
           <div class="row">
             <div class="col-5">
               {% for n in range(player.status.available_EP) %}
+              <!-- TODO show in dropdown your prev selections -->
               <div class="input-group">
                 <select class="form-select" id="fieldep{{n}}" name="field{{n}}">
                   <option value="None">--</option>
@@ -245,6 +259,7 @@
               <span style="text-decoration: underline"
                 ><strong>Insanity Reduction</strong></span
               >
+              <!-- todo number thingo instead probs (increments of four only) -->
               <textarea class="form-control me-2"></textarea>
             </div>
           </div>

@@ -10,17 +10,23 @@
         <li class="list-group-item list-group-imre-players">
           <h4>Players in Imre</h4>
         </li>
-        <li class="list-group-item player-imre">
-          [player 1]
-        </li>
+        {% for player in imre_players %}
+        <li class="list-group-item player-imre">{{player.name}}</li>
+        {% endfor %}
       </ul>
     </div>
     <div class="col-6">
-      <h2 style="text-decoration: underline" class="mt-2 player-actions h2-imre">
+      <h2
+        style="text-decoration: underline"
+        class="mt-2 player-actions h2-imre"
+      >
         Player 1 Getting:
       </h2>
       <span>[player 1 apothecary/black market actions]</span>
-      <h2 style="text-decoration: underline" class="mt-2 player-actions h2-imre">
+      <h2
+        style="text-decoration: underline"
+        class="mt-2 player-actions h2-imre"
+      >
         Player 2 Getting:
       </h2>
       <span>[player 2 apothecary/black market actions]</span>

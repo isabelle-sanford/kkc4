@@ -55,6 +55,8 @@ class Game:
         lodging = LODGINGS[input["lodging"]]
         ps = PlayerStatus.distro_init(p, lodging, input["musical_stat"], inventory)
 
+        print(ps.inventory)
+
         player = Player(p, ps)
 
         if input["ep1"] is not None:
@@ -102,7 +104,23 @@ class Game:
 
         p.take_action(a)
 
+    def update_player_choices(self, choice, player):
+        c = player
 
+        if "imre_next" in choice: c.imre_next = True
+        if "field0" in choice:
+            print("filing in ", choice["field0"])
+            # check here?
+            c.choices.filing_EP = choice["field0"] # no
+                
+        if "actions" in choice:
+            for a in choice["actions"]:
+
+                self.add_action(c.id, a)
+        # what about updating an action? do we just clear all actions before this func? 
+        
+        # todo other choices
+            # imre stuff
 
     def update_choices(self, new_choices):
         # erase all prev choices? (for just the player(s) in the list?)
