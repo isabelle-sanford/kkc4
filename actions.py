@@ -1,6 +1,8 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+
+from outcome import ProcessLog
 if TYPE_CHECKING:
     from player import Player
 import random
@@ -13,7 +15,7 @@ from actioninfo import ActionInfo, ActionCategory, ActionType #, Target
 class Action:
     def __init__(self, player, type: ActionType, target,
                   target_two = None, level = None, item: Item = None): 
-        self.player = player # Player taking the action
+        self.player = player # Player taking the action (class Player)
         
         self.type: ActionType = type # could use info? idk
         self.category: ActionCategory = type.info.category
@@ -24,7 +26,7 @@ class Action:
         
         self.blocked: bool = False
         self.redirected: bool = False
-        self.redirect_target = None # might want original_target
+        self.redirect_target = None # might want original_target # todo
 
         self.successful: bool = True # result for player
 
@@ -43,7 +45,7 @@ class Action:
     def __str__(self):
         # assumes action-taker is known 
         # e.g. Law of Contraposition (Hael -> Wilson)
-        ret = self.type.name # ! gotta be info 
+        ret = self.type.info.name # ! gotta be info 
         if self.target is not None:
             ret += f"({self.target}"
             if self.target_two is not None:
@@ -62,7 +64,10 @@ class Action:
         print(out) # maybe return? 
 
     
-    def perform(self, **kwargs):
+    def perform(self, log: ProcessLog=None, **kwargs):
+        if log is None:
+            log = ProcessLog() # temp that gets destroyed at the end 
+
         if self.blocked and not self.in_block_cycle:
             # log it
             out_one = ", ".join(p.info.name for p in self.blocked_by)
@@ -73,8 +78,9 @@ class Action:
         
         # todo everywhere: check that target can be targeted
         # also for target types being correct
+        # and check self.successful? 
 
-        action_logged = False
+
 
         # todo: insanity bonus
         if self.type == ActionType.UseMommet:
@@ -94,91 +100,89 @@ class Action:
                 print(f"{self.player.info.name} succesfully used Mommet")
 
 
+        if self.category == ActionCategory.CREATEITEM:
+            art_level = self.player.levels_in(FieldName.ARTIFICERY)
+            alc_level = self.player.levels_in(FieldName.ALCHEMY)
+            match self.type:
+
+                case ActionType.CreateWard:
+                    item = Item.Generate(ItemType.WARD, art_level)
+                    self.player.processing.insanity_bonus += 1
+                case ActionType.CreateBloodless:
+                    item = Item.Generate(ItemType.BLOODLESS, art_level)
+                    self.player.processing.insanity_bonus += 2
+                case ActionType.CreateThievesLamp:
+                    item = Item.Generate(ItemType.THIEVESLAMP, art_level)
+                    self.player.processing.insanity_bonus += 2
+                case ActionType.CreateGram:
+                    item = Item.Generate(ItemType.GRAM, art_level)
+                    self.player.processing.insanity_bonus += 3
+                
+                # Alchemy
+                case ActionType.CreateTenaculum:
+                    item = Item.Generate(ItemType.TENACULUM, alc_level)
+                    self.player.processing.insanity_bonus += 1
+                case ActionType.CreateFirestop:
+                    item = Item.Generate(ItemType.FIRESTOP, alc_level)
+                    self.player.processing.insanity_bonus += 2
+                case ActionType.CreatePlumbob:
+                    item = Item.Generate(ItemType.PLUMBOB, alc_level)
+                    self.player.processing.insanity_bonus += 3
+                case ActionType.CreateBonetar:
+                    item = Item.Generate(ItemType.PLUMBOB, alc_level)
+                    self.player.processing.insanity_bonus += 3
+
+                # TODO mommet making 
+                case ActionType.MommetMaking:
+                    # TODO 
+                    print("todo")
+                case ItemType.MOMMET_3rd:
+                    # TODO
+                    print("todo")
+
+            self.player.add_item(item)
+                
+            return 
+        
+        # non-item creation
         match self.type:
 
-            case ActionType.CreateItem:
-                # maybe make helper function for this
-                art_level = self.player.levels_in(FieldName.ARTIFICERY)
-                alc_level = self.player.levels_in(FieldName.ALCHEMY)
-
-                match self.target:
-                    
-                    # Artificery
-                    case ItemType.WARD:
-                        # todo: check that first half is already made
-                        item = Item.Generate(ItemType.WARD, art_level)
-                        self.player.processing.insanity_bonus += 1
-                    case ItemType.BLOODLESS:
-                        item = Item.Generate(ItemType.BLOODLESS, art_level)
-                        self.player.processing.insanity_bonus += 2
-                    case ItemType.THIEVESLAMP:
-                        item = Item.Generate(ItemType.THIEVESLAMP, art_level)
-                        self.player.processing.insanity_bonus += 2
-                    case ItemType.GRAM:
-                        item = Item.Generate(ItemType.GRAM, art_level)
-                        self.player.processing.insanity_bonus += 3
-                    
-                    # Alchemy
-                    case ItemType.TENACULUM:
-                        item = Item.Generate(ItemType.TENACULUM, alc_level)
-                        self.player.processing.insanity_bonus += 1
-                    case ItemType.FIRESTOP:
-                        item = Item.Generate(ItemType.FIRESTOP, alc_level)
-                        self.player.processing.insanity_bonus += 2
-                    case ItemType.PLUMBOB:
-                        item = Item.Generate(ItemType.PLUMBOB, alc_level)
-                        self.player.processing.insanity_bonus += 3
-                    case ItemType.BONETAR:
-                        item = Item.Generate(ItemType.PLUMBOB, alc_level)
-                        self.player.processing.insanity_bonus += 3
-                    
-                    # TODO mommet making 
-                    case ItemType.MOMMET:
-                        # TODO 
-                        print("todo")
-                    case ItemType.MOMMET_3rd:
-                        # TODO
-                        print("todo")
-                    case _:
-                        print("idk")
-
-                self.player.add_item(item)
-            
             # LINGUISTICS
             case ActionType.MysteriousBulletins:
-                # append string to writeup results
-                # todo 
-                pass 
+                log.results.public_results.append(f"[Mysterious Bulletin message from {self.player.name}]")
+                # tell player of success? 
+                return 
             case ActionType.BribeTheMessenger:
-                # notify GM abt it
-                # todo 
-                pass #?
+                log.results.gm_todo.append(f"{self.player} successfully PM spied on {self.target.name} and needs to be sent PM results.")
+                return
             case ActionType.LinguisticAnalysis:
-                # notify GM to say what result is
-                pass
+                log.results.gm_todo.append(f"{self.player} successfully used Linguistic Analysis on {self.target.name} and needs to know whether they told a lie.")
+                return
 
             # ARITHMETICS (pickpocket)
             case ActionType.Pickpocket:
-                if self.player.status.master_of is not FieldName.ARITHMETICS:
-                    if "player_list" in kwargs:
-                        # TODO
-                        pass
-                    #random Target
-                    pass
+                # make sure to check that target is actually None if not placed
+                if self.target is not None and self.player.status.master_of == FieldName.ARITHMETICS: # ie master selected player
+                        recipient = self.target
                 else:
-                    if self.target.holds_item(ItemType.BODYGUARD):
-                        #Log.Action(self, LogOutcome.Failure)
-                        action_logged = True
-                    else:
-                        money = self.target.status.money
-                        proportion = 0.1
-                        levels = self.player.status.elevations.count(FieldName.ARITHMETICS)
-                        if levels == 2:
-                            proportion = 0.2
-                        elif levels == 3:
-                            proportion = 0.3
-                        self.player.increase_money(money*proportion)
-                        self.target.reduce_money(money*proportion)
+                    potential_recipients = self.player.processing.targeted_by
+                    recipient = random.choice(potential_recipients)
+                
+                if recipient.holds_item(ItemType.BODYGUARD):
+                    # failure
+                    self.successful = False
+                    log.log(f"{self.player} tried to pickpocket {recipient} but failed because they have a Bodyguard.")
+                    # change message to pickpocketer? 
+                else:
+                    money = self.target.status.money
+                    proportion = 0.1
+                    levels = self.player.levels_in(FieldName.ARITHMETICS)
+                    if levels == 2:
+                        proportion = 0.2
+                    elif levels >= 3:
+                        proportion = 0.3
+                    self.player.increase_money(money*proportion)
+                    self.target.reduce_money(money*proportion)
             
             # RHETORIC AND LOGIC
             # TODO law of contraposition
@@ -205,7 +209,14 @@ class Action:
                     self.message = elevs # ig, idk
                     # log 
             case ActionType.BannedBooks:
-                # TODO
+                # todo roll chance of being caught
+                
+                if self.player.levels_in(self.target):
+                    if self.target_two is not None and self.target_two not in self.player.status.accessible_actions:
+                        # ie you already studied in the field, you picked an ability to learn, and you don't have it yet
+                        self.player
+                # TODO this takes TWO ACTION PERIODS >:(
+
                 pass
 
             # SYMPATHY
@@ -220,7 +231,8 @@ class Action:
             # TODO medica detainment
             case ActionType.PsychologicalCounselling:
                 phys_levels = self.player.levels_in(FieldName.PHYSICKING)
-
+                if self.target == self.player:
+                    phys_levels = phys_levels * -1
                 self.target.processing.insanity_bonus -= phys_levels
             # TODO cheating death
 
@@ -229,6 +241,7 @@ class Action:
                 # TODO 
                 # log 
                 # remember insanity bonuses
+                # todo roll for getting new name
                 pass
 
 
@@ -245,7 +258,7 @@ class Action:
 
             case ActionType.UsePlumbob:
                 alc_levels = self.player.status.elevations.count(FieldName.ALCHEMY)
-                print(f"{alc_levels} level plum bob used by {self.player} on {self.target}")
+                log.results.gm_todo(f"{alc_levels} level plum bob used by {self.player} on {self.target}.")
                 pass
             case ActionType.UseBonetar:
                 # OFFENSIVE
@@ -267,10 +280,10 @@ class Action:
                     # error check
                     pass
                 
-                if not goes_volatile:
-                    print("destroy ", self.target)
+                log.log(f"DESTROY {self.target} (not volatile)")
+                print("destroy ", self.target)
                 
-                else:
+                if goes_volatile:
                     # choose players to kill
                     if alc_levels == 3:
                         self.status.last_in_medica = self.status.month + 1
@@ -279,20 +292,50 @@ class Action:
                         if roll <= 10:
                             self.status.last_in_medica = self.status.month + 1
                     else:
+                        roll = random.randint(1,2)
+                        if roll == 1:
+                            # YOU DIE
+                            log.log(f"{self.player} dies in the process!")
                         # you have as much chance of dying as everyone else
                         # todo
                         pass
 
+                    dead = []
+                    survive = []
+                    if kwargs["at_lodging"]: # list of ids of players there
+                        for p in kwargs["at_lodging"]:
+                            roll = random.randint(1,2)
+                            if roll == 1:
+                                dead.append(p)
+                            else:
+                                survive.append(p)
+                    
+                    return {"survivors": survive, "die": dead}
+                    # rest of processing is in process_offensive_actions
+                
+
             case ActionType.UseWard:
-                # need to get list of actions on the person
-                pass
+                possible_actions = self.player.processing.targeted_by 
+                choice = random.choice(possible_actions)
+                log.log(f"{self.player} used their Ward to find that someone used {choice.type.info.name} on them.")
+                self.player.processing.player_message.append(f"You successfully used your Ward to find that someone used {choice.type.info.name} on you. {f'This action was level {choice.level}.' if choice.level is not None else ''}")
+                # TODO actually use the ward
+                # maybe this?
+                self.player.use_item(self.target) 
+
             case ActionType.UseThievesLamp:
                 if self.target.holds_item(ItemType.BODYGUARD):
-                    # action fails
+                    self.player.processing.player_message.append(f"You tried to use a Thieves Lamp on {self.target.name} but failed.")
                     pass 
                 else:
                     money = self.target.status.money * .3
                     item_count = len(self.target.status.inventory)
+                    # TODO no talent pipes included
+
+                    if item_count == 1:
+                        stolen = self.target.status.inventory[0]
+                        self.player.processing.items_received.append(stolen)
+                        self.target.status.inventory.remove(stolen)
 
                     # this is a little iffy
                     for i in range(item_count // 2):
@@ -300,10 +343,13 @@ class Action:
                         self.player.processing.items_received.append(stolen)
                         self.target.status.inventory.remove(stolen)
 
+                    # todo log (you received x / your x were stolen)
 
+                return
 
 
             case ActionType.UseMommet:
+                # block unless master level, in which case offense
                 # remember insanity bonuses
                 pass
             

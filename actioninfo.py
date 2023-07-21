@@ -69,7 +69,7 @@ law_of_contraposition = ActionInfo(9, "Law of Contraposition", ActionCategory.OT
 
 omen_recognition = ActionInfo(19, "Omen Recognition", ActionCategory.OTHER, Target.EVENT, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELIR))
 school_records = ActionInfo(11, "School Records", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.RELAR))
-banned_books = ActionInfo(12, "Banned Books", ActionCategory.OTHER, Target.FIELD, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELTHE, True))
+banned_books = ActionInfo(12, "Banned Books", ActionCategory.OTHER, Target.FIELD, Target.ABILITY, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELTHE, True))
 fae_lore = ActionInfo(13, "Fae Lore", ActionCategory.BLOCKETC, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.MASTER))
 
 mommet_making = ActionInfo(14, "Mommet Making", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=Ability2(FieldName.SYMPATHY, Rank.ELIR, True)) # IB per level
@@ -128,6 +128,7 @@ class ActionType(Enum):
     BannedBooks = 12, banned_books
     FaeLore = 13, fae_lore
     MommetMaking = 14, mommet_making
+    # add 3rd-level 
     MalfeasanceProtection = 15, malfeasance_protection
     MedicaEmergency = 16, medica_emergency
     MedicaDetainment = 17, medica_detainment

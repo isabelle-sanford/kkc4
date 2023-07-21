@@ -207,7 +207,7 @@ class PlayerProcessing:
         # Working list of players that blocking them, as Player references
         self.blocked_by: list[Player] = []
 
-        self.targeted_by: list[Player] = [] # for ward, pickpocket, ?
+        self.targeted_by: list[Action] = [] # for ward, pickpocket, ?
 
         # malfeasance protection things
         self.transfer_neg_actions_to = None # master 
@@ -229,6 +229,8 @@ class PlayerProcessing:
 
         self.insanity_bonus = 0 # might want to take something from prev status?
         # and check mews / spindle & draft
+
+        self.player_message = [] # todo fancy this probs
 
     def short_status(self):
         ret = "" 
@@ -470,9 +472,52 @@ class Player:
         ret += "Skindancer" if self.info.is_evil else "Student"
         ret += f" {self.status.rank})"
         return ret
+    
+    def attack(self, attack: Action):
+        # sabotage, bonetar, assassin, mommet, ??
+        if self.status.can_be_targeted == False:
+            attack.successful = False
+            print(f"Attack by f{attack.player} of {attack.type.info.name} on {self.name} was attempted, but {self.name} could not be targeted so it failed.")
+            return False # idk
+        
+        if self.status.lodging == Lodging.HorseAndFour:
+            roll = random.randint(1,2)
+            if roll == 2:
+                self.processing.player_message.append("You were attacked[], but protected!")
+                return False 
+        
+        if attack.type == ActionType.Sabotage:
+            if self.holds_item(ItemType.BLOODLESS):
+                item = self.get_items(ItemType.BLOODLESS)[0]
+                self.use_item(item)
 
+                self.processing.player_message.append("You used your Bloodless to protect you from an attack!") # ig? 
+                return False
 
-    # todo somewhere use_name (to roll for new name)
+        if self.holds_item(ItemType.GRAM):
+            item = self.get_items(ItemType.GRAM)[0]
+            self.use_item(item) 
+
+            self.processing.player_message.append("You used your Bloodless to protect you from an attack!") # ig? 
+            return False
+        
+        if self.holds_item(ItemType.BODYGUARD):
+            item = self.get_items(ItemType.BODYGUARD)[0]
+            self.use_item(item) # todo: needs more info than this (abt sabotage vs not)
+
+            self.processing.player_message.append("Your Bodyguard protected you from an attack!") # ig?
+            return False 
+        
+        # TODO firestop
+        
+        # maybe return result for logging? 
+        # die? 
+        return True
+
+    def use_item(self, item):
+        # TODO
+
+        return
 
     def levels_in(self, field: FieldName):
         # error check?
@@ -481,7 +526,7 @@ class Player:
             count = 4
         return count
 
-    def elevate_in(self, field: FieldName): # todo fix arg
+    def elevate_in(self, field: FieldName):
         self.status.elevations.append(field)
         num_EP = self.status.EP.vals[field]
         if num_EP < 5:
@@ -565,7 +610,7 @@ class Player:
         if fieldinfo.APbylevel[3] is not None:
             self.status.action_periods.append(fieldinfo.APbylevel[3])
 
-        
+    # maybe go_on_horns() for nahlrout?         
 
     def go_insane(self, fields: "list[FieldStatus]"):
         # TODO

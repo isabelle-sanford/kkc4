@@ -107,7 +107,7 @@ class Turn:
         self.month = month
 
         self.log = ProcessLog(month)
-        self.results = Result(month)
+        #self.results = Result(month)
 
         self.actions: list[Action] = []
         self.offensive_actions: list[Action] = []
@@ -329,6 +329,27 @@ class Turn:
             for a in p.choices.actions:
                 print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
+    def preprocessing(self):
+
+        for a in self.actions: 
+            # if failed, do whatever to log it
+
+            if a.successful:
+                # todo: fix for actions that can but don't require a player target
+                # add actions to targeted_by lists for player targets
+                if a.type.info.target1 == Target.PLAYER:
+                    a.target.processing.targeted_by.append(a)
+                if a.type.info.target2 == Target.PLAYER:
+                    a.target_two.processing.targeted_by.append(a)     
+
+                # could split by category here but just do at init?            
+
+                a.player.processing.player_message.append(f"Your action to use {a.type.info.name} on {a.target} {f'and {a.target_two} ' if a.target_two else ''} succeeded.") # more here? idk
+            
+            else:
+                a.player.processing.player_message.append(f"Your action to use {a.type.info.name} on {a.target} {f'and {a.target_two} ' if a.target_two else ''} failed.")
+
+
 
     def process_standard_actions(self):
         # todo: check streets pos actions
@@ -348,7 +369,7 @@ class Turn:
                         continue
 
                     # todo more checks probably
-                    a.perform()
+                    a.perform(log=self.log)
 
             elif a.type.category == ActionCategory.OFFENSIVE:
                 self.offensive_actions.append(a)
@@ -518,6 +539,7 @@ class Turn:
         # todo LOG
 
     # check this over, hmm
+    # also it's 1 IP per FOUR EP
     def offset_IP(self):
         for pid in self.sane_players:
             p = self.players[pid]
@@ -653,12 +675,24 @@ class Turn:
 
             
             # todo bonetar 
+            if a.type == ActionType.UseBonetar and a.successful:
+                lodging_destroyed = a.target
+                at_lodging = [id for id in self.living_players if self.players[id].status.lodging == lodging_destroyed] # that might be a bit much but hey it works 
+                if a.player.id in at_lodging: at_lodging.remove(a.player.id) # handled separately inside perform()
+
+                results = a.perform(log=self.log, at_lodging=at_lodging)
+
+                for d in results["dead"]:
+                    being_attacked.append(d)
+                
+                # todo put survivors on the streets
 
             # todo mommet
 
         still_attacked = []
         
         for attacked in being_attacked:
+            # TODO change to attacked.attack(attackaction)
             if attacked.holds_item(ItemType.GRAM):
                 g = attacked.get_items(ItemType.GRAM)
                 if len(g) > 0:
