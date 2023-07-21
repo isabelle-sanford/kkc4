@@ -111,6 +111,8 @@ small
 - loaded dice: make sure cealds/ruh only have option to bet on numbers up thru 6/12 
 - masters can unbecome masters if they don't enroll/can't pay tuition, but retain abilities, action periods, whatever
 - courier use is immediate (and not an action but does require target + message)
+- what happens if you try to take money from a player and it goes negative lol
+- do more of game_testing notebook w further cycles 
 
 - pipes can be given but not stolen
 - moneylenders should probably not accrue interest while you're insane
@@ -123,7 +125,9 @@ small questions
 - if you play for your pipes and succeed during the last month of a term, do you get the +10 talents immediately or not until the term after rolls around? 
 - the arcane fields (for aturan breaking out) are sympathy, alchemy, artificery, and naming, right? no physicking?
 - do aturans still have a chance of backing out when becoming master?
-
+- if you pickpocket someone with a bodyguard, do you get told that your action failed or succeeded? (same Q for thieves lamp)
+- can grams / bodyguards / anything protect from bonetar? (other than H&4)
+- if a lodging is destroyed, does the writeup indicate if it went volatile?
 
 action period things:
 - anything can be used in a general action period slot 
@@ -132,5 +136,9 @@ action period things:
 - anything with create item category can use a createitem AP 
 - ??
 - how to show UI for that? 
+
+
+note on pickpocketing: currently, who gets stolen from is weighted by action, not just player, so if you take two actions on the same person you're twice as likely to get pickpocketed. I think that's fine? 
+
 
 

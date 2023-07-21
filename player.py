@@ -233,6 +233,7 @@ class PlayerProcessing:
         self.player_message = [] # todo fancy this probs
 
     def short_status(self):
+        # maybe add this to playerstatus / just straight player
         ret = "" 
         ret += "Alive" if self.is_alive else "Dead"
         ret += ", "
@@ -462,7 +463,7 @@ class Player:
 
     def __str__(self):
 
-        ret = f"{self.info}{self.status.EP}\n"
+        ret = f"{self.info.name}\n"
 
         return ret
     
@@ -473,6 +474,7 @@ class Player:
         ret += f" {self.status.rank})"
         return ret
     
+    # i.e. process an attack on you
     def attack(self, attack: Action):
         # sabotage, bonetar, assassin, mommet, ??
         if self.status.can_be_targeted == False:
@@ -652,7 +654,7 @@ class Player:
     def take_action(self, action: Action):
 
         self.choices.actions.append(action)
-        self.status.rank
+        #self.status.rank
         # Do checks to make sure the action is valid?
         # maybe do this in choices?
     
