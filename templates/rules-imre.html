@@ -6,10 +6,10 @@
       <p class="mb-2">
         Every term/full cycle, players (students and Masters alike) can go to
         Imre once (except for those living in
-        <a href="#GreyMan"><em>The Grey Man</em></a> or
-        <a href="#PearlOfImre"><em>The Pearl of Imre</em></a
+        <a href="{{ url_for('rules_uni_basics') }}#GreyMan"><em>The Grey Man</em></a> or
+        <a href="{{ url_for('rules_uni_basics') }}#PearlOfImre"><em>The Pearl of Imre</em></a
         >). For the month they are in Imre, students cannot impress (<a
-          href="#ElevationPoints"
+          href="{{ url_for('rules_uni_basics') }}#ElevationPoints"
           >file EP</a
         >
         with) a Master and Masters cannot elevate students, though students can
@@ -79,9 +79,22 @@
           could. You’ll never know unless you try.
         </li>
         <li class="sharp">
-          Talent Pipes give an additional <a href="#Currency">10 talents</a> per
+          Talent Pipes give an additional <a href="{{ url_for('rules_uni_basics') }}#Currency">10 talents</a> per
           cycle to any player who holds them. Talent Pipes can be given to other
-          players, but they cannot be stolen. If given away, the player who
+          players,
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="If a player comes into possession of two sets of Talent 
+	      Pipes, they effectively ‘combine’ into one set and the other is lost from 
+	      the game. They still only give ten talents per term."
+          >
+            1
+          </button>
+	  but they cannot be stolen. If given away, the player who
           initially won them cannot win another set.
         </li>
       </ul>
@@ -142,8 +155,8 @@
           <h6 style="text-decoration: underline">Giles'</h6>
           <p>
             Only players who are staying at
-            <a href="#GreyMan"><em>The Grey Man</em></a> (or
-            <a href="#Cealdish">Cealdish Commoners</a>) can go to Giles’. Giles
+            <a href="{{ url_for('rules_uni_basics') }}#GreyMan"><em>The Grey Man</em></a> (or
+            <a href="{{ url_for('rules_uni_basics') }}#Cealdish">Cealdish Commoners</a>) can go to Giles’. Giles
             will give loans up to 2 talents and has an interest rate of 15% per
             term. Players are not able to put items up for collateral to
             increase the loan amount like they can with Devi. If you default on
@@ -157,7 +170,18 @@
           <p>
             Each player can go to Devi’s to borrow money from her. The minimum
             loaned is 4 talents and the maximum is half of the player’s term
-            income. (Players can also put up items for collateral to increase
+            income. 
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="Stipend and Talent Pipes if you have them."
+            >
+              2
+            </button>
+	    (Players can also put up items for collateral to increase
             the loan amount.) Interest starts accruing immediately, at a rate of
             30% per term, so if a student borrows 4 talents, the interest will
             be 1 talent and 2 jots, making the full amount owed 5 talents and 2
