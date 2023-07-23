@@ -91,8 +91,9 @@ class FieldStatus:
         # for NPC master choosing
         EP_proportional_list: list[Player] = []
         for p, num in self.EP.items():
-            for n in range(num):
-                EP_proportional_list.append(p) # TODO test pls
+            if p.status.is_enrolled: # make sure this is BEFORE term switch
+                for n in range(num):
+                    EP_proportional_list.append(p) # TODO test pls
         return EP_proportional_list
     
     # todo DESTROY

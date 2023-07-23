@@ -434,7 +434,93 @@ class Turn:
         return nm_ret # i guess
         # todo TEST pls
 
+    def do_elevations2(self):
+        pcE = [None] * 9 # test 
+        npcE = [None] * 9 
+        newM = self.do_new_masters().values()
 
+        for f in self.fields:
+            if f.master is not None:
+                if f.master.status.can_elevate: # processing?
+                    e = f.master.choices.to_elevate 
+                    e = [i for i in e if i not in newM] # test
+
+                    if len(e) > 0:
+                        pcE[f.name] = e
+            else:
+                e = f.get_EP_list() 
+                e = [i for i in e if i not in newM]
+                npcE[f.name] = e
+            
+        # PC masters
+
+        while True:
+            e1 = [i[0] for i in pcE] # hmm
+            dupes = self.get_dupes(e1) # make sure doesn't find None=None
+            if len(dupes) == 0:
+                break
+            for d in dupes:
+                p = e1[d[0]]
+                i = self.get_max([p.status.EP.vals[f] for f in d])
+
+                for f in d:
+                    if f != i:
+                        pcE[f].remove(p) # should always work
+        
+        finalE = e1
+
+        for f in npcE:
+            f = [i for i in f if i not in finalE] # ?
+        
+        npc_choices = [random.choice(l) for l in npcE if len(l) > 0]
+        while True:
+            dupes = self.get_dupes(npc_choices)
+            if len(dupes) == 0:
+                break
+
+            for conflict in dupes:
+                p = npc_choices[conflict]
+                winner = self.get_max([p.status.EP.vals[f] for f in conflict])
+
+                for c in conflict:
+                    if c != winner:
+                        npcE[c] = [i for i in npcE[c] if i != p]
+                        npc_choices[c] = random.choice(npcE[c])
+        
+        finalNPC = npc_choices 
+
+        for i, f in finalE:
+            # check for conflict w PC? (shouldn't happen)
+            if npc_choices[i] is not None: 
+                finalE[i] = npc_choices[i]
+        
+        return finalE
+
+                
+
+
+    def get_max(li: list[int]):
+        random.shuffle(li) # for tiebreakers 
+        idx = 0
+        val = 0
+
+        for i, n in li:
+            if n > val:
+                idx = i
+                val = n
+        return idx
+
+    
+    def get_dupes(li): 
+        dupes = {} 
+
+        for i, val in li: 
+            if li.count(val) > 1:
+                if val in dupes: dupes[val].append(i)
+                else: dupes[val] = [i]
+        return dupes.values()
+    
+    # todo TEST elevations2
 
     # todo somewhere: remember to account for fields being destroyed
     # this is Yikes
@@ -454,6 +540,8 @@ class Turn:
                 if len(m.choices.to_elevate) > 0:
                     if m.processing.can_elevate:
                         pc_choice = m.choices.to_elevate[0]
+
+
                         candidates[f] = m.choices.to_elevate
 
                         if pc_choice in to_elevate:
