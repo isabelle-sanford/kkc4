@@ -91,10 +91,18 @@
               </li>
               <li class="star">
                 Since you’re so important, you <em>also</em> might be called
-                back to Vintas temporarily by your family (25% chance of being
-                roleblocked per turn and having all actions targeting them
-                (excluding the Horns) delayed until they return to the
-                University).
+                back to Vintas temporarily by your family (25% chance per turn of 
+                all actions being roleblocked and having all actions targeting them blocked).
+		<button
+                  type="button"
+                  class="btn rounded-pill btn-sm bg-info"
+                  data-bs-toggle="popover"
+                  data-bs-placement="top"
+                  data-bs-trigger="focus"
+                  data-bs-content="You still can be brought on the Horns, file complaints and EP, and be elevated."
+                >
+                  1
+                </button>
               </li>
               <li class="star">
                 As a nobleman who takes pride in the image they present to
@@ -144,7 +152,20 @@
               You just tend to lack a little skill and knowledge when it comes
               to the arcane arts. Your superstitious nature makes you hesitant
               to <em>really</em> dedicate time to them. (25% chance you’ll back
-              out if elevated in Sympathy, Naming, Alchemy, or Artificery).
+              out if elevated in Sympathy, Naming, Alchemy, or Artificery
+		<button
+                  type="button"
+                  class="btn rounded-pill btn-sm bg-info"
+                  data-bs-toggle="popover"
+                  data-bs-placement="top"
+                  data-bs-trigger="focus"
+                  data-bs-content="If you back out, you still lose the 5 EP that 
+                    were used to elevate you. The Master does not choose a different 
+                    student to elevate that turn."
+                >
+                  2
+                </button>
+              ).
             </li>
             <li class="star">
               Similar to the Vintish Noblemen, you also have a small chance your
@@ -221,9 +242,22 @@
             <li class="star">
               In fact, you’re so good with money, you tend to get a little extra
               when you sell or purchase items (20% increase when selling, and
-              20% decrease when purchasing), and you know how to make the odds
+              20% decrease when purchasing)
+                <button
+                  type="button"
+                  class="btn rounded-pill btn-sm bg-info"
+                  data-bs-toggle="popover"
+                  data-bs-placement="top"
+                  data-bs-trigger="focus"
+                  data-bs-content="This includes player-to-player sales; if you 
+                    sell something for 1 talent, you’ll receive 1.2 talents (but 
+                    the other player will still only pay 1 talent)."
+                >
+                  3
+                </button>
+              , and you know how to make the odds
               work in your favor when gambling (use 1d6 in
-              <a href="#LoadedDice">The Loaded Dice</a>).
+              <a href="{{ url_for('rules_imre') }}#LoadedDice">The Loaded Dice</a>).
             </li>
             <li class="star">
               If you are on the streets and you have less than 6 talents, you
@@ -479,7 +513,7 @@
                 data-bs-trigger="focus"
                 data-bs-content="If you have multiple items, one will be chosen at random."
               >
-                2
+                4
               </button>
             </p>
           </div>
@@ -724,7 +758,7 @@
           data-bs-trigger="focus"
           data-bs-content="200 or more words of game-related discussion in a post counts as ‘quality’ and will receive 1 jot. More words will receive a higher reduction, but this cannot reduce your tuition by more than 2 talents within a given term."
         >
-          3
+          5
         </button>
         (max 2 talent reduction per term)
       </li>
@@ -738,7 +772,7 @@
           data-bs-trigger="focus"
           data-bs-content="By ‘quality RP’ we mean over 200 words in a post. (Both to remain impartial and so you can track yourselves, we don’t judge the quality of the RP.)"
         >
-          4
+          6
         </button>
       </li>
       <li class="star">Impress a Master (regardless of elevation): 5 jots</li>
@@ -750,10 +784,9 @@
           data-bs-toggle="popover"
           data-bs-placement="top"
           data-bs-trigger="focus"
-          data-bs-content="That is, you get 3 jots off for filing a complaint for each month. You don’t get more for filing more complaints. 
-"
+          data-bs-content="That is, you get 3 jots off for filing a complaint for each month. You don’t get more for filing more complaints."
         >
-          5
+          7
         </button>
         : 3 jots per month
       </li>
@@ -796,10 +829,32 @@
       <strong style="color: #5a0312"><em>For Masters:</em></strong>
       <ul>
         <li class="star">Fail to post in the thread: 3 talents</li>
-        <li class="star">Don’t elevate a student: 1 talent</li>
         <li class="star">
-          Fail to use any actions for the entire term (role-blocks do not
-          count): 4 talents
+          Don’t elevate a student
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="If you’re subject to a total roleblock, but have put in a student to be elevated, you do not receive an inflation."
+          >
+            8
+          </button>
+         : 1 talent</li>
+        <li class="star">
+          Fail to use any actions for the entire term
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="This is before roleblocks; i.e. if you take an action but it’s blocked you do not receive an inflation for it."
+          >
+            9
+          </button>
+          : 4 talents
         </li>
       </ul>
     </div>
@@ -831,10 +886,10 @@
   </div>
   <div class="row">
     <div class="example my-3">
-      <strong>Example</strong>: Joe is a Re’lar studying Alchemy and Artificery.
-      Both of these fields have 2 IP for Re’lars. Joe will have 4 IP added to
-      his Insanity Roll, making it all that much more likely that he will go
-      insane.
+      <strong>Example</strong>: Joe is a Re’lar studying Artificery. While staying 
+      in the Mews, he creates a Thieves Lamp. As the Mews has a +2 IP bonus and 
+      creating a Thieves Lamp also has a +2 IP bonus, Joe will have 4 IP added to 
+      his Insanity Roll, making it all that much more likely that he will go insane.
     </div>
   </div>
   <div class="row">
@@ -857,6 +912,20 @@
       <strong>Reducing Insanity</strong>: Elevation Points can be used to reduce
       a player’s Insanity Points. Any EP they have in a field may be removed and
       used instead to reduce their IP by 1 for each 4 EP they sacrifice.
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="If Psychological Counselling is used on you, it occurs 
+            before this reduction does. If you spend EP which would decrease your 
+            Insanity Bonus below +0, it will not be spent."
+        >
+          10
+        </button>      
+      Which EP are sacrificed will be chosen at random, with priority given to 
+      fields in which the player is not filing EP that turn.
     </p>
   </div>
   <div class="row">
@@ -906,7 +975,18 @@
     <p>
       The Horns is the disciplinary system of The University. Every turn,
       students will accrue Discipline Points (DP) through both the lynch and
-      from the Masters. Each Master has a total of 5 DP per turn that they can
+      from the Masters. Each Master has a total of 5 DP
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="If there are not very many players in the game, this number may reduced."
+        >
+          11
+        </button>      
+      per turn that they can
       give to students. While Masters are NPC-controlled, their DP will be
       distributed randomly over all students brought On the Horns, proportional
       to the number of complaints they received (i.e. any student with a
@@ -918,14 +998,15 @@
         data-bs-toggle="popover"
         data-bs-placement="top"
         data-bs-trigger="focus"
-        data-bs-content=" This DP distribution occurs after complaint-related actions and The Golden Pony effect."
+        data-bs-content="This DP distribution occurs after complaint-related actions and <em>The Golden Pony</em> effect. NPCs never place DP onto PC Masters."
       >
-        6</button
+        12
+      </button
       >. If a player becomes Master, they have total control of their DP (they
       can place it on anyone, regardless of whether complaints have been filed).
     </p>
     <p>
-      <a href="#ElevationPoints">Elevation Points</a> can be used to reduce the
+      <a href="{{ url_for('rules_arcanum_basics') }}#ElevationPoints">Elevation Points</a> can be used to reduce the
       number of DP a Master gives to a student, but this is not an active choice
       by the player. If a Master uses any of their DP on a student that has EP
       in their field, the EP in that field will be used up before any DP is
@@ -938,6 +1019,11 @@
       places 3 DP on Burnt, 3 of Burnt’s EP in Naming will be used to reduce the
       Master Namer’s DP to 0. If she has no EP in Naming, she cannot substitute
       EP from a different field.
+    </div>
+    <div class="example my-2">
+      <strong>Example</strong>: Bard has 8 complaints against him, and Stink has 
+      2 complaints. All NPC masters will have an 80% chance of placing each DP on 
+      Bard, and a 20% of DP being assigned to Stink.
     </div>
   </div>
   <div class="row">

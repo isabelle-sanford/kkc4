@@ -20,8 +20,8 @@
         make that item. Items take 2 action periods to create. This can be
         spread through one turn or two. If a student uses two action periods in
         a single turn to make an item quickly, they will not be able to
-        <a href="#Voting">file a complaint</a> or
-        <a href="#ElevationPoints">impress a Master</a> (flavor-wise, because
+        <a href="{{ url_for('rules_game_basics') }}#Voting">file a complaint</a> or
+        <a href="{{ url_for('rules_uni_basics') }}#ElevationPoints">impress a Master</a> (flavor-wise, because
         they’re too busy creating the item to focus on anything else).
       </p>
     </div>
@@ -43,6 +43,16 @@
         </li>
         <li class="star">
           <strong>Master level upgrade</strong>: Gain a fourth action period.
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="If you have no previous elevations in Linguistics, you still get access to all 3 general action periods you get from levels in Linguistics."
+            >
+              1
+            </button>
         </li>
       </ul>
       <p>
@@ -136,7 +146,7 @@
           interest rates.
         </p>
         <p class="mb-1">
-          If you go to <a href="#Devi">Devi</a> or <a href="#Giles">Giles</a>,
+          If you go to <a href="{{ url_for('rules_imre') }}#Devi">Devi</a> or <a href="#Giles">Giles</a>,
           your interest is cut by 20%.
         </p>
         <ul>
@@ -192,9 +202,9 @@
         </p>
         <p class="mb-1">
           10% increase in the payout when you fulfill
-          <a href="#BlackMarket">a Black Market contract</a>. 10% decrease when
-          purchasing items from <a href="#BlackMarket">the Black Market</a> or
-          <a href="NoxsApothecary">the Apothecary</a>.
+          <a href="{{ url_for('rules_imre') }}#BlackMarket">a Black Market contract</a>. 10% decrease when
+          purchasing items from <a href="{{ url_for('rules_imre') }}#BlackMarket">the Black Market</a> or
+          <a href="{{ url_for('rules_imre') }}#NoxsApothecary">the Apothecary</a>.
         </p>
         <ul>
           <li class="check">
@@ -263,7 +273,18 @@
           fascinating to you), boring them so much they forget to file a
           complaint.
         </p>
-        <p class="mb-1">Cancel the vote(s) of your target.</p>
+        <p class="mb-1">Cancel the vote(s)
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="If your target is Proficient in Hyperbole, you will not cancel the two complaints from that action; only the first two complaints filed."
+          >
+            2
+          </button>       
+        of your target.</p>
       </li>
       <li class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
@@ -290,7 +311,18 @@
         <p class="mb-2 flavor">
           You're very good at persuading people to your side of things.
         </p>
-        <p class="mb-1">Change someone’s complaint to someone else.</p>
+        <p class="mb-1">Change one of your target's complaints 
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="If the target has filed no complaints, you cannot make them complain."
+          >
+            3
+          </button>	
+	(chosen at random) to someone else.</p>
       </li>
       <li class="list-group-item list-group-item-action">
         <div class="d-flex w-100 justify-content-between">
@@ -298,8 +330,21 @@
           <small class="text-muted">Master</small>
         </div>
         <p class="mb-1">
-          Redirect a targeted action of another player to another player of your
-          choice.
+          Redirect a targeted action of another player to another player of your 
+	  choice. You must specify the action being redirected, and if the player 
+	  does not take that action then the redirect has no effect. Law of 
+	  Contraposition cannot be roleblocked by any other action
+	  <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="It can still be roleblocked by a passive effect like the Ankers roleblock or being called home as a Vint/Aturan."
+          >
+            4
+          </button>
+	  except mommets. 
         </p>
       </li>
     </div>
@@ -332,7 +377,18 @@
           <h5 class="mb-1"><em>Omen Recognition</em></h5>
           <small class="text-muted">E'lir</small>
         </div>
-        <p class="flavor mb-1">You recognize the signs of all kinds of fae.</p>
+        <p class="flavor mb-1">You recognize the signs of all kinds of fae.
+	  <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="For the purposes of this game, Fae = Skindancers. There aren’t any other Fae in the game."
+          >
+            5
+          </button>
+	</p>
         <p class="mb-1">
           You can investigate any event and determine whether or not it was
           caused by a Skindancer.
@@ -359,7 +415,29 @@
           deep in the Stacks.
         </p>
         <p class="my-2">
-          If you’ve studied in another field (with the exception of Naming), you
+          If you’ve studied
+	  <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="i.e. you’ve been elevated in said field, or you’ve learned an ability in that field from Banned Books already."
+          >
+            6
+          </button>
+	  in another field 
+	  <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="This includes fields which have been destroyed."
+          >
+            7
+          </button>
+	  (with the exception of Naming), you
           may use these books to learn another of that field’s abilities, of
           your choice. If you have not studied in another field, you can choose
           which field you’d like to study and you will learn a random ability in
@@ -377,7 +455,7 @@
           research. There is a (+10%) every time you research thereafter. If you
           use it for 2 action periods on the same turn, there is a (+20%) chance
           of getting caught. If you are caught, you will be brought up on
-          Conduct Unbecoming and receive <a href="#Punishments">lashes</a> as
+          Conduct Unbecoming and receive <a href="{{ url_for('rules_uni_basics') }}#Punishments">lashes</a> as
           your punishment.
         </p>
         <ul>
@@ -418,7 +496,19 @@
         is to beat them. Those who study Sympathy are susceptible to cracking
         and being sent to the Crockery. Students in Sympathy have a Sympathy
         action period, and the Master Sympathist gains an additional Sympathy
-        action period.
+        action period. Sympathy action periods can be used to make mommets, use 
+	mommets, 
+	  <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="Including mommets bought from Devi."
+          >
+            8
+          </button>
+	or use Malfeasance Protection. 
       </p>
     </div>
     <div class="list-group">
@@ -426,6 +516,25 @@
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1"><em>Mommet-making</em></h5>
         </div>
+	<div>
+	  <p class="mb-1">
+	   All mommets are 1-use and cannot be redirected or roleblocked by another 
+	   action. 
+	  <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="Using a mommet can still be roleblocked by e.g. staying at Anker’s or being called home as a Vint/Aturan, and by Firestop (which is passive)."
+          >
+            9
+          </button>
+	   When used (except at Master level), a mommet blocks all actions 
+	   of its target. Mommets retain the level at which they’re created, and 
+	   take 1 action period to create.
+	  </p>
+	</div>
         <ul>
           <li class="check">
             <strong>First level upgrade</strong>: Make a mommet from an
@@ -479,19 +588,29 @@
           <li class="check">
             <strong>Second level upgrade</strong>: Create a binding between you
             and another student, both ways. All actions that happen to you also
-            affect the person you’re bound to, and vice versa.
+            affect the person you’re bound to, <em>and vice versa</em>.
             <ul>
               <li class="arrow">(+2) insanity bonus for use.</li>
             </ul>
           </li>
           <li class="check">
             <strong>Third level upgrade</strong>: Create a binding between you
-            and another student. The worst negative effect (kill > sabotage >
-            longest roleblock > shorter roleblocks) on either person is split
-            between the 2, and downgraded. Downgraded effects: role-blocks→no
-            effect, kills/sabotages→role-blocks (all other actions that cycle
-            are cancelled for both players: complaints, impressing, anything in
-            Imre, etc).
+            and another student. All negative actions 
+	    <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="Negative effects like being roleblocked from staying at Anker’s still affect you. Negative actions include roleblocks, Argumentum Ad Nauseam, plum bobs, and attacks."
+            >
+              10
+            </button>	    
+	    on either person are split between the 2, and downgraded. Downgraded 
+	    effects: role-blocks→no effect, plum bobs→no effect, Argumentum ad 
+	    Nauseam→no effect, kills/sabotages→role-blocks (all other actions 
+	    that cycle are canceled for both players: complaints, impressing, 
+	    anything in Imre, etc).
             <ul>
               <li>(+3) insanity bonus for use.</li>
             </ul>
@@ -529,7 +648,8 @@
           Medica to help out.
         </p>
         <p class="mb-1">
-          All actions targeting you fail. Cannot be used twice in a row.
+          All actions targeting you fail the turn after you place the action. 
+	  Cannot be used twice in a row.
         </p>
         <ul>
           <li class="check">
@@ -546,10 +666,8 @@
             complaints.
           </li>
           <li class="check">
-            <strong>Master level upgrade</strong>: You can still use your second
-            action period, but only through items or other specifically Medica
-            powers (like Medica Detainment), since the other Physiker powers
-            require more attention than you can give.
+            <strong>Master level upgrade</strong>: You may use your Physicker 
+	    action period, but all other action periods are still unavailable.
           </li>
         </ul>
       </li>
@@ -671,7 +789,18 @@
           <li class="arrow mb-2">(+1) insanity bonus on creation.</li>
           <li class="check">
             <strong>First level</strong>: 20% chance of going awry and
-            destroying a different item or canceling a random action of the
+            destroying a different item 
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="If the player has no other items, then the going awry will take the form of one of the other options (destroying one of your items, cancelling one of your other actions, or cancelling one of their actions)."
+            >
+              11
+            </button>
+	    or canceling a random action of the
             target or yourself.
           </li>
           <li class="check">
@@ -683,7 +812,19 @@
           </li>
           <li class="check">
             <strong>Master level upgrade</strong>: You have enough for 2 uses.
-            Usable twice.
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="Once the tenaculum has been used one time, it is 
+		effectively a “half-tenaculum” item which only a Master can use; 
+		if anyone else becomes in possession of the item, it disappears 
+		from the game (because they cannot actually use it for anything)."
+            >
+              12
+            </button>            
           </li>
         </ul>
       </li>
@@ -692,7 +833,19 @@
           <h5 class="mb-1"><em>Firestop</em></h5>
           <small class="text-muted">Re'lar</small>
         </div>
-        <p class="mb-1">Protects from heat-based malfeasance and bone tar.</p>
+        <p class="mb-1">Protects from heat-based malfeasance
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="This includes mommets, tenaculum, Naming actions 
+	      that use Fire, malfeasance protection, and other firestop going volatile."
+            >
+              13
+            </button>            
+ 	 and bone tar as a passive self-protect.</p>
         <ul>
           <li class="arrow mb-2">(+2) insanity bonus on creation.</li>
           <li class="check">
@@ -710,7 +863,7 @@
           </li>
           <li class="check">
             <strong>Master level upgrade</strong>: You’ve made enough for 2
-            uses. Usable twice.
+            uses.
           </li>
         </ul>
       </li>
@@ -736,8 +889,8 @@
           Because the plum bob is dangerous, there is a chance the target will
           fly into a rage. If this happens, the student who used the plum bob
           will be brought on the Horns for Conduct Unbecoming, receiving
-          <a href="#Punishments">lashings</a> as punishment, and cannot use
-          <a href="#NoxsApothecary">nahlrout</a> to prevent their effect. The
+          <a href="{{ url_for('rules_uni_basics') }}#Punishments">lashings</a> as punishment, and cannot use
+          <a href="{{ url_for('rules_imre') }}#NoxsApothecary">nahlrout</a> to prevent their effect. The
           target once in a rage may choose to stop answering questions or to
           answer untruthfully. The questioner is not informed if or when this
           happens.
@@ -747,20 +900,19 @@
           <li class="check">
             <strong>First level</strong>: 30% chance the target will fly into a
             rage on the second question. Third and fourth questions go up each
-            20%, with the fifth question increasing another 30%.
+            +20%, with the fifth question increasing another +30%.
           </li>
           <li class="check">
             <strong>Second level upgrade</strong>: 30% chance of flying into a
-            rage on second question, 10% on third and fourth, 30% on fifth.
+            rage on second question, +10% on third and fourth, +30% on fifth.
           </li>
           <li class="check">
-            <strong>Third level upgrade</strong>: 10% chance on second question
-            and third questions, 20% on fourth question, 30% on fifth.
+            <strong>Third level upgrade</strong>: +10% chance on second question
+            and third questions, +20% on fourth question, +30% on fifth.
           </li>
           <li class="check">
-            <strong>Master level upgrade</strong>: Same chances of target flying
-            into a rage as the third level, but you will not be punished for
-            using the plum bob.
+            <strong>Master level upgrade</strong>: +10% chance on second question, 
+	    third, and fourth question, +20% on fifth.
           </li>
         </ul>
       </li>
@@ -769,12 +921,35 @@
           <h5 class="mb-1"><em>Bone-tar</em></h5>
           <small class="text-muted">El'the</small>
         </div>
-        <p class="mb-1">Destroy a location (Mews or an inn).</p>
+        <p class="mb-1">Destroy a lodging 
+          <button
+            type="button"
+            class="btn rounded-pill btn-sm bg-info"
+            data-bs-toggle="popover"
+            data-bs-placement="top"
+            data-bs-trigger="focus"
+            data-bs-content="All players who were at said location (assuming 
+	      they’re not dead) are left on the Streets for the remainder of the term."
+            >
+              14
+            </button>            
+	  (Mews or an inn).</p>
         <ul>
           <li class="arrow mb-2">(+3) insanity bonus on creation.</li>
           <li class="check">
             <strong>First level</strong>: 50% chance of it going volatile, and
-            killing half of the players staying at the location (including
+            killing half of the players 
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="i.e. each player staying there has a 50% chance of dying, including you."
+              >
+                15
+              </button>
+	    staying at the location (including
             yourself).
           </li>
           <li class="check">
@@ -815,9 +990,6 @@
       <h2>Artificery</h2>
     </div>
     <div class="row">
-      <p class="my-1">
-        All artificery items can be given away, and most can be destroyed.
-      </p>
       <ul>
         <li class="star">
           <strong>First level</strong>: Items are usable only once. Gain an Item
@@ -838,7 +1010,7 @@
       </ul>
       <p class="mb-3 note">
         <em>Note</em>: Players who create an item and then are elevated to a new
-        level do not gain the upgrade on the item they created previously. Items
+        level do not gain the upgrade on the item they created previously. Unlike Alchemy items, Artificery items
         retain the upgrade of the level the player was when they created them.
       </p>
     </div>
@@ -873,6 +1045,19 @@
         </div>
         <p class="mb-1">
           Robs a player of 30% of their money and 50% of their possessions.
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="If you have only one item, it will always be stolen. 
+		But otherwise, if you have multiple items then the number stolen 
+		will round down (e.g. if you have three items you will still only 
+		have one stolen)."
+              >
+                16
+              </button>
         </p>
         <ul>
           <li class="arrow">(+2) insanity bonus for creation</li>
@@ -885,6 +1070,16 @@
         </div>
         <p class="mb-1">
           Passively protects from sabotages, kills, and malignant sympathy.
+            <button
+              type="button"
+              class="btn rounded-pill btn-sm bg-info"
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-trigger="focus"
+              data-bs-content="Mommets and malfeasance protection."
+              >
+                17
+              </button>
           Grams cannot be destroyed.
         </p>
         <ul>
@@ -973,7 +1168,9 @@
   <div class="row pt-3">
     <div class="example my-3">
       <strong>Multi-Name Order Example</strong>: Use Fire to kill all those who
-      attack me this cycle and use Earth to prevent my death.
+      attack me this cycle and use Earth to prevent my death. (This action would 
+      take up two action periods and grant a +2 bonus to the insanity roll, along 
+      with at least +2 from knowing two Names (Fire and Earth).)
     </div>
     <div class="example my-3">
       <strong>Insanity Bonus Example</strong>: Araris is an El’the Namer who has

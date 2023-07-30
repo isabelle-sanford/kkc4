@@ -7,15 +7,15 @@
     <p>
       The Arcanum is where all the fun happens at the University. Led by the
       nine Masters, there are
-      <a href="#ArcanumFields">many different fields of study</a> in which for
+      <a href="{{ url_for('rules_arcanum_fields') }}#ArcanumFields">many different fields of study</a> in which for
       students to try their hands: <a href="#Sympathy">Sympathy</a>,
-      <a href="#Artificery">Artificery</a>, <a href="#Alchemy">Alchemy</a>,
-      <a href="#Naming">Naming</a>,
-      <a href="#RhetoricLogic">Rhetoric and Logic</a>,
-      <a href="#Arithmetic">Arithmetic</a>,
-      <a href="#Linguistics">Linguistics</a>,
-      <a href="#Physicking">Physicking</a>, and
-      <a href="#Archives">the Archives</a>. University students do not start in
+      <a href="{{ url_for('rules_arcanum_fields') }}#Artificery">Artificery</a>, <a href="#Alchemy">Alchemy</a>,
+      <a href="{{ url_for('rules_arcanum_fields') }}#Naming">Naming</a>,
+      <a href="{{ url_for('rules_arcanum_fields') }}#RhetoricLogic">Rhetoric and Logic</a>,
+      <a href="{{ url_for('rules_arcanum_fields') }}#Arithmetic">Arithmetic</a>,
+      <a href="{{ url_for('rules_arcanum_fields') }}#Linguistics">Linguistics</a>,
+      <a href="{{ url_for('rules_arcanum_fields') }}#Physicking">Physicking</a>, and
+      <a href="{{ url_for('rules_arcanum_fields') }}#Archives">the Archives</a>. University students do not start in
       the Arcanum. They are brought into the Arcanum once they have shown they
       have the moral fortitude necessary for a member of the Arcanum, are
       sponsored by <a href="#Masters">a Master</a>, and are elevated to the rank
@@ -210,6 +210,16 @@
     <p>
       Masters cannot be brought <a href="#TheHorns">On the Horns</a>. All
       Disciplinary Points on a Master are dissolved.
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="An NPC master will not assign DP to PC masters."
+        >
+          1
+        </button>
     </p>
   </div>
   <div class="row">
@@ -218,8 +228,18 @@
   <div class="row">
     <p>
       To make things easier, Masters do still have to worry about
-      <a href="#Lodging">Lodging</a>. The Lodging options are the same as they
+      <a href="{{ url_for('rules_uni_basics') }}#Lodging">Lodging</a>. The Lodging options are the same as they
       are for students, but cost 25% less for Masters.
+        <button
+          type="button"
+          class="btn rounded-pill btn-sm bg-info"
+          data-bs-toggle="popover"
+          data-bs-placement="top"
+          data-bs-trigger="focus"
+          data-bs-content="This is additive with the Ruh’s lodging discount, i.e. a Ruh master will have 75% off lodgings."
+        >
+          2
+        </button>
     </p>
     <p>
       Masters also still have to pay tuition. However, their default tuition is
@@ -241,7 +261,7 @@
     <p>
       If a PC Master is killed or sabotaged, the Master will go back to being
       NPC-controlled. If a former Master breaks out of
-      <a href="#Insanity">the Crockery</a> and their field is still
+      <a href="{{ url_for('rules_uni_basics') }}#Insanity">the Crockery</a> and their field is still
       NPC-controlled, they will not become the Master of that field once again.
       They will permanently be reduced to El’the (unless they go insane and
       break out again, in which case they become Re’lar, etc).
