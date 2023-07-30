@@ -1,16 +1,30 @@
 from enum import Enum, IntEnum
 
-class FieldName(IntEnum):
-    LINGUISTICS = 0
-    ARITHMETICS = 1
-    RHETORICLOGIC = 2
-    ARCHIVES = 3
-    SYMPATHY = 4
-    PHYSICKING = 5
-    ALCHEMY = 6
-    ARTIFICERY = 7
-    NAMING = 8
-    GENERAL = 9  # ? # gotta remember this when iterating thru
+class FieldName(Enum):
+    LINGUISTICS = 0, "Linguistics"
+    ARITHMETICS = 1, "Arithmetics"
+    RHETORICLOGIC = 2, "Rhetoric & Logic"
+    ARCHIVES = 3, "Archives"
+    SYMPATHY = 4, "Sympathy"
+    PHYSICKING = 5, "Physicking"
+    ALCHEMY = 6, "Alchemy"
+    ARTIFICERY = 7, "Artificery"
+    NAMING = 8, "Naming"
+    GENERAL = 9, "GENERAL"  # ? # gotta remember this when iterating thru
+
+    def __new__(cls, value, name, ):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.fullname = name
+        return member
+
+    def __int__(self):
+        return self.value
+    
+    def __str__(self):
+        return self.fullname
+
+
 # maybe separate out action periods, bc Item Creation and all
 
 
@@ -64,6 +78,21 @@ class Lodging(Enum):
     def __str__(self):
         return f"{self.fullname} ({self.price} talents)"
 
+LODGINGS = {
+    "Anker's": Lodging.Ankers,
+    "King's-Drab": Lodging.KingsDrab,
+    "Golden-Pony": Lodging.GoldenPony,
+    "Windy-Tower": Lodging.WindyTower,
+    "Horse-and-Four": Lodging.HorseAndFour,
+    "Spindle-and-Draft": Lodging.SpindleAndDraft,
+    "Streets": Lodging.Streets,
+    "Underthing": Lodging.Underthing,
+    "Mews": Lodging.Mews,
+    "Grey-Man": Lodging.GreyMan,
+    "Pearl-of-Imre": Lodging.PearlOfImre
+}
+
+
 class Background(Enum): 
     Vint = 0, "Vintish Nobleman", 20, 30, [Lodging.HorseAndFour, Lodging.SpindleAndDraft]
     Aturan = 1, "Aturan Nobleman", 13.34, 20, [Lodging.WindyTower, Lodging.HorseAndFour]
@@ -85,3 +114,12 @@ class Background(Enum):
     
     def __str__(self) -> str:
         return f"{self.fullname}"
+
+# for conversion from distro page
+BACKGROUNDS = {
+    "Vintish-Nobleman": Background.Vint,
+    "Aturan-Nobleman": Background.Aturan,
+    "Yllish-Commoner": Background.Yll,
+    "Cealdish-Commoner": Background.Ceald,
+    "Edema-Ruh": Background.Ruh
+}

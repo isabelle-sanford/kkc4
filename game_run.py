@@ -8,7 +8,7 @@ from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import Background, FieldName, Lodging, Rank
+from statics import Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -24,29 +24,56 @@ class Game:
         self.apothecary = Apothecary()
         self.blackmarket = BlackMarket()
 
+        self.fields = FIELDS
+
+        self.player_list = {}
+
 
     def add_player(self, input):
-        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], input["background"])
+        background = BACKGROUNDS[input["background"]]
+        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], background)
         p.id = self.num_players
 
         inventory = []
-        if input["inventory"] is not None:
-            inventory.append(Item.Generate(input["inventory"])) # does this work or do you need to do something different bc 2 nahlrout? 
-        ps = PlayerStatus.distro_init(p, input["lodging"], input["musical_stat"], inventory)
+        if input["inventory"] is not None: # is it ever? 
+            match input["inventory"]:
+                case "1nahlrout":
+                    inventory.append(Item.Generate(ItemType.NAHLROUT))
+                case "2nahlrout":
+                    inventory.append(Item.Generate(ItemType.NAHLROUT))
+                    inventory.append(Item.Generate(ItemType.NAHLROUT))
+                case "ward":
+                    inventory.append(Item.Generate(ItemType.WARD))
+                case "tenaculum":
+                    inventory.append(Item.Generate(ItemType.TENACULUM))
+                case "bloodless":
+                    inventory.append(Item.Generate(ItemType.BLOODLESS))
+                case "gram":
+                    inventory.append(Item.Generate(ItemType.GRAM))
+                case "bonetar":
+                    inventory.append(Item.Generate(ItemType.BONETAR))
+        lodging = LODGINGS[input["lodging"]]
+        ps = PlayerStatus.distro_init(p, lodging, input["musical_stat"], inventory)
+
+        print(ps.inventory)
 
         player = Player(p, ps)
 
         if input["ep1"] is not None:
-            player.assign_EP(FIELDS[input["ep1"][0]].name, input["ep1"][1])
+            ep_field = FIELDS[input["ep1"][0]].name
+            ep_num = input["ep1"][1]
+            player.assign_EP(ep_field, ep_num)
             FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
 
         
-        if input["ep2"] is not None:
+        if input["ep2"] is not None and input["ep2"][1] > 0:
             player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
-            FIELDS[input["ep1"][0]].add_EP(player, input["ep2"][1])
+            FIELDS[input["ep2"][0]].add_EP(player, input["ep2"][1])
 
 
         self.players.append(player)
+
+        self.player_list[p.name] = player
 
         self.num_players += 1
 
@@ -77,7 +104,23 @@ class Game:
 
         p.take_action(a)
 
+    def update_player_choices(self, choice, player):
+        c = player
 
+        if "imre_next" in choice: c.imre_next = True
+        if "field0" in choice:
+            print("filing in ", choice["field0"])
+            # check here?
+            c.choices.filing_EP = choice["field0"] # no
+                
+        if "actions" in choice:
+            for a in choice["actions"]:
+
+                self.add_action(c.id, a)
+        # what about updating an action? do we just clear all actions before this func? 
+        
+        # todo other choices
+            # imre stuff
 
     def update_choices(self, new_choices):
         # erase all prev choices? (for just the player(s) in the list?)

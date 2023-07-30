@@ -1,5 +1,4 @@
 {% extends 'index.html' %} {% block body %}
-
 <div class="container pt-2" style="font-family: Luminari">
   <div class="my-2">
     <h1 class="h1-field-info">KKC4 Field Information</h1>
@@ -8,10 +7,9 @@
   {% for f in fields %}
   <div class="row">
     <div class="col-3">
-      <h2 class="h2-field-info">{{f.info.name}}</h2>
+      <h2 class="h2-field-info">{{f.name}}</h2>
       <span>
-        {% if f.master is None %} NPC {% else %} {{f.master.info.name}} {% endif
-        %}
+        {% if f.master %} {{f.master.info.name}} {% else %} NPC {% endif %}
       </span>
     </div>
     <div class="col-4">
@@ -19,15 +17,15 @@
         <li class="list-group-item list-group-item-info">
           <h4>EP in Field</h4>
         </li>
-        {% for player in fields.EP %}
+        {% for player in f.EP %}
         <li class="list-group-item player-ep">
-          {{player}} - {{fields.EP[player]}}
+          {{player.name}} - {{f.EP[player]}}
         </li>
         {% endfor %}
       </ul>
       <span class="my-2">Elevate:</span>
       <ul class="list-group my-2">
-        <li class="list-group-item elevate">{{fields.elevating}}</li>
+        <li class="list-group-item elevate">{{f.elevating}}</li>
       </ul>
     </div>
     <div class="col-4">
@@ -35,7 +33,7 @@
         <li class="list-group-item list-group-item-danger">
           <h4>DP Filed</h4>
         </li>
-        {% for p in fields.DP %}
+        {% for p in f.DP %}
         <li class="list-group-item dp-filed">{{p}}</li>
         {% endfor %}
       </ul>
@@ -49,5 +47,4 @@
     <button class="btn btn-primary" type="button">Roll Elevation</button>
   </div>
 </div>
-
-{ % endblock % }
+{% endblock %}

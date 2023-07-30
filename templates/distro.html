@@ -1,7 +1,7 @@
 {% extends 'index.html' %} {% block body %}
 
 <div class="container pt-2" style="font-family: Luminari">
-  <form class="row g-3 distro-form" id="kkc4">
+  <form class="row g-3 distro-form" id="kkc4" method="post">
     <div class="col-md-6 mb-3">
       <label for="playername" class="form-label">Player Name</label>
       <input
@@ -9,11 +9,18 @@
         class="form-control"
         id="playername"
         name="playername"
+        value="hael"
       />
     </div>
     <div class="col-md-6 mb-3">
       <label for="RPname" class="form-label">RP Name</label>
-      <input type="text" class="form-control" id="RPname" name="RPname" />
+      <input
+        type="text"
+        class="form-control"
+        id="RPname"
+        name="RPname"
+        value="whatevz"
+      />
     </div>
     <div class="col-md-2">
       <div class="form-check">
@@ -22,7 +29,7 @@
           type="radio"
           name="alignment"
           id="student"
-          value="Student"
+          value="student"
         />
         <label class="form-check-label" for="student" style="color: #158801">
           Student
@@ -34,7 +41,7 @@
           type="radio"
           name="alignment"
           id="skindancer"
-          value="Skindancer"
+          value="skindancer"
         />
         <label class="form-check-label" for="skindancer" style="color: #ff0000">
           Skindancer
@@ -42,8 +49,8 @@
       </div>
     </div>
     <div class="col-md-5 pt-3">
-      <label for="SocialClass" class="form-label">Social Class</label>
-      <select class="form-select" id="SocialClass" name="SocialClass">
+      <label for="socialclass" class="form-label">Social Class</label>
+      <select class="form-select" id="socialclass" name="socialclass">
         <option value="Vintish-Nobleman">Vintish Nobleman</option>
         <option value="Aturan-Nobleman">Aturan Nobleman</option>
         <option value="Yllish-Commoner">Yllish Commoner</option>
@@ -52,8 +59,8 @@
       </select>
     </div>
     <div class="col-md-5 pt-3">
-      <label for="Lodging" class="form-label">Lodging</label>
-      <select class="form-select" id="Lodging" name="Lodging">
+      <label for="lodging" class="form-label">Lodging</label>
+      <select class="form-select" id="lodging" name="lodging">
         <option value="Anker's">Anker's</option>
         <option value="King's-Drab">The King's Drab</option>
         <option value="Golden-Pony">The Golden Pony</option>
@@ -71,7 +78,13 @@
     </div>
     <div class="col-md-2 mb-3" style="text-align: center">
       <label for="musical" class="form-label">Musical</label>
-      <input type="number" class="form-control" id="musical" name="musical" />
+      <input
+        type="number"
+        class="form-control"
+        id="musical"
+        name="musical"
+        value="8"
+      />
     </div>
     <div class="col-md-7 mb-3">
       <p id="fieldprof" style="text-align: center">Field Proficiency</p>
@@ -85,17 +98,18 @@
           type="Number"
           class="form-control input-group-text ep-input"
           name="ep1"
+          value="1"
         />
         <select class="form-select" id="fieldep1" name="field1">
-          <option value="Linguistics">Linguistics</option>
-          <option value="Arithmetics">Arithmetics</option>
-          <option value="RhetoricLogic">Rhetoric/Logic</option>
-          <option value="Archives">Archives</option>
-          <option value="Sympathy">Sympathy</option>
-          <option value="Physicking">Phsysicking</option>
-          <option value="Alchemy">Alchemy</option>
-          <option value="Artificery">Artificery</option>
-          <option value="Naming">Naming</option>
+          <option value="0">Linguistics</option>
+          <option value="1">Arithmetics</option>
+          <option value="2">Rhetoric/Logic</option>
+          <option value="3">Archives</option>
+          <option value="4">Sympathy</option>
+          <option value="5">Phsysicking</option>
+          <option value="6">Alchemy</option>
+          <option value="7">Artificery</option>
+          <option value="8">Naming</option>
         </select>
       </div>
       <div class="input-group">
@@ -108,17 +122,18 @@
           type="Number"
           class="form-control input-group-text ep-input"
           name="ep2"
+          value="{{ request.form['ep2'] }}"
         />
         <select class="form-select" id="fieldep2" name="field2">
-          <option value="Linguistics">Linguistics</option>
-          <option value="Arithmetics">Arithmetics</option>
-          <option value="RhetoricLogic">Rhetoric/Logic</option>
-          <option value="Archives">Archives</option>
-          <option value="Sympathy">Sympathy</option>
-          <option value="Physicking">Phsysicking</option>
-          <option value="Alchemy">Alchemy</option>
-          <option value="Artificery">Artificery</option>
-          <option value="Naming">Naming</option>
+          <option value="0">Linguistics</option>
+          <option value="1">Arithmetics</option>
+          <option value="2">Rhetoric/Logic</option>
+          <option value="3">Archives</option>
+          <option value="4">Sympathy</option>
+          <option value="5">Phsysicking</option>
+          <option value="6">Alchemy</option>
+          <option value="7">Artificery</option>
+          <option value="8">Naming</option>
         </select>
       </div>
     </div>
@@ -156,19 +171,33 @@
           <th>Social Class</th>
           <th>Lodging</th>
           <th>Musical</th>
-          <th># EP 1</th>
-          <th>Field 1</th>
-          <th># EP 2</th>
-          <th>Field 2</th>
+          <th>EP</th>
           <th>Inventory</th>
         </tr>
       </thead>
-      <tbody></tbody>
-      <tfoot>
+      <tbody>
+        {% for p in g.players %}
+
+        <tr>
+          <td>{{p.name}}</td>
+          <td>{{p.info.rp_name}}</td>
+          <td>
+            {% if p.info.is_evil %} Skindancer {% else %}Student {% endif %}
+          </td>
+          <td>{{p.info.social_class}}</td>
+          <td>{{p.status.lodging}}</td>
+          <td>{{p.status.musical_stat}}</td>
+          <td>{{p.status.EP}}</td>
+          <td>{{p.status.inventory}}</td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+      <!-- <tfoot>
         <tr>
           <td colspan="11">footer</td>
         </tr>
-      </tfoot>
+      </tfoot> -->
     </table>
   </div>
 </div>

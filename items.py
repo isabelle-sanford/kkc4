@@ -3,19 +3,31 @@ import random
 
 
 class ItemType(Enum):
-    MOMMET = 1
-    TENACULUM = 2
-    FIRESTOP = 3
-    PLUMBOB = 4
-    BONETAR = 5
-    WARD = 6
-    BLOODLESS = 7
-    THIEVESLAMP = 8
-    GRAM = 9
-    TALENTPIPES = 10
-    NAHLROUT = 11
-    BODYGUARD = 12 # hmm
-    MOMMET_3rd = 13
+    MOMMET = 1, "Mommet"
+    TENACULUM = 2, "Tenaculum"
+    FIRESTOP = 3, "Firestop"
+    PLUMBOB = 4, "Plum Bob"
+    BONETAR = 5, "Bonetar"
+    WARD = 6, "Ward"
+    BLOODLESS = 7, "Bloodless"
+    THIEVESLAMP = 8, "Thieves Lamp"
+    GRAM = 9, "Gram"
+    TALENTPIPES = 10, "Talent Pipes"
+    NAHLROUT = 11, "Nahlrout"
+    BODYGUARD = 12, "Bodyguard" # hmm
+    MOMMET_3rd = 13, "Mommet (3rd level)"
+
+    def __new__(cls, value, name, ):
+        member = object.__new__(cls)
+        member._value_ = value
+        member.fullname = name
+        return member
+
+    def __int__(self):
+        return self.value
+    
+    def __str__(self):
+        return self.fullname
 
 
 class Item:
@@ -88,4 +100,17 @@ class Item:
             ret += f" on {self.target} "
         if self.uses > 1:
             ret += f" ({self.uses} use(s))"
+        
+        return ret
+    
+    def __repr__(self):
+        ret = f"{self.name}"
+
+        if self.target is not None:
+            # mommet only
+            ret += f" on {self.target} "
+        if self.uses > 1:
+            ret += f" ({self.uses} use(s))"
+        
+        return ret
         

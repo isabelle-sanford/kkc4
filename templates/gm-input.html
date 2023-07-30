@@ -23,8 +23,8 @@
         <div class="input-group">
           <select class="form-select" id="Vote" name="Players">
             <option value="None">None</option>
-            <!-- sane players only? -->
-            {% for player in playerlist %}
+            <!-- sane players only? TODO -->
+            {% for player in players %}
             <option value="{{player}}">{{player}}</option>
             {% endfor %}
           </select>
@@ -103,7 +103,7 @@
   </div>
   <hr />
 
-  { % endfor %}
+  {% endfor %}
 </div>
 
 {% endblock %}
