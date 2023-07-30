@@ -102,7 +102,7 @@ use_mommet = ActionInfo(23, "Use Mommet", ActionCategory.BLOCKETC, is_negative=T
 use_tenaculum_item = ActionInfo(24, "Use Tenaculum (Item)", ActionCategory.BLOCKETC, Target.ITEM, is_negative=True)
 use_tenaculum_action = ActionInfo(25, "Use Tenaculum (Action)", ActionCategory.BLOCKETC, Target.ACTION, is_negative=True)
 use_plumbob = ActionInfo(26, "Use Plum Bob", ActionCategory.OTHER, Target.PLAYER, is_negative=True) # neg?
-use_bonetar = ActionInfo(27, "Use Bonetar", ActionCategory.OFFENSIVE, Target.LOCATION, is_negative=True)
+use_bonetar = ActionInfo(27, "Use Bonetar", ActionCategory.OFFENSIVE, Target.LOCATION, Target.OTHER, is_negative=True)
 use_ward = ActionInfo(28, "Use Ward", ActionCategory.OTHER)
 use_thieveslamp = ActionInfo(29, "Use Thieves Lamp", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True)
 use_nahlrout = ActionInfo(30, "Use Nahlrout", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True)

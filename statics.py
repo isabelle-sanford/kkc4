@@ -14,7 +14,7 @@ class FieldName(IntEnum):
     GENERAL = 9  # ? # gotta remember this when iterating thru
 
 
-class Rank(Enum):
+class Rank(IntEnum):
     NONE = 0
     ELIR = 1
     RELAR = 2

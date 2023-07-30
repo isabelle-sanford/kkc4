@@ -1,7 +1,9 @@
 from field import FieldStatus
 from game_run import Game, Turn
+from items import ItemType
 from player import Player
 from flask import Flask, render_template, request, url_for, flash, redirect
+from actioninfo import ActionType
 
 # sql connection goes here
 
@@ -79,7 +81,7 @@ def player(name):
     # todo POST method for choice submissions
     
     #print(player)
-    return render_template('player_page.html', player=player)
+    return render_template('player_page.html', player=player, playerlist=g.players, actions=ActionType, items=ItemType)
 
 @app.route("/gm/start")
 def start_game():

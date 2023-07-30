@@ -31,7 +31,6 @@ class PlayerStatic:
         return ret
 
 class EP:
-    # TODO figure out what's going on here
     def __init__(self):
 
         self.vals = {
@@ -68,7 +67,7 @@ class PlayerStatus:
     def __init__(self, player_static):
         self.info = player_static
 
-        self.accessible_actions: set[ActionType] = set() # TODO
+        self.accessible_actions: set[ActionType] = set() 
         if player_static.is_evil:
             self.accessible_actions.add(ActionType.Sabotage)
         self.month =  -1 #??
@@ -90,7 +89,7 @@ class PlayerStatus:
 
         # things the player knows / happened prev turn
         # so their page can have invalid stuff grayed out or whatever
-        self.can_take_actions = True # why is this blue
+        self.can_take_actions = True
         self.can_file_complaints = True 
         self.can_file_EP = True 
         self.can_be_targeted = True # medica emergency, vint/aturan
@@ -117,8 +116,9 @@ class PlayerStatus:
             "DEVI_defaulted": False,
             "DEVI_amt_owed": 0.0,
             "DEVI_collateral": [],
-            "BLACKMARKET_Contractlog": []
-            # TODO blacklistings probs
+            "BLACKMARKET_Contractlog": [],
+            "LOADEDDICE_lastwon": -1,
+            "LOADEDDICE_blacklistedtil": -1
         }
         self.has_talent_pipes = False # todo
 
@@ -177,8 +177,6 @@ class PlayerStatus:
 
         return newstatus
     
-    # TODO string / print func 
-
     # yes this is redundant no I am not happy about it
     def levels_in(self, field: FieldName):
         # error check?
@@ -245,12 +243,11 @@ class PlayerProcessing:
         # protect / attack info, maybe? 
 
         self.items_received: list[Item] = []
-        # todo remember to add this ^ to next_status (AFTER everything else is processed)
 
         self.getting_elevated_in: FieldName = None
 
         self.insanity_bonus = 0 # might want to take something from prev status?
-        # and check mews / spindle & draft
+        # and check mews / spindle & draft (currently in PROCESS_TURN)
 
 
         self.player_message = [] # todo fancy this probs
@@ -273,16 +270,24 @@ class PlayerChoices:
     # choices are actually processed and integrated to the overall game separately 
     # it's essentially just the info submitted from the player's page
 
-    def __init__(self, playerstatic, month: int = 0):
+    def __init__(self, playerstatic, month: int = 0, status: PlayerStatus = None):
         self.player_static = playerstatic
         self.month = month
+        self.status = status
         # maybe also status here? 
 
         if self.month % 3 == 2: # make lodging choice in month BEFORE term start
             self.next_lodging: Lodging = Lodging.Streets
+            if not self.status.is_expelled:
+                self.enroll_next = True # check expulsion etc 
 
-        self.imre_next = False # should check if in imre lodging
-        self.enroll_next = True # check expulsion etc 
+        # change up being in Imre or not
+        if self.status.lodging == Lodging.GreyMan or self.status.lodging == Lodging.PearlOfImre:
+            self.imre_next = True
+        else:
+            # updated later when processing choices, if person wants to go
+            self.imre_next = False
+
 
         # List of complaints made (NOT including PiH)
         # remember cannot vote if expelled
@@ -293,39 +298,41 @@ class PlayerChoices:
         self.filing_EP: list[FieldName] = []
 
         # if master 
-        self.assigned_DP: list[Player] = []
-        self.to_elevate: list[Player] = [] # ordered preference list
+        if self.status.master_of is not None:
+            self.assigned_DP: list[Player] = []
+            self.to_elevate: list[Player] = [] # ordered preference list
 
         # IMRE (check if player is there?)
-        self.IMRE_CHOICES = {
-            "Eolian": {
-                "audition": False,
-                "practice": False
-            },
-            "Devi": {
-                "acquire_loan": False,
-                "give_collateral": [], # item list
-                "loan_amount": 0.0
-            }, "Giles": {
-                "acquire_loan": False,
-                "loan_amount": 0.0
-            }, "Loaded Dice": {
-                "place_bet": False,
-                "bet_amt": 0.0,
-                "numbers": []
-            }, "Apothecary": {
-                "nahlrout": 0,
-                "courier": 0, # does this need target?
-                "bloodless": 0,
-                "gram": 0
-            }, "Black Market": {
-                "mommet": [], # items
-                "bodyguard": [], # player targets
-                "assassin": [], # player targets
-                "take_contract": [], # contract ids
-                "place_contract": [] # contract info
+        if self.status.in_Imre:
+            self.IMRE_CHOICES = {
+                "Eolian": {
+                    "audition": False,
+                    "practice": False
+                },
+                "Devi": {
+                    "acquire_loan": False,
+                    "give_collateral": [], # item list
+                    "loan_amount": 0.0
+                }, "Giles": {
+                    "acquire_loan": False,
+                    "loan_amount": 0.0
+                }, "Loaded Dice": {
+                    "place_bet": False,
+                    "bet_amt": 0.0,
+                    "numbers": []
+                }, "Apothecary": {
+                    "nahlrout": 0,
+                    "courier": 0, # does this need target?
+                    "bloodless": 0,
+                    "gram": 0
+                }, "Black Market": {
+                    "mommet": [], # items
+                    "bodyguard": [], # player targets
+                    "assassin": [], # player targets
+                    "take_contract": [], # contract ids
+                    "place_contract": [] # contract info
+                }
             }
-        }
 
         # probably automatically have interest here, if start of term + relevant? 
         self.pay_giles = 0
@@ -340,14 +347,6 @@ class PlayerChoices:
 
         return ret
 
-
-    # def __str__(self):
-    #     # this is probably not ideal :p
-    #     line1 = f"Player: {self.info.name}  Month: {self.month}\n"
-    #     line2 = f"ep filed: {[s.name for s in self.EP_filed]}\n" # ! fix later
-    #     line3 = f"Going to Imre next month: {self.imre_next}\n"
-        
-    #     return line1 + line2 + line3
 
 @dataclass
 class Tuition:
@@ -447,7 +446,7 @@ class Tuition:
         
         return t
         
-    # todo reset_tuition thingy probably?
+
 
 
 
@@ -461,8 +460,6 @@ class Player:
         if player_choices is None:
             player_choices = PlayerChoices(player_static, 0)
         self.choices: PlayerChoices = player_choices 
-
-        # self.past_statuses = [] ? 
         
         # sort of irregularly used, but maybe more helpful than passing full Player instances around everywhere
         self.id: int = player_static.id 
@@ -475,6 +472,8 @@ class Player:
         self.processing: PlayerProcessing = player_process
 
         self.tuition = Tuition(self.id)
+
+        self.history = [] # [(status m0, choices, processing), (status m1, choices, processing), ...]
 
     def __str__(self):
 
@@ -490,12 +489,13 @@ class Player:
         return ret
     
     # i.e. process an attack on you
-    def attack(self, attack: Action):
+    def get_attacked(self, attack: Action):
         # sabotage, bonetar, assassin, mommet, ??
-        if self.status.can_be_targeted == False:
+        if self.processing.can_be_targeted == False: 
             attack.successful = False
             print(f"Attack by f{attack.player} of {attack.type.info.name} on {self.name} was attempted, but {self.name} could not be targeted so it failed.")
-            return False # idk
+            # todo log properly
+            return False # idk, maybe string?
         
         if self.status.lodging == Lodging.HorseAndFour:
             roll = random.randint(1,2)
@@ -520,7 +520,7 @@ class Player:
         
         if self.holds_item(ItemType.BODYGUARD):
             item = self.get_items(ItemType.BODYGUARD)[0]
-            self.use_item(item) # todo: needs more info than this (abt sabotage vs not)
+            self.use_item(item, info=attack.type) 
 
             self.processing.player_message.append("Your Bodyguard protected you from an attack!") # ig?
             return False 
@@ -528,11 +528,24 @@ class Player:
         # TODO firestop
         
         # maybe return result for logging? 
-        # die? 
+        # die? / go insane?
+
         return True
 
-    def use_item(self, item):
-        # TODO
+    def use_item(self, item, info=None):
+        # TODO ?
+
+        still_exists = item.use(info)
+
+        if not still_exists:
+            self.status.inventory.remove(item) # ig?
+
+            if not self.holds_item(item.type):
+                if item.type.using_action is not None:
+                    self.status.accessible_actions.discard(item.type.using_action)
+
+                    if item.type == ItemType.TENACULUM:
+                        self.status.accessible_actions.discard(ActionType.UseTenaculumItem)
 
         return
 
@@ -544,6 +557,8 @@ class Player:
         return count
 
     def elevate_in(self, field: FieldName):
+        # if becoming a master, use become_master and NOT this
+
         self.status.elevations.append(field)
         num_EP = self.status.EP.vals[field]
         if num_EP < 5:
@@ -600,7 +615,6 @@ class Player:
         if FIELDS[field].info[num_elevs - 1] is not None:
             self.status.action_periods.append(FIELDS[field].info[num_elevs - 1])
 
-        # TODO more stuff if master (probs) (down in become_master)
 
         # anything else? 
 
@@ -619,13 +633,18 @@ class Player:
         for i, elev in self.status.elevations:
             if elev != field:
                 # add the AP from that elevation, if relevant
-                if fieldinfo.APbylevel[i + 1] is not None:
-                    self.status.action_periods.append(fieldinfo.APbylevel[i + 1])
+                #? had i+1 here but I don't think that's right
+                if fieldinfo.APbylevel[i] is not None:
+                    self.status.action_periods.append(fieldinfo.APbylevel[i])
         
         # add master AP
         self.status.elevations.append(field)
         if fieldinfo.APbylevel[3] is not None:
             self.status.action_periods.append(fieldinfo.APbylevel[3])
+
+        
+        self.status.rank = Rank.MASTER 
+        # do stuff with EP? 
 
     # maybe go_on_horns() for nahlrout?         
 
@@ -636,16 +655,31 @@ class Player:
 
         for f in fields:
             f.remove_player(self)
-        self.status.EP = None
+        # self.status.EP = None # hm # still useful for DP / IP? 
 
         # ... other stuff? 
+        self.processing.player_message.append("You went insane!")
         return 
 
     def break_out(self):
         # TODO
         self.status.is_sane = True
         self.status.broke_out = True
-        # rank stuff, accessible abilities, ...
+        self.processing.player_message.append("You broke out of the Crockery!!")
+
+        # todo lodging 
+
+        if self.status.rank is not Rank.NONE:
+            self.status.rank -=1
+        
+            abilities_to_lose = [a for a in self.status.accessible_abilities if a.info.field_ability is not None]
+            if len(abilities_to_lose) > 0:
+                lost = random.choice(abilities_to_lose)
+                self.processing.player_message.append(f"You lost a rank and access to the ability {lost.info.name}.")
+            
+                self.status.accessible_abilities.discard(lost)
+
+        
         return 
     
     def die(self, fields: "list[FieldStatus]"):
@@ -661,6 +695,8 @@ class Player:
         for f in fields:
             f.remove_player(self)
         self.status.EP = None
+
+        self.processing.player_message("Sorry, you died!") # todo: add dead doc link
         
         # TODO ??
     
@@ -677,6 +713,7 @@ class Player:
         self.status.is_expelled = True
         self.status.can_file_EP = True
         self.status.can_be_elevated = False
+        self.status.can_file_complaints = False
 
         for f in fields:
             f.remove_player(self)
@@ -691,12 +728,12 @@ class Player:
         self.processing.items_received.append(item)
         if item.type.using_action is not None:
             self.status.accessible_actions.add(item.type.using_action)
+        if item.type == ItemType.TENACULUM:
+            self.status.accessible_actions.add(ActionType.UseTenaculumItem) # hacky but works
         
         self.status.accessible_actions.add(ActionType.GiveItem)
-        # todo make sure to take away when inventory is empty
-        # add tenaculum.item here, idk
+
     
-    # todo remove_item (to take away relevant action ability)
 
     def holds_item(self, item_type: ItemType) -> bool:
         count = 0
@@ -724,6 +761,7 @@ class Player:
         return list
 
     # not sure if to do imre stuff here or in process_imre tbh
+    # todo somewhere - Imre roleblock locations
     def visit_eolian(self):
         if self.status.IMRE_INFO["EOLIAN_auditioned"]:
             # cannot re-audition
@@ -731,23 +769,43 @@ class Player:
         
         if self.choices.IMRE_CHOICES["Eolian"]["practice"]:
             self.status.musical_stat += 0.5
+            self.processing.player_message.append("You practiced for your Pipes, and improved your musical skill slightly.")
             return 
         
         if self.choices.IMRE_CHOICES["Eolian"]["audition"]:
             mstat = self.status.musical_stat
+
+            roll = random.randint(1,10)
             pipes = False
-            # TODO
+            if roll + mstat >= 12:
+                pipes = True
 
             if pipes:
                 self.status.inventory.append(Item.Generate(ItemType.TALENTPIPES))
                 self.status.has_talent_pipes = True
+
+                self.processing.player_message.append("You won your Talent Pipes!")
+            else:
+                self.processing.player_message.append("You tried for your Talent Pipes, but didn't get them.")
             
+            self.status.IMRE_INFO["EOLIAN_auditioned"] = True
+            
+            # todo log for GM
             return
 
     def gamble_loadeddice(self):
-        # todo check blacklisting
         if not self.choices.IMRE_CHOICES["Loaded Dice"]["place_bet"]:
             return
+    
+        if self.status.IMRE_INFO["LOADEDDICE_blacklistedtil"] > self.month:
+            # todo log 
+            print("Can't go to loaded dice yet!")
+            return 
+        if self.status.IMRE_INFO["LOADEDDICE_lastwon"] + 3 <= self.month:
+            print("Can't go to loaded dice yet!")
+            return
+
+
         houseroll = random.randint(1,20)
         if self.info.social_class == Background.Ceald:
             houseroll = random.randint(1, 6)
@@ -778,9 +836,15 @@ class Player:
             winnings = bet_amt * multiplier
 
             self.increase_money(winnings)
-        
+
+            if self.status.IMRE_INFO["LOADEDDICE_lastwon"] + 6 <= self.month:
+                self.status.IMRE_INFO["LOADEDDICE_blacklistedtil"] = self.month + 12
+                # TODO log this
+                
+            self.processing.player_message.append(f"You went to the Loaded Dice and won! You received {winnings} talents for your gamble.") # should be in talents/etc but whatevs
         else: # lost
             self.reduce_money(bet_amt)
+            self.processing.player_message.append(f"You went to the Loaded Dice and lost everything you bet.") 
     
     def visit_devi(self):
         if self.status.IMRE_INFO["DEVI_defaulted"]:
@@ -798,8 +862,7 @@ class Player:
             return
 
         income = 0
-        if self.holds_item(ItemType.TALENTPIPES):
-            # ! this talent pipes check should be post stealing stuff
+        if self.holds_item(ItemType.TALENTPIPES): # ?or self.status.has_pipes
             # (which i thiiiink it is?)
             income += 10
         income += self.status.stipend
@@ -818,12 +881,12 @@ class Player:
         # todo take collateral
         self.status.IMRE_INFO["DEVI_amt_owed"] = d["loan_amount"]
 
+        self.processing.player_message.append(f"You took out a loan from Devi for {d['loan_amount']}!")
+
     def visit_giles(self):
         if self.status.IMRE_INFO["GILES_defaulted"]:
             return 
         # maybe check for prev loan too? 
-
-
 
         d = self.choices.IMRE_CHOICES["Giles"]
 
@@ -846,6 +909,8 @@ class Player:
         self.increase_money(d["loan_amount"])
         self.status.IMRE_INFO["GILES_amt_owed"] = d["loan_amount"]
 
+        self.processing.player_message.append(f"You took out a loan from Giles for {d['loan_amount']}!")
+
     def pay_devi(self):
         owed = self.status.IMRE_INFO["DEVI_amt_owed"]
         paying = self.choices.pay_devi
@@ -865,10 +930,15 @@ class Player:
         self.status.IMRE_INFO["DEVI_amt_owed"] -= paying
         self.reduce_money(paying)
 
+        self.processing.player_message.append(f"You paid Devi back {paying} and now owe her {self.status.IMRE_INFO['DEVI_amt_owed']}.")
+
         # return collateral if loan is entirely paid off
         if self.status.IMRE_INFO["DEVI_amt_owed"] <= 0:
             for item in self.status.IMRE_INFO["DEVI_collateral"]:
                 self.add_item(item)
+            
+            self.processing.player_message.append(f"Since your loan has been fully paid back, she has also returned any items you gave her as collateral.")
+            
         
     def pay_giles(self):
         owed = self.status.IMRE_INFO["GILES_amt_owed"]
@@ -889,19 +959,23 @@ class Player:
         self.status.IMRE_INFO["GILES_amt_owed"] -= paying
         self.reduce_money(paying)
 
+        self.processing.player_message.append(f"You paid Giles back {paying} and now owe her {self.status.IMRE_INFO['GILES_amt_owed']}.")
+
     def apoth_orders(self):
         # check in imre or whatever
         o = self.choices.IMRE_CHOICES["Apothecary"]
+        # todo
 
     # todo place_contract? (to remove the thing that's the reward)
-    
-    # todo use_item()
 
     def increase_money(self, amount: float):
         self.status.money += amount
 
     def reduce_money(self, amount: float):
         self.status.money -= amount
+        if self.status.money < 0:
+            print("Uh oh! I've got less than no money!")
+            # todo log proper lol
 
     def block_all(self, target):
         self.take_action(Action("Mommet", self,"Block All",target))
@@ -917,9 +991,6 @@ class Player:
             if a.type.find(type) > -1:
                 return a
         return None  
-    
-    def import_complaint(self, target): #?
-        self.choices.complaints.append(target)
 
     # changed this slightly bc I wasn't clear what it was doing / if it was right
     def assign_DP(self, total = 1, master_of:FieldName = None):
@@ -943,18 +1014,7 @@ class Player:
             self.processing.DP += total
 
     def assign_EP(self, field: FieldName, total = 1):
-        # todo add to field's ep listing? 
+        # todo add to field's ep listing? curr done in Turn file_EP
         self.status.EP.vals[field] += total
 
 
-# maybe put this elsewhere - a test.py file? 
-class PlayerRandom:
-    def __init__(self) -> None:
-        pass
-
-    def Generate(self, name:str) -> Player:
-        static = PlayerStatic(name, name, random.choice([True,False]),random.choice(list(Background)))
-        status = PlayerStatus(static,random.choice(list(Lodging)),random.randint(1,20),[],round(random.random()*20.0,2))
-        choice = PlayerChoices()
-
-        return Player(static,status,choice)

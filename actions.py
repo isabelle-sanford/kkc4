@@ -136,9 +136,9 @@ class Action:
                 case ActionType.MommetMaking:
                     # TODO 
                     print("todo")
-                case ItemType.MOMMET_3rd:
-                    # TODO
-                    print("todo")
+                # case ItemType.MOMMET_3rd:
+                #     # TODO
+                #     print("todo")
 
             self.player.add_item(item)
                 

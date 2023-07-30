@@ -95,9 +95,11 @@
               <option value="Windy-Tower">The Windy Tower</option>
               <option value="Horse-and-Four">The Horse and Four</option>
               <option value="Spindle-and-Draft">The Spindle and Draft</option>
+              {% if not player.status.IMRE_INFO["GILES_defaulted"] %}
               <option value="Grey-Man" style="color: #c30b7f">
                 The Grey Man
               </option>
+              {% endif %}
               <option value="Pearl-of-Imre" style="color: #c30b7f">
                 The Pearl of Imre
               </option>
@@ -148,58 +150,101 @@
     <form class="col-6 mt-2" method="post">
       <div>
         <fieldset class="fieldset-uni">
+          <!-- TODO CHECK IF ROLEBLOCKED IN STATUS -->
           <legend align="center" class="legend-uni">Actions</legend>
+          {% for i, ap in player.status.action_periods %}
           <div class="input-group">
             <!-- TODO only show possible # of action periods etc -->
-            <span class="input-group-text actions">General</span>
-            <select class="form-select" id="action1" name="action1">
+            <span class="input-group-text actions">{{ap}}</span>
+            <select class="form-select" id="action{{i}}" name="action{{i}}">
               <option value="None">--</option>
               {% for a in player.status.accessible_abilities %}
-              <!-- TODO a.info.name when status changes -->
-              <option value="{{a}}">{{a.name}}</option>
+              <option value="{{a}}">{{a.info.name}}</option>
               {% endfor %}
             </select>
-            <select class="form-select" id="target1" name="target1">
-              <!-- TODO -->
-              <option value="Stink">Stink</option>
-              <option value="Elbereth">Elbereth</option>
-              <option value="Wilson">Wilson</option>
+
+            <!-- VARIOUS TARGET TYPES -->
+            <select class="form-select" id="targetplayer" name="targetplayer">
+              <!-- TODO only living players -->
+              {% for p in playerlist %}
+              <option value="{{p.name}}">{{p.name}}</option>
+              {% endfor %}
             </select>
+
+            <!-- ? consider diff list for this? -->
+            <select class="form-select" id="targetaction" name="targetaction">
+              {% for at in ActionType %}
+              <option value="{{at.info.name}}">{{at.info.name}}</option>
+              {% endfor %}
+            </select>
+
+            <select class="form-select" id="targetlodging" name="targetlodging">
+              <option value="Underthing">The Underthing</option>
+              <option value="Mews">The Mews</option>
+              <option value="Anker's">Anker's</option>
+              <option value="King's-Drab">The King's Drab</option>
+              <option value="Golden-Pony">The Golden Pony</option>
+              <option value="Windy-Tower">The Windy Tower</option>
+              <option value="Horse-and-Four">The Horse and Four</option>
+              <option value="Spindle-and-Draft">The Spindle and Draft</option>
+              <option value="Grey-Man" style="color: #c30b7f">
+                The Grey Man
+              </option>
+              <option value="Pearl-of-Imre" style="color: #c30b7f">
+                The Pearl of Imre
+              </option>
+            </select>
+
+            <select class="form-select" id="targetitem" name="targetitem">
+              {% for it in items %}
+              <option value="{{it.name}}">{{it.name}}</option>
+              {% endfor %}
+            </select>
+
+            <select class="form-select" id="targetfield" name="targetfield">
+              <option value="None">--</option>
+              <option value="Linguistics">Linguistics</option>
+              <option value="Arithmetics">Arithmetics</option>
+              <option value="RhetoricLogic">Rhetoric/Logic</option>
+              <option value="Archives">Archives</option>
+              <option value="Sympathy">Sympathy</option>
+              <option value="Physicking">Phsysicking</option>
+              <option value="Alchemy">Alchemy</option>
+              <option value="Artificery">Artificery</option>
+              <option value="Naming">Naming</option>
+            </select>
+
+            <!-- TODO events, other, Names -->
+
+            <!-- SECONDDARY TARGET -->
+            <select class="form-select" id="targetplayer2" name="targetplayer2">
+              <!-- TODO only living players -->
+              {% for p in playerlist %}
+              <option value="{{p.name}}">{{p.name}}</option>
+              {% endfor %}
+            </select>
+
+            <!-- ? consider diff list for this? -->
+            <select class="form-select" id="targetaction2" name="targetaction2">
+              {% for at in ActionType %}
+              <option value="{{at.info.name}}">{{at.info.name}}</option>
+              {% endfor %}
+            </select>
+
+            <select class="form-select" id="targetitem2" name="targetitem2">
+              {% for it in items %}
+              <option value="{{it.name}}">{{it.name}}</option>
+              {% endfor %}
+            </select>
+
+            <!-- TODO abilities, other -->
           </div>
-          <div class="input-group">
-            <span class="input-group-text actions">Action 2</span>
-            <select class="form-select" id="action2" name="action2">
-              <option value="Create">Create</option>
-            </select>
-            <select class="form-select" id="target2" name="target2">
-              <option value="tenaculum">Tenaculum</option>
-              <option value="firestop">Firestop</option>
-              <option value="bone-tar">Bone-tar</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <span class="input-group-text actions">Action 3</span>
-            <select class="form-select" id="action3" name="action3">
-              <option value="Sabotage">Fae Lore</option>
-              <option value="Create">Banned Books</option>
-            </select>
-            <select class="form-select" id="target3" name="target3">
-              <option value="Stink">Stink</option>
-              <option value="Elbereth">Elbereth</option>
-              <option value="Wilson">Wilson</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <span class="input-group-text actions">Action 4</span>
-            <select class="form-select" id="action4" name="action4">
-              <option value="Sabotage">Wind</option>
-              <option value="Create">Fire</option>
-            </select>
-            <textarea
-              class="form-control"
-              style="margin-right: 10px"
-            ></textarea>
-          </div>
+          {% endfor %}
+
+          <textarea class="form-control" style="margin-right: 10px">
+Notes</textarea
+          >
+
           <div class="col-12 my-3">
             <button
               type="submit"
@@ -365,5 +410,7 @@
     </div>
   </div>
 </div>
+
+<script src="../static/playerpage.js"></script>
 
 {% endblock %}

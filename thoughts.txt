@@ -1,16 +1,13 @@
 
 
-re enums: can you have a null state for them? should they be combined with the main class? how do 
+todo II:
+- get_attacked in Player / offensive_actions in Turn 
+
+
+
+
 
 - webpage is gonna need some random helper funcs for converting money to talents/jots/etc 
-
-- consider having a field for abilities, lodgings, etc, that's just the "operative number" or whatever (so if we wanted to change the mews insanity bonus it'd only have to happen in one place)
-
-
-ability questions: 
-- is redirect a negative action (NO)
-- proficient_in_hyperbole probs shouldn't have targets? (I think it does but just not player-side)
-- argumentum_ad_nauseam is probs negative, same with persuasive_arguments
 
 
 todo: have fieldStatus contain list of potential masters, in order of time that it happened
@@ -20,35 +17,17 @@ Qs FOR WILSON:
 - Persuasive arguments: You can't force them if they have 1/no complaints to vote, right? 
 
 
-- Does using EP to remove IP come before or after elevations? (ELEVATIONS ARE FIRST)
-solution: if using EP to reduce IP, which EP you're using is not specified but will prioritize EP in a field in which you're NOT filing that same turn 
-
-- What exactly does Ward tell you? (actiontype?)
-
-- When Masters are roleblocked, can they still elevate / assign DP? - yes unless it's TOTAL (and in that case they don't get the tuition bump if they still put in the order and just got blocked from doing it)
-- Do we want you to be able to use an item the same turn you buy/receive it? (no)
-
-
-- can you be elevated if you're not currently enrolled
 - if you're de-elevated from master can you still do master-level actions (YES)
 
 OoA stuff 
-- should malfeasance protection downgrades work on ankers roleblock / vint homecoming / etc? (NO)
-- should you be able to use an item on the same turn it gets stolen? (NO)
-- if someone gets elevated and you use school records on them that turn, do you get to see what their newest elevation is in? (NO)
 - medica emergency/malfeasance III
 
 
 flask stuff 
 - make Imre player section a diff page (maybe make all player components diff pages?)
-- are the css files similar / can they be
-
 
 notes
 - stealing items happens early/first 
-- medica emergency takes place the NEXT turn
-- persuasive arguments changes 1 vote, at random, does not apply to PiH votes
-
 
 stuff not in ooa 
 - update # of EP available (during elevating?)
@@ -57,16 +36,16 @@ stuff not in ooa
 
 
 particularly notable todos 
-- accessible_abilities
+- accessible_abilities (MOSTLY DONE)
 - tuition (MOSTLY DONE)
 - imre (MOSTLY DONE EXCEPT BLACK MARKET)
-- action period stuff
+- action period stuff (PARTLY DONE)
 - item stuff (use_item, ids, half items, master-level alchemy items being 2-use)
 - results
 - naming (sigh)
 - customization of results
 - sql 
-- getting info out of pages into code :))
+- getting info out of pages into code (figured out)
 - offensive / defensive things
 
 abilities
@@ -75,7 +54,7 @@ abilities
 - switch stuff to ability2 version
 - mommet making
 - all linguistics 
-- arithmetics passives
+- great deals from arithmetics
 - law of contraposition, proficient in hyperbole 
 - fae lore 
 - medica detainment, cheating death
@@ -92,15 +71,12 @@ small
 - update_choices 
 - make sure playerlists are generally of just the living ones
 - gm input stuff aside from complaints
-- make mastery/elevation less ugly
-    - also, pc master choice takes precedence over npc
 - underthing (cannot be targeted or take actions)
 - IP offset is 1 IP per FOUR EP
 - breakout removes 1 random power (need to get one that's actually a field ability, not using an item)
 - failure to do formal apology means 2 DP next turn
 - expelled students can only target ppl in Imre or other expelled students
 - sabotages kill expelled students unless protected
-- multiple masters try to elevate a student -> field where they have MORE EP takes precedence
 - masters who cannot pay tuition get demoted 
 - making an item over just one turn they can't file complaints or EP or take other actions 
 - need to deal with Events (for omen recognition)
@@ -113,6 +89,7 @@ small
 - courier use is immediate (and not an action but does require target + message)
 - what happens if you try to take money from a player and it goes negative lol
 - do more of game_testing notebook w further cycles 
+- js for only showing appropriate target type
 
 - pipes can be given but not stolen
 - moneylenders should probably not accrue interest while you're insane
@@ -123,7 +100,6 @@ small questions
 - say you have a 3 talent loan to giles, and it's the last month of a turn. you put in an order to pay giles 2 talents. does that mean you pay your interest first (3 * .15) and the rest is used to pay back part of the original? (currently yes, and the rest of the payback is post stipend recipience)
 - if you break out do you count as 'expelled' (or just having-gone-insane) for the purpose of the win conditions
 - if you play for your pipes and succeed during the last month of a term, do you get the +10 talents immediately or not until the term after rolls around? 
-- the arcane fields (for aturan breaking out) are sympathy, alchemy, artificery, and naming, right? no physicking?
 - do aturans still have a chance of backing out when becoming master?
 - if you pickpocket someone with a bodyguard, do you get told that your action failed or succeeded? (same Q for thieves lamp)
 - can grams / bodyguards / anything protect from bonetar? (other than H&4)
@@ -142,3 +118,6 @@ note on pickpocketing: currently, who gets stolen from is weighted by action, no
 
 
 
+to test:
+- who to elevate
+- if someone was lashed or whatever, future turns noting being roleblocked

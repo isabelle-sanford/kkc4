@@ -19,6 +19,7 @@ class Game:
         self.num_players = 0
         self.players: list[Player] = []
         self.turns: list[Turn] = []
+        self.curr_turn: Turn = None
         # this is where field status init should go
 
         self.apothecary = Apothecary()
@@ -27,6 +28,8 @@ class Game:
         self.fields = FIELDS
 
         self.player_list = {}
+
+        self.month = 0
 
 
     def add_player(self, input):
@@ -141,29 +144,31 @@ class Game:
             # todo other choices
                 # imre stuff
 
+
+
 # could put this inside game, idk
 class Turn:
 
-    def __init__(self, playerlist: "list[Player]", gm_input, month: int, fields: "list[FieldStatus]", apothecary: Apothecary, blackmarket: BlackMarket):
-        self.players = playerlist
+    def __init__(self, gm_input, month: int, game: Game):
+        self.players = game.players
         self.gm_input = gm_input
         self.month = month
+        self.game = game
 
         self.log = ProcessLog(month)
-        #self.results = Result(month)
 
         self.actions: list[Action] = []
         self.offensive_actions: list[Action] = []
 
-        self.fields = fields
-        self.apothecary: Apothecary = apothecary
-        self.blackmarket: BlackMarket = blackmarket
+        self.fields = game.fields # hmm, or just directly access game.fields? 
+        self.apothecary: Apothecary = game.apothecary # same here
+        self.blackmarket: BlackMarket = game.blackmarket
 
         self.sane_players: list[int] = [] # just ids 
         self.living_players: list[int] = [] # just ids 
         self.imre_players: list[int] = [] # just ids
 
-        for p in playerlist:
+        for p in self.players:
             if p.status.is_alive:
                 self.living_players.append(p.id)
 
@@ -674,11 +679,11 @@ class Turn:
     def offset_IP(self):
         for pid in self.sane_players:
             p = self.players[pid]
-            if p.choices.offset_IP > 0:
-                offset = p.choices.offset_IP
-                if p.insanity_bonus > 0:
-                    if p.insanity_bonus < offset:
-                        num_EP = offset - p.insanity_bonus
+            if p.choices.offset_IP > 3:
+                offset = p.choices.offset_IP // 4
+                if p.processing.insanity_bonus > 0:
+                    if p.processing.insanity_bonus < offset:
+                        num_EP = offset - p.processing.insanity_bonus
                     else:
                         num_EP = offset 
                 
@@ -762,7 +767,7 @@ class Turn:
         #TODO
 
         sabotagee = None
-        being_attacked = [] # maybe include reason? 
+        attacks = [] # (attack action, target)
         could_go_insane = []
         protected = []
 
@@ -771,23 +776,30 @@ class Turn:
                 roll = random.randint(1,4)
 
                 if roll == 1:
-                    being_attacked.append(self.players[p])
+                    # todo probs not this
+                    attacks.append(("Streets", self.players[p]))
             
             if self.players[p].processing.insanity_bonus > 0:
                 could_go_insane.append(self.players[p])
 
         for a in self.offensive_actions:
             # check if blocked? 
-            if a.target.status.lodging == Lodging.HorseAndFour:
-                roll = random.randint(1,2)
-                if roll == 1:
-                    protected.append(a.target) # hmmm
-                    # TODO fix 
+            # if a.target.status.lodging == Lodging.HorseAndFour:
+            #     roll = random.randint(1,2)
+            #     if roll == 1:
+            #         protected.append(a.target) # hmmm
+            #         # TODO fix 
             
             if a.type == ActionType.Sabotage and a.successful:
-                # TODO remember that if insane, this is unblockable kill
-                # if expelled, it's a kill (but blockable)
-                if a.target.processing.can_be_targeted:
+                # todo if expelled, it's a kill (but blockable)
+
+                # if insane, this is unblockable kill
+                if not a.target.status.is_sane:
+                    a.successful = True
+                    sabotagee = a.target
+                    attacks.append((a, a.target))
+
+                elif a.target.processing.can_be_targeted:
                     sabotagee = a.target
 
                     if sabotagee.holds_item(ItemType.BLOODLESS):
@@ -802,7 +814,7 @@ class Turn:
             
             if a.type == ActionType.UseAssassin and a.successful:
                 if a.target.processing.can_be_targeted:
-                    being_attacked.append(a.target)
+                    attacks.append((a, a.target))
 
             
             # todo bonetar 
@@ -822,22 +834,9 @@ class Turn:
 
         still_attacked = []
         
-        for attacked in being_attacked:
+        for attacked in attacks:
             # TODO change to attacked.attack(attackaction)
-            if attacked.holds_item(ItemType.GRAM):
-                g = attacked.get_items(ItemType.GRAM)
-                if len(g) > 0:
-                    g[0].use()
-                    protected.append(attacked)
-            
-            elif attacked.holds_item(ItemType.BODYGUARD):
-                bs = attacked.get_items(ItemType.BODYGUARD)
-                if len(bs) > 0:
-                    bs[0].use() # KILL
-                    protected.append(attacked)
-            
-            else:
-                still_attacked.append(attacked)
+            attacked[1].get_attacked(attacked[0])
         
         if sabotagee is not None:
             if sabotagee.holds_item(ItemType.GRAM):
@@ -859,8 +858,8 @@ class Turn:
             if roll + p.processing.insanity_bonus >= 12:
                 p.go_insane()
 
-        for a in still_attacked:
-            a.die()
+        # for a in still_attacked:
+        #     a.die()
 
         # TODO LOGGING / RESULTS
         return
@@ -922,6 +921,13 @@ class Turn:
 
         return
 
+    def postprocessing(self):
+        for pid in self.living_players:
+            p = self.players[pid]
+
+            if len(p.processing.items_received) > 0:
+                for item in p.processing.items_received:
+                    p.status.inventory.append(item)
 
     def PROCESS_TURN(self):
         # update field statuses to new month (?)
@@ -994,7 +1000,8 @@ class Turn:
         self.process_offensive_actions()
         self.log.log("Offensive actions processed!")
 
-        # TODO give players any items they received
+        # give players any items they received
+        self.postprocessing()
 
         self.log.add_section("Final", "Turn is processed! blah blah blah")
 
