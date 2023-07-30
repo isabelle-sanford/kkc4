@@ -54,7 +54,7 @@ class Item:
         Item.ITEM_COUNT += 1
 
     @classmethod
-    def Generate(cls, type: ItemType, level: int = 0, target = None, half = False):
+    def Generate(cls, type: ItemType, level: int = 0, target = None, half = False): # todo add half to below stuff
         if type == ItemType.MOMMET: # add sep 3rd level?
             return Item("Mommet", type, 1, False, True, level, target)
         elif type == ItemType.TENACULUM:

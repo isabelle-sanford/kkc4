@@ -107,6 +107,7 @@ class BlackMarket:
         self.num_bodyguards = 20 
         self.bodyguard_price = 100
         self.contracts: list[Contract] = []
+        self.mommets: list[Item] = []
 
     def restock(self):
         self.num_assassins += 1 # idk

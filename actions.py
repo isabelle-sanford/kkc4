@@ -45,7 +45,7 @@ class Action:
     def __str__(self):
         # assumes action-taker is known 
         # e.g. Law of Contraposition (Hael -> Wilson)
-        ret = self.type.info.name # ! gotta be info 
+        ret = self.type.info.name 
         if self.target is not None:
             ret += f"({self.target}"
             if self.target_two is not None:
@@ -62,6 +62,7 @@ class Action:
         out += f"Player: {self.player.info.name} Target: {self.target.info.name} Target_Two: {self.target_two}\n"
         out += f"In_Block_cycle: {self.in_block_cycle}, Blocked: {self.blocked}, Blocked_By: [{', '.join([p.info.name for p in self.blocked_by])}]\n"
         print(out) # maybe return? 
+        return out
 
     
     def perform(self, log: ProcessLog=None, **kwargs):
@@ -324,24 +325,28 @@ class Action:
                 self.player.use_item(self.target) 
 
             case ActionType.UseThievesLamp:
+                # item stealing has already been done previously
                 if self.target.holds_item(ItemType.BODYGUARD):
-                    self.player.processing.player_message.append(f"You tried to use a Thieves Lamp on {self.target.name} but failed.")
+                    self.player.processing.player_message.append(f"You tried to use a Thieves Lamp on {self.target.name} and received nothing.")
                     pass 
                 else:
                     money = self.target.status.money * .3
-                    item_count = len(self.target.status.inventory)
-                    # TODO no talent pipes included
+                    self.target.reduce_money(money)
+                    self.player.increase_money(money)
 
-                    if item_count == 1:
-                        stolen = self.target.status.inventory[0]
-                        self.player.processing.items_received.append(stolen)
-                        self.target.status.inventory.remove(stolen)
+                    # item_count = len(self.target.status.inventory)
+                    # # TODO no talent pipes included
 
-                    # this is a little iffy
-                    for i in range(item_count // 2):
-                        stolen = random.choice(self.target.status.inventory)
-                        self.player.processing.items_received.append(stolen)
-                        self.target.status.inventory.remove(stolen)
+                    # if item_count == 1:
+                    #     stolen = self.target.status.inventory[0]
+                    #     self.player.processing.items_received.append(stolen)
+                    #     self.target.status.inventory.remove(stolen)
+
+                    # # this is a little iffy
+                    # for i in range(item_count // 2):
+                    #     stolen = random.choice(self.target.status.inventory)
+                    #     self.player.processing.items_received.append(stolen)
+                    #     self.target.status.inventory.remove(stolen)
 
                     # todo log (you received x / your x were stolen)
 
@@ -360,6 +365,9 @@ class Action:
             case ActionType.Sabotage:
                 # todo
                 pass
+
+            # TODO ActionType.GiveItem
+                # and check for talent pipes shenanigans
 
     def __str__(self) -> str:
         return f"{self.player.info.name}: {self.type} "

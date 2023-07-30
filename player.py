@@ -93,7 +93,7 @@ class PlayerStatus:
         self.can_file_complaints = True 
         self.can_file_EP = True 
         self.can_be_targeted = True # medica emergency, vint/aturan
-        self.can_elevate = True
+        self.can_elevate = True # eh, maybe do this in become_master()
         self.can_be_elevated = True
         # is lashed? 
 
@@ -276,10 +276,29 @@ class PlayerChoices:
         self.status = status
         # maybe also status here? 
 
+        
+        self.pay_giles = 0
+        self.pay_devi = 0
+
         if self.month % 3 == 2: # make lodging choice in month BEFORE term start
             self.next_lodging: Lodging = Lodging.Streets
             if not self.status.is_expelled:
                 self.enroll_next = True # check expulsion etc 
+            
+            if self.status.IMRE_INFO["DEVI_amt_owed"] > 0:
+                arit_reduction = self.status.levels_in(FieldName.ARITHMETICS) * 10 + 10
+                interest_owed = self.status.IMRE_INFO["DEVI_amt_owed"] * 0.3 * (1 - arit_reduction / 100)
+
+                self.pay_devi = interest_owed
+            
+            if self.status.IMRE_INFO["GILES_amt_owed"] > 0:
+                arit_reduction = self.status.levels_in(FieldName.ARITHMETICS) * 10 + 10
+                interest_owed = self.status.IMRE_INFO["GILES_amt_owed"] * 0.15 * (1 - arit_reduction / 100)
+                
+                self.pay_giles = interest_owed
+
+
+
 
         # change up being in Imre or not
         if self.status.lodging == Lodging.GreyMan or self.status.lodging == Lodging.PearlOfImre:
@@ -334,9 +353,6 @@ class PlayerChoices:
                 }
             }
 
-        # probably automatically have interest here, if start of term + relevant? 
-        self.pay_giles = 0
-        self.pay_devi = 0
 
         self.offset_IP = 0
  
@@ -532,6 +548,28 @@ class Player:
 
         return True
 
+    def get_stolen_from(self):
+        
+        updated_inventory = []
+        for item in self.status.inventory:
+            if item.type == ItemType.TALENTPIPES:
+                continue
+            if item.type == ItemType.BODYGUARD:
+                continue # todo not if kingsdrab is blocked by bodyguards
+            updated_inventory.append(item)
+        
+        if len(updated_inventory) == 0:
+            return None
+
+        choice = random.choice(updated_inventory)
+
+        # probably actually take item later, for processing purposes
+        # self.status.inventory.remove(choice)
+        # self.processing.player_message.append("You misplaced the item ", choice)
+        return choice
+
+        
+
     def use_item(self, item, info=None):
         # TODO ?
 
@@ -617,6 +655,7 @@ class Player:
 
 
         # anything else? 
+
 
 
     def become_master(self, field: FieldName):

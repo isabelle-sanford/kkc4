@@ -8,7 +8,7 @@ from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
+from statics import ORDERED_LODGINGS, Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -209,12 +209,15 @@ class Turn:
     
     def start_term(self):
 
+        self.log.add_section("NEW TERM", "Starting new term.")
+
         # pay off interest to devi / giles (any further payment is in process_imre)
-        # todo LOG
+        self.log.log("Paying off interests to Giles / Devi...")
+        # also maybe do this inside player, not here?
         for pid in self.sane_players:
             p = self.players[pid] # idk why I'm even using pid at this point
 
-            if p.status.IMRE_INFO["DEVI_amt_owed"] > 0:
+            if p.status.IMRE_INFO["DEVI_amt_owed"] > 0: # ? and not yet defaulted?
                 paying = p.choices.pay_devi 
                 owed = p.status.IMRE_INFO["DEVI_amt_owed"]
                 arit_reduction = p.levels_in(FieldName.ARITHMETICS) * 10 + 10
@@ -226,10 +229,17 @@ class Turn:
                     # DEFAULT
                     p.IMRE_INFO["DEVI_defaulted"] = True
 
-                    # TODO: add mommet to black market 
+                    mommet = Item.Generate(ItemType.MOMMET, 1, p)
+                    mommet.uses = (owed + interest_owed) // 1
+
+                    self.blackmarket.mommets.append(mommet) # todo need to add its price
+
+                    p.processing.player_message.append("You did not pay Devi enough to cover your interest! You have now defaulted, and she has put a mommet on the Black Market with your name on it.")
+                    self.log.log(f"{p.name} defaulted on their loan to Devi.")
                 else:
                     p.status.IMRE_INFO["DEVI_amt_owed"] -= interest_owed
                     p.choices.pay_devi -= interest_owed # rest of payment happens later
+                    p.processing.player_message.append("You successfully paid off your interest owed to Devi.")
 
             if p.status.IMRE_INFO["GILES_amt_owed"] > 0:
                 paying = p.choices.pay_giles
@@ -242,14 +252,17 @@ class Turn:
                 if paying < interest_owed:
                     # DEFAULT
                     p.IMRE_INFO["GILES_defaulted"] = True
-                    # blacklist from grey man
+                    # todo blacklist from grey man
+                    p.processing.player_message.append("You didn't pay Giles enough to cover your interest! You have now defaulted, and are no longer welcome at the Grey Man.")
+                    self.log.log(f"{p.name} defaulted on their loan to Giles.")
 
                 else:
                     p.status.IMRE_INFO["GILES_amt_owed"] -= interest_owed
                     p.choices.pay_giles -= interest_owed # rest of payment happens later
+                    p.processing.player_message.append("You successfully paid off your interest owed to Giles.")
 
 
-        self.log.add_section("NEW TERM", "Starting new term.")
+        
         
         # GIVE STIPENDS
         for pid in self.sane_players:
@@ -277,7 +290,7 @@ class Turn:
                 
                 if p.status.money >= tuition:
                     # todo check for the preferences thingy
-                    p.status.money -= tuition
+                    p.status.money -= tuition # should really use the reduce_money() func
                     p.status.is_enrolled = True
                 else:
                     p.status.is_enrolled = False
@@ -294,28 +307,151 @@ class Turn:
             if p.status.master_of is not None:
                 lodging_price *= 0.75
             
+
             if p.status.money >= lodging_price:
                 p.status.money -= lodging_price
                 p.status.lodging = p.choices.next_lodging
             else:
-                # WHATEVER, TODO
+                # this isn't hacky at all shhh
+                i = ORDERED_LODGINGS.index(p.choices.next_lodging)
+                while p.status.money >= lodging_price:
+                    i -= 1
+                    new_lodging = ORDERED_LODGINGS[i]
+                    lodging_price = new_lodging.price
+                
+                p.status.money -= lodging_price
+                p.status.lodging = new_lodging
+
                 # LOG
-                pass
+
             
             if p.initial_status.lodging == Lodging.WindyTower:
                 p.status.available_EP -= 1
 
-            # TODO lodging effects 
             if p.status.lodging == Lodging.WindyTower:
                 p.status.available_EP += 1
                 # what if master / expelled / whatevs 
             elif p.status.lodging == Lodging.GreyMan or p.status.lodging == Lodging.PearlOfImre:
                 p.status.in_Imre = True
-        # todo make sure expelled students not in mews
+        # todo make sure expelled students not in mews?
 
 
         self.log.log("Stipends, tuition, & lodging processed.")
     
+
+    def preprocessing(self):
+
+        for a in self.actions:
+             # check that target(s) can be targeted 
+            if a.type.info.target1 == Target.PLAYER:
+                if a.target and not a.target.status.can_be_targeted:
+                    a.successful = False 
+            if a.type.info.target2 == Target.PLAYER:
+                if a.target_two and not a.target_two.status.can_be_targeted:
+                    a.successful = False 
+
+            # check that target is valid if action taker is expelled
+            # (i.e. target is expelled or in imre)
+            if a.player.status.is_expelled:
+                if a.type.info.target1 == Target.PLAYER and a.target:
+                    if (not a.target.status.is_expelled) and (not a.target.status.in_Imre):
+                        a.successful = False 
+                if a.type.info.target2 == Target.PLAYER and a.target_two:
+                    if (not a.target_two.status.is_expelled) and (not a.target_two.status.in_Imre):
+                        a.successful = False 
+
+            # for item steal/destroy, roll for specifics on what happens
+            # TODO make this just 'pending' to account for RB cycles
+            # sighhhhh
+            if a.type == ActionType.UseThievesLamp and a.successful:
+                if len(a.target.status.inventory) > 0:
+                    if a.target.holds_item(ItemType.BODYGUARD):
+                        continue # i guess????
+                    else:
+                        item_count = len(self.target.status.inventory)
+                        items_stolen = []
+                        if self.target.holds_item(ItemType.TALENTPIPES):
+                            item_count -= 1
+
+
+                        if item_count == 1:
+                            stolen = self.target.get_stolen_from()
+                            items_stolen.append(stolen)
+
+                        # this is a little iffy
+                        for i in range(item_count // 2):
+                            stolen = self.target.get_stolen_from()
+                            items_stolen.append(stolen)
+                a.info = items_stolen # i guess
+
+            if a.type == ActionType.UseTenaculumItem and a.successful:
+                awry = False
+                if a.level == 1:
+                    roll = random.randint(1,100)
+                    if roll <= 20:
+                        awry = True
+
+                if a.level == 2:
+                    roll = random.randint(1,100)
+                    if roll <= 10:
+                        awry = True
+                
+                if awry:
+                    # TODO
+                    pass # sigh
+
+                destroyed = None
+
+                if a.target_two:
+                    if a.target.holds_item(a.target_two):
+                        destroyed = self.target.get_items(a.target_two)[0]
+                        a.info = destroyed # idk
+
+                
+                if destroyed is None:
+                    # item unspecified or not specified correctly
+                    destroyed = self.target.get_stolen_from() # hm
+                    a.info = destroyed
+
+
+
+            if a.type == ActionType.UseTenaculumAction and a.successful:
+                awry = False
+                if a.level == 1:
+                    roll = random.randint(1,100)
+                    if roll <= 20:
+                        awry = True
+
+                if a.level == 2:
+                    roll = random.randint(1,100)
+                    if roll <= 10:
+                        awry = True
+                if awry:
+                    # goes awry! 
+                    change = random.randint(1,4)
+
+                    # todo: no talent pipes
+                    target_items = self.target.status.inventory
+                    self_items = self.player.status.inventory
+                    target_actions = self.target.choices.actions
+                    self_actions = self.player.choices.actions
+
+                    options = ["Destroy Target's Item", "Destroy Own Item", "Block Target's Action", "Block Self Action"]
+
+                    if len(target_items) == 0:
+                        options.remove("Destroy Target's Item")
+                    # ? can tenaculum destroy itself?
+                    if len(target_actions) == 0: 
+                        options.remove("Block Target's Action")
+                        # what if only 1 action, and it's the specified one?
+                    if len(self_actions) == 1:
+                        options.remove("Block Self Action")
+                    
+                    choice = random.choice(options)
+                        
+
+        return
+
 
     def apply_valid_blocks(self, block_list: "list[Action]", count = 0, process_block_cycles = False):
         state_changed = False
@@ -377,7 +513,7 @@ class Turn:
             for a in p.choices.actions:
                 print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
-    def preprocessing(self):
+    def preprocessing_standard(self):
 
         for a in self.actions: 
             # if failed, do whatever to log it
@@ -475,7 +611,7 @@ class Turn:
             f.elevating = nm
             f.next_masters.remove(nm) # probably?
 
-            # nm.make_master(f) # TODO
+            nm.become_master(f) # TODO
 
             nm_ret[f] = nm # ehhhhh
         
@@ -537,11 +673,16 @@ class Turn:
         
         finalNPC = npc_choices 
 
-        for i, f in finalE:
+        for i, p in finalE:
             # check for conflict w PC? (shouldn't happen)
             if npc_choices[i] is not None: 
                 finalE[i] = npc_choices[i]
         
+        for i, p in finalE:
+            if p is not None:
+                p.elevate_in(FieldName(i)) #?
+
+
         return finalE
 
                 
@@ -796,20 +937,21 @@ class Turn:
                 # if insane, this is unblockable kill
                 if not a.target.status.is_sane:
                     a.successful = True
-                    sabotagee = a.target
+                    #sabotagee = (a,a.target)
                     attacks.append((a, a.target))
 
                 elif a.target.processing.can_be_targeted:
-                    sabotagee = a.target
+                    sabotagee = (a,a.target)
 
-                    if sabotagee.holds_item(ItemType.BLOODLESS):
-                        b = sabotagee.get_items(ItemType.BLOODLESS)
+                    # checked later
+                    # if sabotagee.holds_item(ItemType.BLOODLESS):
+                    #     b = sabotagee.get_items(ItemType.BLOODLESS)
 
-                        if len(b) > 0: # should always be true
-                            b[0].use() # todo, probs
+                    #     if len(b) > 0: # should always be true
+                    #         b[0].use() # todo, probs
                         
-                            a.successful = True # bc not blocked
-                            sabotagee = None
+                    #         a.successful = True # bc not blocked
+                    #         sabotagee = None
                     
             
             if a.type == ActionType.UseAssassin and a.successful:
@@ -832,31 +974,48 @@ class Turn:
 
             # todo mommet
 
-        still_attacked = []
+        dying: set(Player) = set()
         
         for attacked in attacks:
             # TODO change to attacked.attack(attackaction)
-            attacked[1].get_attacked(attacked[0])
+            result = attacked[1].get_attacked(attacked[0])
+
+            if result: # person dies
+                dying.append(attacked[1])
+                self.log.log(f"{attacked[1].name} dying to {attacked[0].name}")
+                self.log.results.public_results.append(f"{attacked[1].name} was killed!") # ?add alignment?
+            else: # person is protected
+                self.log.log(f"{attacked[1].name} was attacked by {attacked[0]} but survived") # due to?
+                self.log.results.public_results.append(f"{attacked[1].name} was attacked, but survived!")
         
-        if sabotagee is not None:
-            if sabotagee.holds_item(ItemType.GRAM):
-                g = attacked.get_items(ItemType.GRAM)
-                if len(g) > 0:
-                    g[0].use()
-                    protected.append(sabotagee)
-            elif sabotagee.holds_item(ItemType.BODYGUARD):
-                bs = attacked.get_items(ItemType.BODYGUARD)
-                if len(bs) > 0:
-                    bs[0].use() # SABOTAGE
-                    protected.append(sabotagee)
+        if sabotagee is not None: # if sabotage was attack, this is none
+            was_sabotaged = sabotagee[1].get_attacked(sabotagee[0])
+            if was_sabotaged:
+                self.log.log(f"{sabotagee[1]} successfully sabotaged")
+                self.log.results.public_results.append(f"{sabotagee[1]} went insane!")
             else:
-                sabotagee.go_insane()
+                self.log.log(f"{sabotagee[1].name} was sabotaged but survived") # due to?
+                self.log.results.public_results.append(f"{sabotagee[1].name} was attacked, but survived!")
+            # if sabotagee.holds_item(ItemType.GRAM):
+            #     g = attacked.get_items(ItemType.GRAM)
+            #     if len(g) > 0:
+            #         g[0].use()
+            #         protected.append(sabotagee)
+            # elif sabotagee.holds_item(ItemType.BODYGUARD):
+            #     bs = attacked.get_items(ItemType.BODYGUARD)
+            #     if len(bs) > 0:
+            #         bs[0].use() # SABOTAGE
+            #         protected.append(sabotagee)
+            # else:
+            #     sabotagee.go_insane()
         
         for p in could_go_insane:
             roll = random.randint(1,10)
 
             if roll + p.processing.insanity_bonus >= 12:
                 p.go_insane()
+                self.log.log(f"{p.name} went insane normally")
+                self.log.results.public_results(f"{p.name} went insane!") # todo: check against already-insane ppl
 
         # for a in still_attacked:
         #     a.die()
@@ -953,6 +1112,8 @@ class Turn:
                 p.processing.insanity_bonus += 2
             elif p.status.lodging == Lodging.SpindleAndDraft:
                 p.processing.insanity_bonus -= 2
+            
+
 
         # set up passive roleblocks
         self.log.add_section("Roleblocks & The Like", "Starting to process roleblocks etc.")
@@ -975,7 +1136,15 @@ class Turn:
                 action_blocked = random.choice(p.choices.actions)
                 action_blocked.blocked = True
                 action_blocked.block_reasoning += "Ankers"
+            elif p.status.lodging == Lodging.KingsDrab and random.randrange(0,100) < 5:
+                p.get_stolen_from()
+                # log? 
+
             # TODO log
+        
+        # TODO process if actions by expelled students work
+        # can only target expelled ppl or ppl in imre
+        self.preprocessing()
         
         self.log.log("Passive roleblocks processed...")
 
