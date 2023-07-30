@@ -1,33 +1,37 @@
 from enum import Enum
 import random
-
+from actioninfo import ActionType
 
 class ItemType(Enum):
-    MOMMET = 1, "Mommet"
-    TENACULUM = 2, "Tenaculum"
-    FIRESTOP = 3, "Firestop"
-    PLUMBOB = 4, "Plum Bob"
-    BONETAR = 5, "Bonetar"
-    WARD = 6, "Ward"
-    BLOODLESS = 7, "Bloodless"
-    THIEVESLAMP = 8, "Thieves Lamp"
-    GRAM = 9, "Gram"
-    TALENTPIPES = 10, "Talent Pipes"
-    NAHLROUT = 11, "Nahlrout"
-    BODYGUARD = 12, "Bodyguard" # hmm
-    MOMMET_3rd = 13, "Mommet (3rd level)"
 
-    def __new__(cls, value, name, ):
+    MOMMET = 1, ActionType.UseMommet
+    TENACULUM = 2, ActionType.UseTenaculumAction # hmm
+    FIRESTOP = 3, None # passive
+    PLUMBOB = 4, ActionType.UsePlumbob
+    BONETAR = 5, ActionType.UseBonetar
+    WARD = 6, ActionType.UseWard
+    BLOODLESS = 7, None # passive
+    THIEVESLAMP = 8, ActionType.UseThievesLamp
+    GRAM = 9, None # passive
+    TALENTPIPES = 10, None # passive # maybe remove
+    NAHLROUT = 11, ActionType.UseNahlrout
+    BODYGUARD = 12, None # passive # maybe remove? (can't be given or stolen)
+    MOMMET_3rd = 13, ActionType.UseMommet
+
+    def __new__(cls, value, using_action):
         member = object.__new__(cls)
         member._value_ = value
-        member.fullname = name
+        member.using_action = using_action
+
         return member
 
     def __int__(self):
         return self.value
+
     
     def __str__(self):
         return self.fullname
+
 
 
 class Item:
@@ -75,7 +79,7 @@ class Item:
             elif type ==  ItemType.BLOODLESS:
                 return Item("Bloodless", type, uses, True, False, level, id)
             elif type == ItemType.THIEVESLAMP:
-                return Item("Thieve's Lamp", type, uses, False, True, level, id)
+                return Item("Thieves Lamp", type, uses, False, True, level, id)
             else: # Gram
                 return Item("Gram", type, uses, True, False, level, id) 
         elif type == ItemType.TALENTPIPES:

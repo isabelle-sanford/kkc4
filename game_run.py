@@ -150,7 +150,7 @@ class Turn:
         self.month = month
 
         self.log = ProcessLog(month)
-        self.results = Result(month)
+        #self.results = Result(month)
 
         self.actions: list[Action] = []
         self.offensive_actions: list[Action] = []
@@ -372,6 +372,27 @@ class Turn:
             for a in p.choices.actions:
                 print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
 
+    def preprocessing(self):
+
+        for a in self.actions: 
+            # if failed, do whatever to log it
+
+            if a.successful:
+                # todo: fix for actions that can but don't require a player target
+                # add actions to targeted_by lists for player targets
+                if a.type.info.target1 == Target.PLAYER:
+                    a.target.processing.targeted_by.append(a)
+                if a.type.info.target2 == Target.PLAYER:
+                    a.target_two.processing.targeted_by.append(a)     
+
+                # could split by category here but just do at init?            
+
+                a.player.processing.player_message.append(f"Your action to use {a.type.info.name} on {a.target} {f'and {a.target_two} ' if a.target_two else ''} succeeded.") # more here? idk
+            
+            else:
+                a.player.processing.player_message.append(f"Your action to use {a.type.info.name} on {a.target} {f'and {a.target_two} ' if a.target_two else ''} failed.")
+
+
 
     def process_standard_actions(self):
         # todo: check streets pos actions
@@ -391,7 +412,7 @@ class Turn:
                         continue
 
                     # todo more checks probably
-                    a.perform()
+                    a.perform(log=self.log)
 
             elif a.type.category == ActionCategory.OFFENSIVE:
                 self.offensive_actions.append(a)
@@ -456,7 +477,93 @@ class Turn:
         return nm_ret # i guess
         # todo TEST pls
 
+    def do_elevations2(self):
+        pcE = [None] * 9 # test 
+        npcE = [None] * 9 
+        newM = self.do_new_masters().values()
 
+        for f in self.fields:
+            if f.master is not None:
+                if f.master.status.can_elevate: # processing?
+                    e = f.master.choices.to_elevate 
+                    e = [i for i in e if i not in newM] # test
+
+                    if len(e) > 0:
+                        pcE[f.name] = e
+            else:
+                e = f.get_EP_list() 
+                e = [i for i in e if i not in newM]
+                npcE[f.name] = e
+            
+        # PC masters
+
+        while True:
+            e1 = [i[0] for i in pcE] # hmm
+            dupes = self.get_dupes(e1) # make sure doesn't find None=None
+            if len(dupes) == 0:
+                break
+            for d in dupes:
+                p = e1[d[0]]
+                i = self.get_max([p.status.EP.vals[f] for f in d])
+
+                for f in d:
+                    if f != i:
+                        pcE[f].remove(p) # should always work
+        
+        finalE = e1
+
+        for f in npcE:
+            f = [i for i in f if i not in finalE] # ?
+        
+        npc_choices = [random.choice(l) for l in npcE if len(l) > 0]
+        while True:
+            dupes = self.get_dupes(npc_choices)
+            if len(dupes) == 0:
+                break
+
+            for conflict in dupes:
+                p = npc_choices[conflict]
+                winner = self.get_max([p.status.EP.vals[f] for f in conflict])
+
+                for c in conflict:
+                    if c != winner:
+                        npcE[c] = [i for i in npcE[c] if i != p]
+                        npc_choices[c] = random.choice(npcE[c])
+        
+        finalNPC = npc_choices 
+
+        for i, f in finalE:
+            # check for conflict w PC? (shouldn't happen)
+            if npc_choices[i] is not None: 
+                finalE[i] = npc_choices[i]
+        
+        return finalE
+
+                
+
+
+    def get_max(li: list[int]):
+        random.shuffle(li) # for tiebreakers 
+        idx = 0
+        val = 0
+
+        for i, n in li:
+            if n > val:
+                idx = i
+                val = n
+        return idx
+
+    
+    def get_dupes(li): 
+        dupes = {} 
+
+        for i, val in li: 
+            if li.count(val) > 1:
+                if val in dupes: dupes[val].append(i)
+                else: dupes[val] = [i]
+        return dupes.values()
+    
+    # todo TEST elevations2
 
     # todo somewhere: remember to account for fields being destroyed
     # this is Yikes
@@ -476,6 +583,8 @@ class Turn:
                 if len(m.choices.to_elevate) > 0:
                     if m.processing.can_elevate:
                         pc_choice = m.choices.to_elevate[0]
+
+
                         candidates[f] = m.choices.to_elevate
 
                         if pc_choice in to_elevate:
@@ -561,6 +670,7 @@ class Turn:
         # todo LOG
 
     # check this over, hmm
+    # also it's 1 IP per FOUR EP
     def offset_IP(self):
         for pid in self.sane_players:
             p = self.players[pid]
@@ -696,12 +806,24 @@ class Turn:
 
             
             # todo bonetar 
+            if a.type == ActionType.UseBonetar and a.successful:
+                lodging_destroyed = a.target
+                at_lodging = [id for id in self.living_players if self.players[id].status.lodging == lodging_destroyed] # that might be a bit much but hey it works 
+                if a.player.id in at_lodging: at_lodging.remove(a.player.id) # handled separately inside perform()
+
+                results = a.perform(log=self.log, at_lodging=at_lodging)
+
+                for d in results["dead"]:
+                    being_attacked.append(d)
+                
+                # todo put survivors on the streets
 
             # todo mommet
 
         still_attacked = []
         
         for attacked in being_attacked:
+            # TODO change to attacked.attack(attackaction)
             if attacked.holds_item(ItemType.GRAM):
                 g = attacked.get_items(ItemType.GRAM)
                 if len(g) > 0:

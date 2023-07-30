@@ -15,6 +15,8 @@ class ProcessLog:
         self.sections = {"init": ["starting log..."]}
         self.curr_section = "init"
 
+        self.results = Result(month)
+
     def add_section(self, name: str, starter: str):
         self.sections[name] = [starter]
         self.curr_section = name
@@ -52,6 +54,8 @@ class Result:
         self.player_messages = [] #?
         self.all_actions: list[Action] = []
         self.non_action_results = []
+
+        self.gm_todo = []
 
         self.warnings = []
         self.errors = []
