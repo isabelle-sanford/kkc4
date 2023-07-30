@@ -8,7 +8,7 @@ from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import ORDERED_LODGINGS, Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
+from statics import NONIMRE_LODGINGS, Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
@@ -251,7 +251,7 @@ class Turn:
 
                 if paying < interest_owed:
                     # DEFAULT
-                    p.IMRE_INFO["GILES_defaulted"] = True
+                    p.status.IMRE_INFO["GILES_defaulted"] = True
                     # todo blacklist from grey man
                     p.processing.player_message.append("You didn't pay Giles enough to cover your interest! You have now defaulted, and are no longer welcome at the Grey Man.")
                     self.log.log(f"{p.name} defaulted on their loan to Giles.")
@@ -296,6 +296,10 @@ class Turn:
                     p.status.is_enrolled = False
 
 
+            if p.choices.next_lodging == Lodging.GreyMan and p.status.IMRE_INFO["GILES_defaulted"]:
+                p.processing.player_message.append("You tried to stay at the Grey Man, but defaulted on your debt to Giles, so are unable to stay there! You were placed at the King's Drab instead.")
+                p.choices.next_lodging = Lodging.KingsDrab
+
 
         # DO LODGING STUFF
         # remember to check price for masters, ruh
@@ -312,11 +316,17 @@ class Turn:
                 p.status.money -= lodging_price
                 p.status.lodging = p.choices.next_lodging
             else:
+                # TODO imre lodgings
+                # if p.choices.next_lodging == Lodging.PearlOfImre:
+                #     new_lodging = Lodging.GreyMan
+                #     if p.status.money
+
+
                 # this isn't hacky at all shhh
-                i = ORDERED_LODGINGS.index(p.choices.next_lodging)
+                i = NONIMRE_LODGINGS.index(p.choices.next_lodging)
                 while p.status.money >= lodging_price:
                     i -= 1
-                    new_lodging = ORDERED_LODGINGS[i]
+                    new_lodging = NONIMRE_LODGINGS[i]
                     lodging_price = new_lodging.price
                 
                 p.status.money -= lodging_price
@@ -333,6 +343,8 @@ class Turn:
                 # what if master / expelled / whatevs 
             elif p.status.lodging == Lodging.GreyMan or p.status.lodging == Lodging.PearlOfImre:
                 p.status.in_Imre = True
+            
+
         # todo make sure expelled students not in mews?
 
 

@@ -76,6 +76,8 @@ LODGINGS = {
     "Grey-Man": Lodging.GreyMan,
     "Pearl-of-Imre": Lodging.PearlOfImre
 }
+# for going to the next cheapest lodging if you can't afford current
+NONIMRE_LODGINGS = [Lodging.Streets, Lodging.Mews, Lodging.Ankers, Lodging.KingsDrab, Lodging.GoldenPony, Lodging.WindyTower, Lodging.HorseAndFour, Lodging.SpindleAndDraft]
 
 
 class Background(Enum): 

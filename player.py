@@ -762,7 +762,6 @@ class Player:
         
         # anything else? 
 
-
     def add_item(self, item: Item):
         self.processing.items_received.append(item)
         if item.type.using_action is not None:
@@ -771,8 +770,6 @@ class Player:
             self.status.accessible_actions.add(ActionType.UseTenaculumItem) # hacky but works
         
         self.status.accessible_actions.add(ActionType.GiveItem)
-
-    
 
     def holds_item(self, item_type: ItemType) -> bool:
         count = 0
@@ -977,8 +974,7 @@ class Player:
                 self.add_item(item)
             
             self.processing.player_message.append(f"Since your loan has been fully paid back, she has also returned any items you gave her as collateral.")
-            
-        
+                    
     def pay_giles(self):
         owed = self.status.IMRE_INFO["GILES_amt_owed"]
         paying = paying

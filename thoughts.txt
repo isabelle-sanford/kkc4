@@ -2,7 +2,11 @@
 
 todo II:
 - get_attacked in Player / offensive_actions in Turn 
-
+- imre being-roleblocked locations
+- update to new player choices somewhere? maybe have a next_turn thingy in the Player class? 
+- learning new names (+ adding them to status + passive insanity bonus from them)
+- check somewhere that Vints are only in the top two lodgings they can afford
+- some classes on the streets with low money get lower merc death chance
 
 
 
