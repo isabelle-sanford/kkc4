@@ -30,20 +30,21 @@ class PlayerStatic:
         ret += "\n"
         return ret
 
-@dataclass
 class EP:
     # TODO figure out what's going on here
-    vals = {
-            FieldName.LINGUISTICS: 0, 
-            FieldName.ARITHMETICS: 0, 
-            FieldName.RHETORICLOGIC: 0,
-            FieldName.ARCHIVES: 0, 
-            FieldName.SYMPATHY: 0,
-            FieldName.PHYSICKING: 0,
-            FieldName.ALCHEMY: 0,
-            FieldName.ARTIFICERY: 0,
-            FieldName.NAMING: 0
-            }
+    def __init__(self):
+
+        self.vals = {
+                FieldName.LINGUISTICS: 0, 
+                FieldName.ARITHMETICS: 0, 
+                FieldName.RHETORICLOGIC: 0,
+                FieldName.ARCHIVES: 0, 
+                FieldName.SYMPATHY: 0,
+                FieldName.PHYSICKING: 0,
+                FieldName.ALCHEMY: 0,
+                FieldName.ARTIFICERY: 0,
+                FieldName.NAMING: 0
+                }
     
     def get_list(self): # [rhet, rhet, ling, ling, ling, ...]
         all_EP: list[FieldName] = []
@@ -54,16 +55,19 @@ class EP:
         return all_EP
     
     def __str__(self) -> str:
-        #hmm
-        out = f"| Lin | Ari | R&L | Arc | Sym | Phy | Alc | Art | Nam |\n|"
-        for v in self.vals.values():
-            out += f"{v: >3}  |"
-        return out
+        ret = ""
+       
+        for k in self.vals.keys():
+            if self.vals[k] > 0:
+                ret += f"({k}: {self.vals[k]}) "
+            
+        return ret
 
 class PlayerStatus:
 
     def __init__(self, player_static):
         self.info = player_static
+
         self.accessible_actions: set[ActionType] = set() # TODO
         if player_static.is_evil:
             self.accessible_actions.add(ActionType.Sabotage)
@@ -83,6 +87,7 @@ class PlayerStatus:
         self.in_Imre = False
         self.broke_out = False # for underthing
         
+
         # things the player knows / happened prev turn
         # so their page can have invalid stuff grayed out or whatever
         self.can_take_actions = True # why is this blue
@@ -181,6 +186,23 @@ class PlayerStatus:
         if self.status.master_of == field:
             count = 4
         return count
+    
+    
+    def short_status(self):
+        ret = "" 
+        ret += "Alive" if self.is_alive else "Dead"
+        ret += ", "
+        ret += "Sane" if self.is_sane else "Insane"
+        ret += " (Expelled)" if self.is_expelled else ""
+
+        return ret
+    
+    def print_money(self):
+        # this can probs be better / nicer 
+        m = self.money # 30.14
+        ret = f"{int(m // 1)} talent(s), {int((m * 10) // 1) % 10} jot(s), and {int(m * 100) % 10} drab(s)" 
+
+        return ret
 
 
     
@@ -230,6 +252,7 @@ class PlayerProcessing:
         self.insanity_bonus = 0 # might want to take something from prev status?
         # and check mews / spindle & draft
 
+
         self.player_message = [] # todo fancy this probs
 
     def short_status(self):
@@ -240,16 +263,8 @@ class PlayerProcessing:
         ret += "Sane" if self.is_sane else "Insane"
         ret += " (Expelled)" if self.is_expelled else ""
 
-        return ret
 
-    def print_money(self):
-        # this can probs be better / nicer 
-        m = self.money # 3.14
-        m *= 100 # 314
-        m = str(m) # "314"
-        ret = f"{m[0]} talent(s), {m[1]} jot(s), and {m[2]} drab(s)" 
 
-        return ret
 
 
 class PlayerChoices:
@@ -928,6 +943,7 @@ class Player:
             self.processing.DP += total
 
     def assign_EP(self, field: FieldName, total = 1):
+        # todo add to field's ep listing? 
         self.status.EP.vals[field] += total
 
 

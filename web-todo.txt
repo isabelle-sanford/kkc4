@@ -1,0 +1,8 @@
+
+
+- update ALL links between rules pages to be correct 
+- sql
+- turn results page 
+- security stuff (eventually)
+- download bootstrap? 
+- gm input needs submit button

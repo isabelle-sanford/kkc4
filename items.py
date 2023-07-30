@@ -3,6 +3,7 @@ import random
 from actioninfo import ActionType
 
 class ItemType(Enum):
+
     MOMMET = 1, ActionType.UseMommet
     TENACULUM = 2, ActionType.UseTenaculumAction # hmm
     FIRESTOP = 3, None # passive
@@ -21,11 +22,16 @@ class ItemType(Enum):
         member = object.__new__(cls)
         member._value_ = value
         member.using_action = using_action
+
         return member
 
     def __int__(self):
         return self.value
-\
+
+    
+    def __str__(self):
+        return self.fullname
+
 
 
 class Item:
@@ -98,4 +104,17 @@ class Item:
             ret += f" on {self.target} "
         if self.uses > 1:
             ret += f" ({self.uses} use(s))"
+        
+        return ret
+    
+    def __repr__(self):
+        ret = f"{self.name}"
+
+        if self.target is not None:
+            # mommet only
+            ret += f" on {self.target} "
+        if self.uses > 1:
+            ret += f" ({self.uses} use(s))"
+        
+        return ret
         
