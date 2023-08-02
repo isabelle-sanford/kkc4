@@ -4,7 +4,7 @@ from items import ItemType
 from player import Player
 from flask import Flask, render_template, request, url_for, flash, redirect
 from actioninfo import ActionType
-
+import pickle
 # sql connection goes here
 
 app = Flask(__name__)
@@ -18,7 +18,6 @@ living_players = [] # seems useful, idk
 
 g = Game()
 
-t1: Turn = None
 
 # main public game page
 @app.route("/")
@@ -85,7 +84,7 @@ def player(name):
 
 @app.route("/gm/start")
 def start_game():
-    t1 = Turn(g.players, {}, 0, fields, g.apothecary, g.blackmarket)
+    g.start_game()
     # does this stay like this once start_game is done? 
     return render_template('gm-start.html')
 
@@ -101,7 +100,15 @@ def gm_players():
 
 @app.route("/gm/imre")
 def gm_imre():
-    return render_template('gm-imre.html', imre_players=[t1.players[id] for id in t1.imre_players]) # TODO
+    return render_template('gm-imre.html', imre_players=[g.curr_turn.players[id] for id in t1.imre_players]) # TODO
+
+@app.route("/gm/processturn")
+def process_turn():
+    with open('gamenow.pickle', 'rb') as f:
+        curr_game = pickle.load(f)
+
+    return render_template('gm-turn.html', game=curr_game)
+# TODO: page post-processing to reset 'g' to new thingy
 
 @app.route("/rules/game-basics")
 def rules_game_basics():

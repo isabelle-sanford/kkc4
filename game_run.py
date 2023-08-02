@@ -10,12 +10,16 @@ from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
 from statics import NONIMRE_LODGINGS, Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
 
+import pickle
+
 # idk 
 #PLAYERS: "list[Player]" = [] 
 
 class Game:
 
     def __init__(self):
+
+
         self.num_players = 0
         self.players: list[Player] = []
         self.turns: list[Turn] = []
@@ -24,12 +28,13 @@ class Game:
 
         self.apothecary = Apothecary()
         self.blackmarket = BlackMarket()
-
         self.fields = FIELDS
-
         self.player_list = {}
-
         self.month = 0
+
+        self.curr_gm_input = None
+
+        
 
 
     def add_player(self, input):
@@ -82,9 +87,20 @@ class Game:
 
         return player
 
-    def start_game(self, distro_inputs):
-        for d in distro_inputs:
-            self.add_player(d) 
+    def start_game(self):
+        # for d in distro_inputs:
+        #     self.add_player(d) 
+
+        self.curr_turn = Turn(None, 0, self)
+        
+        with open('gamestart.pickle', 'wb') as f:
+            pickle.dump(self, f)
+        
+        with open('t1players.pickle', 'wb') as f:
+            pickle.dump(self.players, f)
+        
+        with open('gamenow.pickle', 'wb') as f:
+            pickle.dump(self, f)
 
 
     # ...should this be in Turn? not sure
@@ -114,7 +130,7 @@ class Game:
         if "field0" in choice:
             print("filing in ", choice["field0"])
             # check here?
-            c.choices.filing_EP = choice["field0"] # no
+            c.choices.filing_EP[0] = int(choice["field0"]) # no
                 
         if "actions" in choice:
             for a in choice["actions"]:
@@ -124,7 +140,7 @@ class Game:
         
         # todo other choices
             # imre stuff
-
+    # ! TODO
     def update_choices(self, new_choices):
         # erase all prev choices? (for just the player(s) in the list?)
         for choice in new_choices:
@@ -143,6 +159,26 @@ class Game:
             
             # todo other choices
                 # imre stuff
+
+    def new_turn(self, gm_inputs):
+
+
+        self.turns.append(self.curr_turn)
+        self.month += 1
+        self.curr_turn = Turn(gm_inputs, self.month, self)
+
+
+        self.curr_turn.PROCESS_TURN()
+
+        # TODO: add gm processing manually here
+
+        m = 'turn' + str(self.month) + '.pickle' 
+
+        with open(m, 'wb') as f:
+            pickle.dump(self.curr_turn)
+
+        with open('gamenow.pickle', 'wb') as f:
+            pickle.dump(self, f)
 
 
 
@@ -350,6 +386,26 @@ class Turn:
 
         self.log.log("Stipends, tuition, & lodging processed.")
     
+
+    def preprocess_tenaculum(self):
+        for a in self.actions:
+            if a.type == ActionType.UseTenaculumAction:
+                awry = False
+                if a.level == 1: #! LEVEL IS OF USER
+                    roll = random.randint(1,100)
+                    if roll <= 20:
+                        awry = True
+
+                if a.level == 2:
+                    roll = random.randint(1,100)
+                    if roll <= 10:
+                        awry = True
+                # DO STUFF
+                pass
+
+            if a.type == ActionType.UseTenaculumItem:
+                # DO STUFF
+                pass
 
     def preprocessing(self):
 

@@ -314,7 +314,7 @@ class PlayerChoices:
 
         self.actions: list[Action] = []
 
-        self.filing_EP: list[FieldName] = []
+        self.filing_EP: list[FieldName] = [None] * self.status.available_EP
 
         # if master 
         if self.status.master_of is not None:
@@ -871,7 +871,7 @@ class Player:
             
             winnings = bet_amt * multiplier
 
-            self.increase_money(winnings)
+            self.increase_money(winnings - bet_amt)
 
             if self.status.IMRE_INFO["LOADEDDICE_lastwon"] + 6 <= self.month:
                 self.status.IMRE_INFO["LOADEDDICE_blacklistedtil"] = self.month + 12
