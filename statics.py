@@ -12,7 +12,7 @@ class FieldName(IntEnum):
     ARTIFICERY = 7
     NAMING = 8
     GENERAL = 9  # ? # gotta remember this when iterating thru
-
+FIELDNAMES = ["Linguistics", "Arithmetics", "Rhetoric & Logic", "Archives", "Sympathy", "Physicking", "Alchemy", "Artificery", "Naming"]
 
 class Rank(IntEnum):
     NONE = 0
@@ -39,7 +39,7 @@ class Lodging(Enum):
     Streets = 0, "The Streets", 0
     Underthing = 1, "The Underthing", 0
     Mews = 2, "Mews", 1 # +2 IP
-    Ankers = 3, "Ankers", 4 # 15% 1 action cancelled
+    Ankers = 3, "Anker's", 4 # 15% 1 action cancelled
     KingsDrab = 4, "The King's Drab", 6 # ?% stolen item
     GreyMan = 5, "The Grey Man", 7 # Giles, Imre
     GoldenPony = 6, "The Golden Pony", 8 # -2 complaints

@@ -4,7 +4,7 @@ from enum import Enum
 import random
 from actioninfo import ActionInfo 
 
-from statics import Background, Lodging, FieldName, Rank
+from statics import Background, Lodging, FieldName, Rank, FIELDNAMES
 from actions import ActionType, Action
 from field import FieldStatus, FIELDS
 from items import ItemType, Item
@@ -58,7 +58,7 @@ class EP:
        
         for k in self.vals.keys():
             if self.vals[k] > 0:
-                ret += f"({k}: {self.vals[k]}) "
+                ret += f"({FIELDNAMES[k]}: {self.vals[k]}) "
             
         return ret
 
@@ -137,7 +137,7 @@ class PlayerStatus:
         s.lodging: Lodging = current_lodging
 
         s.musical_stat = musical_stat
-        s.inventory: list[Item] = [inventory] # questionable
+        s.inventory: list[Item] = inventory # questionable
         # should bodyguard be in inventory or separate?
         
 
@@ -474,7 +474,7 @@ class Player:
         self.info: PlayerStatic = player_static 
 
         if player_choices is None:
-            player_choices = PlayerChoices(player_static, 0)
+            player_choices = PlayerChoices(player_static, 0, player_status)
         self.choices: PlayerChoices = player_choices 
         
         # sort of irregularly used, but maybe more helpful than passing full Player instances around everywhere

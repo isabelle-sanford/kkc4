@@ -91,7 +91,7 @@ class Game:
         # for d in distro_inputs:
         #     self.add_player(d) 
 
-        self.curr_turn = Turn(None, 0, self)
+        self.curr_turn = Turn({}, 0, self)
         
         with open('gamestart.pickle', 'wb') as f:
             pickle.dump(self, f)
@@ -126,16 +126,24 @@ class Game:
     def update_player_choices(self, choice, player):
         c = player
 
-        if "imre_next" in choice: c.imre_next = True
-        if "field0" in choice:
-            print("filing in ", choice["field0"])
-            # check here?
-            c.choices.filing_EP[0] = int(choice["field0"]) # no
-                
-        if "actions" in choice:
-            for a in choice["actions"]:
+        # term start things
+        if "lodging" in choice:
+            c.choices.next_lodging = int(choice["lodging"])
 
-                self.add_action(c.id, a)
+
+        if "imre_next" in choice: c.choices.imre_next = True
+
+        for i in range(6):
+            if ("field" + str(i)) in choice:
+                print("filing in field" + str(i))
+                c.choices.filing_EP[i] = int(choice["field"+str(i)])
+
+        for i in range(4):
+            if ("action" + str(i)) in choice:
+                a_info = choice["action"+str(i)]
+                # TODO
+
+                self.add_action(c.id, a_info)
         # what about updating an action? do we just clear all actions before this func? 
         
         # todo other choices
@@ -227,7 +235,7 @@ class Turn:
 
         # other lists? imre? 
 
-        if gm_input["complaints"]:
+        if "complaints" in gm_input:
             for v in range(len(gm_input["complaints"])):
                 # accessing id here is a little dubious but ok
                 self.players[v].choices.complaints = gm_input["complaints"][v]

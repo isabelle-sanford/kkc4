@@ -1,0 +1,109 @@
+{% extends 'player_page.html' %} {% block actions %}
+<form class="col-6 mt-2" method="post">
+  <div>
+    ACTIONS
+    <!-- TODO only show if NOT in imre -->
+    <fieldset class="fieldset-uni">
+      <!-- TODO CHECK IF ROLEBLOCKED IN STATUS -->
+      <legend align="center" class="legend-uni">Actions</legend>
+      {% for i, ap in player.status.action_periods %}
+      <div class="input-group">
+        <!-- TODO only show possible # of action periods etc -->
+        <span class="input-group-text actions">{{ap}}</span>
+        <select class="form-select" id="action{{i}}" name="action{{i}}">
+          <option value="None">--</option>
+          {% for a in player.status.accessible_abilities %}
+          <option value="{{a}}">{{a.info.name}}</option>
+          {% endfor %}
+        </select>
+
+        <!-- VARIOUS TARGET TYPES -->
+        <select class="form-select" id="targetplayer" name="targetplayer">
+          <!-- TODO only living players -->
+          {% for p in playerlist %}
+          <option value="{{p.name}}">{{p.name}}</option>
+          {% endfor %}
+        </select>
+
+        <!-- ? consider diff list for this? -->
+        <select class="form-select" id="targetaction" name="targetaction">
+          {% for at in ActionType %}
+          <option value="{{at.info.name}}">{{at.info.name}}</option>
+          {% endfor %}
+        </select>
+
+        <select class="form-select" id="targetlodging" name="targetlodging">
+          <option value="1">The Underthing</option>
+          <option value="2">The Mews</option>
+          <option value="3">Anker's</option>
+          <option value="4">The King's Drab</option>
+          <option value="6">The Golden Pony</option>
+          <option value="7">The Windy Tower</option>
+          <option value="8">The Horse and Four</option>
+          <option value="10">The Spindle and Draft</option>
+          <option value="5" style="color: #c30b7f">The Grey Man</option>
+          <option value="9" style="color: #c30b7f">The Pearl of Imre</option>
+        </select>
+
+        <select class="form-select" id="targetitem" name="targetitem">
+          {% for it in items %}
+          <option value="{{it.value}}">{{it.name}}</option>
+          {% endfor %}
+        </select>
+
+        <select class="form-select" id="targetfield" name="targetfield">
+          <option value="0">Linguistics</option>
+          <option value="1">Arithmetics</option>
+          <option value="2">Rhetoric/Logic</option>
+          <option value="3">Archives</option>
+          <option value="4">Sympathy</option>
+          <option value="5">Phsysicking</option>
+          <option value="6">Alchemy</option>
+          <option value="7">Artificery</option>
+          <option value="8">Naming</option>
+        </select>
+
+        <!-- TODO events, other, Names -->
+
+        <!-- SECONDARY TARGET -->
+        <select class="form-select" id="targetplayer2" name="targetplayer2">
+          <!-- TODO only living players -->
+          {% for p in playerlist %}
+          <option value="{{p.id}}">{{p.name}}</option>
+          {% endfor %}
+        </select>
+
+        <!-- ? consider diff list for this? -->
+        <select class="form-select" id="targetaction2" name="targetaction2">
+          {% for at in ActionType %}
+          <option value="{{at.value}}">{{at.info.name}}</option>
+          {% endfor %}
+        </select>
+
+        <select class="form-select" id="targetitem2" name="targetitem2">
+          {% for it in items %}
+          <option value="{{it.value}}">{{it.name}}</option>
+          {% endfor %}
+        </select>
+
+        <!-- TODO abilities, other -->
+      </div>
+      {% endfor %}
+
+      <textarea class="form-control" style="margin-right: 10px">Notes</textarea>
+
+      <div class="col-12 my-3">
+        <button
+          type="submit"
+          class="btn submit"
+          id="submitAction"
+          name="submitAction"
+        >
+          Submit Actions
+        </button>
+      </div>
+    </fieldset>
+  </div>
+</form>
+
+{% endblock %}

@@ -161,14 +161,14 @@ class ActionType(Enum):
     DecreasedTuition = 35, decreased_tuition
 
     # kinda need for accessible abilities stuff
-    CreateTenaculum = 36
-    CreateFirestop = 37
-    CreatePlumbob = 38
-    CreateBonetar = 39
-    CreateWard = 40
-    CreateBloodless = 41
-    CreateThievesLamp = 42
-    CreateGram = 43
+    CreateTenaculum = 36, create_item # !
+    CreateFirestop = 37, create_item
+    CreatePlumbob = 38, create_item
+    CreateBonetar = 39, create_item
+    CreateWard = 40, create_item
+    CreateBloodless = 41, create_item
+    CreateThievesLamp = 42, create_item
+    CreateGram = 43, create_item
 
 
     def __new__(cls, value, info):

@@ -79,12 +79,13 @@ def player(name):
         g.update_player_choices(request.form, player)
     # todo POST method for choice submissions
     
-    #print(player)
+    print(player.status.accessible_actions)
     return render_template('player_page.html', player=player, playerlist=g.players, actions=ActionType, items=ItemType)
 
 @app.route("/gm/start")
 def start_game():
     g.start_game()
+    print(g.players)
     # does this stay like this once start_game is done? 
     return render_template('gm-start.html')
 
@@ -107,7 +108,7 @@ def process_turn():
     with open('gamenow.pickle', 'rb') as f:
         curr_game = pickle.load(f)
 
-    return render_template('gm-turn.html', game=curr_game)
+    return render_template('processing.html', game=curr_game, actions=curr_game.curr_turn.actions)
 # TODO: page post-processing to reset 'g' to new thingy
 
 @app.route("/rules/game-basics")

@@ -1,0 +1,27 @@
+<!-- actions list 'action' -->
+{% extends 'processing.html' %} {% block actions %} {% for a in actions %}
+<div class="row">
+  {{a.type.name}} by {{a.player.name}} on target(s): {{a.target}},
+  {{a.target_two}}
+
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      name="succeeds"
+      id="succeeds"
+      value="{{a.successful}}"
+    />
+    <label class="form-check-label" for="succeeds"> Succeeds </label>
+  </div>
+
+  <textarea
+    class="form-control"
+    style="margin-right: 10px"
+    value="{{a.message}}"
+  >
+Message</textarea
+  >
+</div>
+
+{% endfor %} {% endblock %}

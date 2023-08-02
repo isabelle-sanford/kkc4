@@ -22,7 +22,7 @@ class ItemType(Enum):
         member = object.__new__(cls)
         member._value_ = value
         member.using_action = using_action
-        member.name = fullname
+        member.item_name = fullname
 
         return member
 

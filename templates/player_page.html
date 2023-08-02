@@ -82,25 +82,23 @@
               style="background-color: #f7c1f1; color: #7b086e"
               >Lodging:</span
             >
-            <select class="form-select" id="Lodging" name="Lodging">
-              <option value="Streets">On the Streets</option>
+            <select class="form-select" id="lodging" name="lodging">
+              <option value="0">On the Streets</option>
               {% if player.status.broke_out %}
-              <option value="Underthing">The Underthing</option>
+              <option value="1">The Underthing</option>
               {% endif %} {% if not player.status.is_expelled %}
-              <option value="Mews">The Mews</option>
+              <option value="2">The Mews</option>
               {% endif %}
-              <option value="Anker's">Anker's</option>
-              <option value="King's-Drab">The King's Drab</option>
-              <option value="Golden-Pony">The Golden Pony</option>
-              <option value="Windy-Tower">The Windy Tower</option>
-              <option value="Horse-and-Four">The Horse and Four</option>
-              <option value="Spindle-and-Draft">The Spindle and Draft</option>
+              <option value="3">Anker's</option>
+              <option value="4">The King's Drab</option>
+              <option value="6">The Golden Pony</option>
+              <option value="7">The Windy Tower</option>
+              <option value="8">The Horse and Four</option>
+              <option value="10">The Spindle and Draft</option>
               {% if not player.status.IMRE_INFO["GILES_defaulted"] %}
-              <option value="Grey-Man" style="color: #c30b7f">
-                The Grey Man
-              </option>
+              <option value="5" style="color: #c30b7f">The Grey Man</option>
               {% endif %}
-              <option value="Pearl-of-Imre" style="color: #c30b7f">
+              <option value="9" style="color: #c30b7f">
                 The Pearl of Imre
               </option>
             </select>
@@ -147,118 +145,7 @@
         </fieldset>
       </div>
     </form>
-    <form class="col-6 mt-2" method="post">
-      <div>
-        <!-- TODO only show if NOT in imre -->
-        <fieldset class="fieldset-uni">
-          <!-- TODO CHECK IF ROLEBLOCKED IN STATUS -->
-          <legend align="center" class="legend-uni">Actions</legend>
-          {% for i, ap in player.status.action_periods %}
-          <div class="input-group">
-            <!-- TODO only show possible # of action periods etc -->
-            <span class="input-group-text actions">{{ap}}</span>
-            <select class="form-select" id="action{{i}}" name="action{{i}}">
-              <option value="None">--</option>
-              {% for a in player.status.accessible_abilities %}
-              <option value="{{a}}">{{a.info.name}}</option>
-              {% endfor %}
-            </select>
 
-            <!-- VARIOUS TARGET TYPES -->
-            <select class="form-select" id="targetplayer" name="targetplayer">
-              <!-- TODO only living players -->
-              {% for p in playerlist %}
-              <option value="{{p.name}}">{{p.name}}</option>
-              {% endfor %}
-            </select>
-
-            <!-- ? consider diff list for this? -->
-            <select class="form-select" id="targetaction" name="targetaction">
-              {% for at in ActionType %}
-              <option value="{{at.info.name}}">{{at.info.name}}</option>
-              {% endfor %}
-            </select>
-
-            <select class="form-select" id="targetlodging" name="targetlodging">
-              <option value="Underthing">The Underthing</option>
-              <option value="Mews">The Mews</option>
-              <option value="Anker's">Anker's</option>
-              <option value="King's-Drab">The King's Drab</option>
-              <option value="Golden-Pony">The Golden Pony</option>
-              <option value="Windy-Tower">The Windy Tower</option>
-              <option value="Horse-and-Four">The Horse and Four</option>
-              <option value="Spindle-and-Draft">The Spindle and Draft</option>
-              <option value="Grey-Man" style="color: #c30b7f">
-                The Grey Man
-              </option>
-              <option value="Pearl-of-Imre" style="color: #c30b7f">
-                The Pearl of Imre
-              </option>
-            </select>
-
-            <select class="form-select" id="targetitem" name="targetitem">
-              {% for it in items %}
-              <option value="{{it.name}}">{{it.name}}</option>
-              {% endfor %}
-            </select>
-
-            <select class="form-select" id="targetfield" name="targetfield">
-              <option value="None">--</option>
-              <option value="Linguistics">Linguistics</option>
-              <option value="Arithmetics">Arithmetics</option>
-              <option value="RhetoricLogic">Rhetoric/Logic</option>
-              <option value="Archives">Archives</option>
-              <option value="Sympathy">Sympathy</option>
-              <option value="Physicking">Phsysicking</option>
-              <option value="Alchemy">Alchemy</option>
-              <option value="Artificery">Artificery</option>
-              <option value="Naming">Naming</option>
-            </select>
-
-            <!-- TODO events, other, Names -->
-
-            <!-- SECONDDARY TARGET -->
-            <select class="form-select" id="targetplayer2" name="targetplayer2">
-              <!-- TODO only living players -->
-              {% for p in playerlist %}
-              <option value="{{p.name}}">{{p.name}}</option>
-              {% endfor %}
-            </select>
-
-            <!-- ? consider diff list for this? -->
-            <select class="form-select" id="targetaction2" name="targetaction2">
-              {% for at in ActionType %}
-              <option value="{{at.info.name}}">{{at.info.name}}</option>
-              {% endfor %}
-            </select>
-
-            <select class="form-select" id="targetitem2" name="targetitem2">
-              {% for it in items %}
-              <option value="{{it.name}}">{{it.name}}</option>
-              {% endfor %}
-            </select>
-
-            <!-- TODO abilities, other -->
-          </div>
-          {% endfor %}
-
-          <textarea class="form-control" style="margin-right: 10px">
-Notes</textarea
-          >
-
-          <div class="col-12 my-3">
-            <button
-              type="submit"
-              class="btn submit"
-              id="submitAction"
-              name="submitAction"
-            >
-              Submit Actions
-            </button>
-          </div>
-        </fieldset>
-      </div>
-    </form>
     <form class="col-6 pt-2" method="post">
       <div>
         <fieldset class="fieldset-uni">
@@ -313,6 +200,116 @@ Notes</textarea
       </div>
     </form>
   </div>
+  {% if player.status.in_imre %} {% block imre %} {% endblock %} {% else %}
+  <form class="col-6 mt-2" method="post">
+    <div>
+      ACTIONS
+      <!-- TODO only show if NOT in imre -->
+      <fieldset class="fieldset-uni">
+        <!-- TODO CHECK IF ROLEBLOCKED IN STATUS -->
+        <legend align="center" class="legend-uni">Actions</legend>
+        {% for ap in player.status.action_periods %}
+        <div class="input-group">
+          <!-- TODO only show possible # of action periods etc -->
+          <span class="input-group-text actions">{{ap}}</span>
+          <select class="form-select" id="action{{i}}" name="action{{i}}">
+            <option value="None">--</option>
+            {% for a in player.status.accessible_actions %}
+            <option value="{{a}}">{{a.info.name}}</option>
+            {% endfor %}
+          </select>
+
+          <!-- VARIOUS TARGET TYPES -->
+          <select class="form-select" id="targetplayer" name="targetplayer">
+            <!-- TODO only living players -->
+            {% for p in playerlist %}
+            <option value="{{p.name}}">{{p.name}}</option>
+            {% endfor %}
+          </select>
+
+          <!-- ? consider diff list for this? -->
+          <select class="form-select" id="targetaction" name="targetaction">
+            {% for at in ActionType %}
+            <option value="{{at.info.name}}">{{at.info.name}}</option>
+            {% endfor %}
+          </select>
+
+          <!-- <select class="form-select" id="targetlodging" name="targetlodging">
+            <option value="1">The Underthing</option>
+            <option value="2">The Mews</option>
+            <option value="3">Anker's</option>
+            <option value="4">The King's Drab</option>
+            <option value="6">The Golden Pony</option>
+            <option value="7">The Windy Tower</option>
+            <option value="8">The Horse and Four</option>
+            <option value="10">The Spindle and Draft</option>
+            <option value="5" style="color: #c30b7f">The Grey Man</option>
+            <option value="9" style="color: #c30b7f">The Pearl of Imre</option>
+          </select> -->
+
+          <select class="form-select" id="targetitem" name="targetitem">
+            {% for it in items %}
+            <option value="{{it.value}}">{{it.name}}</option>
+            {% endfor %}
+          </select>
+
+          <select class="form-select" id="targetfield" name="targetfield">
+            <option value="0">Linguistics</option>
+            <option value="1">Arithmetics</option>
+            <option value="2">Rhetoric/Logic</option>
+            <option value="3">Archives</option>
+            <option value="4">Sympathy</option>
+            <option value="5">Phsysicking</option>
+            <option value="6">Alchemy</option>
+            <option value="7">Artificery</option>
+            <option value="8">Naming</option>
+          </select>
+
+          <!-- TODO events, other, Names -->
+
+          <!-- SECONDARY TARGET --><!-- TODO only living players -->
+          <!-- <select class="form-select" id="targetplayer2" name="targetplayer2">
+            
+            {% for p in playerlist %}
+            <option value="{{p.id}}">{{p.name}}</option>
+            {% endfor %}
+          </select> -->
+
+          <!-- ? consider diff list for this? -->
+          <select class="form-select" id="targetaction2" name="targetaction2">
+            {% for at in ActionType %}
+            <option value="{{at.value}}">{{at.info.name}}</option>
+            {% endfor %}
+          </select>
+          <!-- 
+          <select class="form-select" id="targetitem2" name="targetitem2">
+            {% for it in items %}
+            <option value="{{it.value}}">{{it.name}}</option>
+            {% endfor %}
+          </select> -->
+
+          <!-- TODO abilities, other -->
+        </div>
+        {% endfor %}
+
+        <!-- <textarea class="form-control" style="margin-right: 10px">
+Notes</textarea
+        > -->
+
+        <div class="col-12 my-3">
+          <button
+            type="submit"
+            class="btn submit"
+            id="submitAction"
+            name="submitAction"
+          >
+            Submit Actions
+          </button>
+        </div>
+      </fieldset>
+    </div>
+  </form>
+  {% endif %}
   <div class="row">
     <div class="col-12 mt-2">
       <fieldset class="fieldset-uni">
@@ -398,7 +395,8 @@ Notes</textarea
       </fieldset>
     </div>
   </form>
-  {% endif %} {% block imre %} {% endblock %}
+  {% endif %}
+
   <!-- TODO add paying giles / devi with big red thing for next term interest thingy -->
 
   <div class="row">

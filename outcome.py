@@ -1,7 +1,11 @@
 
 
+from typing import TYPE_CHECKING
 
-from actions import Action
+
+if TYPE_CHECKING:
+
+    from actions import Action
 
 
 class ProcessLog:
