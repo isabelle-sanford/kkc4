@@ -149,6 +149,7 @@ class Game:
         # todo other choices
             # imre stuff
     # ! TODO
+    # PICKLE THIS
     def update_choices(self, new_choices):
         # erase all prev choices? (for just the player(s) in the list?)
         for choice in new_choices:
@@ -168,7 +169,7 @@ class Game:
             # todo other choices
                 # imre stuff
 
-    def new_turn(self, gm_inputs):
+    def new_turn(self, gm_inputs = None):
 
 
         self.turns.append(self.curr_turn)
@@ -187,6 +188,8 @@ class Game:
 
         with open('gamenow.pickle', 'wb') as f:
             pickle.dump(self, f)
+        
+        return self.curr_turn.log
 
 
 
@@ -395,7 +398,7 @@ class Turn:
 
         self.log.log("Stipends, tuition, & lodging processed.")
 
-        
+
     
 
     def preprocess_tenaculum(self):

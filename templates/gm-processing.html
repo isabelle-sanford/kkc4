@@ -1,0 +1,15 @@
+{% extends 'index.html' %} {% block body %}
+
+<div class="container pt-2" style="font-family: Luminari">
+  <div class="my-2">
+    <h1 class="h1-imre">Imre</h1>
+  </div>
+
+  <div class="row">{{game.curr_turn.get_log()}}</div>
+
+  <div class="row">
+    Player final statuses: {% for p in game.players %} {{p.status}} {% endfor %}
+  </div>
+</div>
+
+{% endblock}

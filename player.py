@@ -356,10 +356,22 @@ class PlayerChoices:
 
         self.offset_IP = 0
  
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         # TODO
 
-        ret = f"{self.player_static.name}: complaints {self.complaints}"
+        ret = f"{self.player_static.name}: complaints {self.complaints}\n"
+        if self.month % 3 == 2:
+            ret += f"Lodging {self.next_lodging}, enroll next {self.enroll_next}\n"
+        if self.pay_giles > 0:
+            ret += f"Pay giles {self.pay_giles}\n"
+        if self.pay_devi > 0:
+            ret += f"Pay devi {self.pay_devi}\n"
+        ret += f"Imre next? {self.imre_next}\n"
+        ret += f"Actions: {self.actions}"
+        ret += f"EP filing: {self.filing_EP}\n"
+        # TODO master stuff
+        if self.status.in_Imre:
+            ret += self.IMRE_CHOICES #?
 
         return ret
 

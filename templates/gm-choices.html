@@ -5,7 +5,11 @@
     <h1 class="h1-imre">Imre</h1>
   </div>
 
-  {% block actions %} {% endblock %}
+  <div class="row">
+    {% for p in g.players %} {{p.choices}}
+    <hr />
+    {% endfor %}
+  </div>
 </div>
 
 {% endblock}

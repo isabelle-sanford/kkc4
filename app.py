@@ -101,14 +101,24 @@ def gm_players():
 
 @app.route("/gm/imre")
 def gm_imre():
-    return render_template('gm-imre.html', imre_players=[g.curr_turn.players[id] for id in t1.imre_players]) # TODO
+    return render_template('gm-imre.html', imre_players=[g.curr_turn.players[id] for id in g.curr_turn.imre_players]) # TODO
+
+@app.route("/gm/playerchoices")
+def playerchoices():
+    with open('gamenow.pickle', 'rb') as f:
+        curr_game = pickle.load(f)
+    return render_template('gm-choices.html', g=curr_game) # TODO
+
 
 @app.route("/gm/processturn")
 def process_turn():
     with open('gamenow.pickle', 'rb') as f:
         curr_game = pickle.load(f)
 
-    return render_template('processing.html', game=curr_game, actions=curr_game.curr_turn.actions)
+        # TODO gm inputs for RP etc
+        process_log = curr_game.new_turn()
+
+    return render_template('processing.html', game=curr_game, actions=curr_game.curr_turn.actions, log=process_log)
 # TODO: page post-processing to reset 'g' to new thingy
 
 @app.route("/rules/game-basics")
