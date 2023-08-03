@@ -504,6 +504,15 @@ class Player:
         ret += f" {self.status.rank})"
         return ret
     
+    def calc_lodging(self, lodging: Lodging):
+        curr_price = lodging.price
+        if self.info.social_class == Background.Ruh:
+            curr_price /= 2
+        if self.status.master_of is not None:
+            curr_price *= 0.75
+        
+        return curr_price
+        
     # i.e. process an attack on you
     def get_attacked(self, attack: Action):
         # sabotage, bonetar, assassin, mommet, ??

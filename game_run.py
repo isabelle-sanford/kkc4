@@ -338,6 +338,7 @@ class Turn:
                     p.status.is_enrolled = True
                 else:
                     p.status.is_enrolled = False
+                    self.log.log(f"Player {p.name} could not afford their tuition of {tuition} and as such is not enrolling this turn.")
 
 
             if p.choices.next_lodging == Lodging.GreyMan and p.status.IMRE_INFO["GILES_defaulted"]:
@@ -348,36 +349,36 @@ class Turn:
         # DO LODGING STUFF
         # remember to check price for masters, ruh
             # ordering on these?
-            lodging_price = p.choices.next_lodging.price
-            if p.info.social_class == Background.Ruh:
-                lodging_price /= 2
-            
-            if p.status.master_of is not None:
-                lodging_price *= 0.75
-            
+            lodging_price = p.calc_lodging(p.choices.next_lodging)
 
             if p.status.money >= lodging_price:
                 p.status.money -= lodging_price
                 p.status.lodging = p.choices.next_lodging
             else:
+                self.log.log(f"Player {p.name} could not afford to stay at {p.choices.next_lodging} after tuition.")
                 # TODO imre lodgings
-                # if p.choices.next_lodging == Lodging.PearlOfImre:
-                #     new_lodging = Lodging.GreyMan
-                #     if p.status.money
+                if p.choices.next_lodging == Lodging.PearlOfImre:
+                    new_lodging = Lodging.GreyMan
+                    new_lodging_price = p.calc_lodging(Lodging.GreyMan)
 
 
+                    if p.status.money >= new_lodging_price:
+                        p.status.lodging = Lodging.GreyMan
+                        p.status.money -= new_lodging_price
+                
+                if p.choices.next_lodging == Lodging.GreyMan:
+                    i = NONIMRE_LODGINGS.index(Lodging.GoldenPony)
+                else: 
                 # this isn't hacky at all shhh
-                i = NONIMRE_LODGINGS.index(p.choices.next_lodging)
-                while p.status.money >= lodging_price:
+                    i = NONIMRE_LODGINGS.index(p.choices.next_lodging)
+                while p.status.money <= lodging_price:
                     i -= 1
                     new_lodging = NONIMRE_LODGINGS[i]
-                    lodging_price = new_lodging.price
+                    lodging_price = p.calc_lodging(new_lodging)
                 
                 p.status.money -= lodging_price
                 p.status.lodging = new_lodging
-
-                # LOG
-
+                self.log.log(f"They have been moved to {new_lodging}.")
             
             if p.initial_status.lodging == Lodging.WindyTower:
                 p.status.available_EP -= 1
@@ -393,6 +394,8 @@ class Turn:
 
 
         self.log.log("Stipends, tuition, & lodging processed.")
+
+        
     
 
     def preprocess_tenaculum(self):
@@ -714,18 +717,17 @@ class Turn:
             
         # PC masters
 
-        while True:
-            e1 = [i[0] for i in pcE] # hmm
-            dupes = self.get_dupes(e1) # make sure doesn't find None=None
-            if len(dupes) == 0:
-                break
-            for d in dupes:
-                p = e1[d[0]]
-                i = self.get_max([p.status.EP.vals[f] for f in d])
+        
+        e1 = [i[0] for i in pcE] # hmm
+        dupes = self.get_dupes(e1) # make sure doesn't find None=None
 
-                for f in d:
-                    if f != i:
-                        pcE[f].remove(p) # should always work
+        for d in dupes:
+            p = e1[d[0]]
+            i = self.get_max([p.status.EP.vals[f] for f in d])
+
+            for f in d:
+                if f != i:
+                    pcE[f].remove(p) # should always work
         
         finalE = e1
 
@@ -733,26 +735,32 @@ class Turn:
             f = [i for i in f if i not in finalE] # ?
         
         npc_choices = [random.choice(l) for l in npcE if len(l) > 0]
-        while True:
-            dupes = self.get_dupes(npc_choices)
-            if len(dupes) == 0:
-                break
+        # remove anyone a PC already went for 
+        for i, p in npc_choices:
+            if p in pcE.values():
+                npc_choices[i] = None
 
-            for conflict in dupes:
-                p = npc_choices[conflict]
-                winner = self.get_max([p.status.EP.vals[f] for f in conflict])
 
-                for c in conflict:
-                    if c != winner:
-                        npcE[c] = [i for i in npcE[c] if i != p]
-                        npc_choices[c] = random.choice(npcE[c])
-        
+        dupes = self.get_dupes(npc_choices)
+
+
+        for conflict in dupes:
+            p = npc_choices[conflict]
+            winner = self.get_max([p.status.EP.vals[f] for f in conflict])
+
+            for c in conflict:
+                if c != winner:
+                    npcE[c] = [i for i in npcE[c] if i != p]
+                    npc_choices[c] = random.choice(npcE[c])
+
+    
         finalNPC = npc_choices 
 
         for i, p in finalE:
             # check for conflict w PC? (shouldn't happen)
             if npc_choices[i] is not None: 
                 finalE[i] = npc_choices[i]
+        
         
         for i, p in finalE:
             if p is not None:

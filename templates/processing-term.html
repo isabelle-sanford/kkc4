@@ -1,0 +1,24 @@
+{% extends 'index.html' %} {% block body %}
+
+<div class="container pt-2" style="font-family: Luminari">
+  <div class="my-2">
+    <h1 class="h1-imre">Term Start Processing</h1>
+  </div>
+  PLAYER ORDERS:
+  <div class="row">
+    <!-- player choices -->
+    {% for p in t.players %} {% if p.id in t.sane_players %} {{p.name}} - Lodge
+    at {{p.choices.next_lodging.name}}, enroll next {{p.choices.enroll_next}}
+    <!-- other stuff? -->
+    {% endif %} {% endfor %}
+
+    <!-- PROCESS button -->
+
+    <!-- results -->
+    <!-- PRINT PROCESSLOG -->
+    {% for p in t.players %} {{p.name}} - {{p.choices.next_lodging.name}},
+    tuition {{}}
+  </div>
+</div>
+
+{% endblock}
