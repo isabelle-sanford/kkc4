@@ -8,16 +8,49 @@ from outcome import ProcessLog, Result
 from player import Player, PlayerProcessing, PlayerStatic, PlayerStatus, PlayerChoices, Tuition
 from actioninfo import Target
 from actions import Action, ActionType, ActionCategory
-from statics import NONIMRE_LODGINGS, Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
+from statics import FIELDNAMES, NONIMRE_LODGINGS, Background, FieldName, Lodging, Rank, BACKGROUNDS, LODGINGS
 
 import pickle
 
 # idk 
 #PLAYERS: "list[Player]" = [] 
 
+distro_shortcut = [
+    {
+        "player_name": "Kas",
+        "player_rpname": "",
+        "is_evil": False,
+        "background": Background.Yll,
+        "inventory": None,
+        "lodging": Lodging.Ankers, # idk
+        "musical_stat": 1,
+        "ep1": [FieldName.RHETORICLOGIC, 3]
+     },
+    {
+        "player_name": "El",
+        "player_rpname": "",
+        "is_evil": False,
+        "background": Background.Ceald,
+        "inventory": None,
+        "lodging": Lodging.Ankers, # idk
+        "musical_stat": 1,
+        "ep1": [FieldName.LINGUISTICS, 2]
+     },
+    {
+        "player_name": "Hael",
+        "player_rpname": "",
+        "is_evil": True,
+        "background": Background.Ruh,
+        "inventory": "1nahlrout",
+        "lodging": Lodging.KingsDrab, # idk
+        "musical_stat": 1,
+        "ep1": [FieldName.ALCHEMY, 2]
+     }
+]
+
 class Game:
 
-    def __init__(self):
+    def __init__(self, shortcut_distro = False):
 
 
         self.num_players = 0
@@ -32,14 +65,20 @@ class Game:
         self.player_list = {}
         self.month = 0
 
-        self.curr_gm_input = None
+        self.curr_gm_input = {}
+
+        if shortcut_distro:
+            for p in distro_shortcut:
+                self.add_player(p)
+            
+            self.start_game()
 
         
 
 
     def add_player(self, input):
-        background = BACKGROUNDS[input["background"]]
-        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], background)
+        #background = BACKGROUNDS[input["background"]]
+        p = PlayerStatic(input["player_name"], input["player_rpname"], input["is_evil"], Background(int(input["background"])))
         p.id = self.num_players
 
         inventory = []
@@ -60,8 +99,8 @@ class Game:
                     inventory.append(Item.Generate(ItemType.GRAM))
                 case "bonetar":
                     inventory.append(Item.Generate(ItemType.BONETAR))
-        lodging = LODGINGS[input["lodging"]]
-        ps = PlayerStatus.distro_init(p, lodging, input["musical_stat"], inventory)
+        #lodging = LODGINGS[input["lodging"]]
+        ps = PlayerStatus.distro_init(p, input["lodging"], input["musical_stat"], inventory)
 
         print(ps.inventory)
 
@@ -73,10 +112,6 @@ class Game:
             player.assign_EP(ep_field, ep_num)
             FIELDS[input["ep1"][0]].add_EP(player, input["ep1"][1])
 
-        
-        if input["ep2"] is not None and input["ep2"][1] > 0:
-            player.assign_EP(FIELDS[input["ep2"][0]].name, input["ep2"][1])
-            FIELDS[input["ep2"][0]].add_EP(player, input["ep2"][1])
 
 
         self.players.append(player)
@@ -134,9 +169,11 @@ class Game:
         if "imre_next" in choice: c.choices.imre_next = True
 
         for i in range(6):
-            if ("field" + str(i)) in choice:
-                print("filing in field" + str(i))
-                c.choices.filing_EP[i] = int(choice["field"+str(i)])
+            s = "field" + str(i)
+            if s in choice and choice[s] is not None:
+                print("filing EP #" + str(i) + " in field " + choice[s])
+                if choice[s] != "None":
+                    c.choices.filing_EP[i] = int(choice[s])
 
         for i in range(4):
             if ("action" + str(i)) in choice:
@@ -148,6 +185,9 @@ class Game:
         
         # todo other choices
             # imre stuff
+        
+        with open('gamenow.pickle', 'wb') as f:
+            pickle.dump(self, f)
     # ! TODO
     # PICKLE THIS
     def update_choices(self, new_choices):
@@ -169,12 +209,12 @@ class Game:
             # todo other choices
                 # imre stuff
 
-    def new_turn(self, gm_inputs = None):
+    def new_turn(self):
 
 
         self.turns.append(self.curr_turn)
         self.month += 1
-        self.curr_turn = Turn(gm_inputs, self.month, self)
+        self.curr_turn = Turn(self.curr_gm_input, self.month, self)
 
 
         self.curr_turn.PROCESS_TURN()
@@ -184,7 +224,7 @@ class Game:
         m = 'turn' + str(self.month) + '.pickle' 
 
         with open(m, 'wb') as f:
-            pickle.dump(self.curr_turn)
+            pickle.dump(self.curr_turn, f)
 
         with open('gamenow.pickle', 'wb') as f:
             pickle.dump(self, f)
@@ -238,10 +278,10 @@ class Turn:
 
         # other lists? imre? 
 
-        if "complaints" in gm_input:
+        if "complaints" in gm_input and gm_input["complaints"] is not None:
             for v in range(len(gm_input["complaints"])):
                 # accessing id here is a little dubious but ok
-                self.players[v].choices.complaints = gm_input["complaints"][v]
+                self.players[v].choices.complaints = [int(i) for i in gm_input["complaints"][v]] # might need to intify
                 if len(gm_input["complaints"][v]) > 0:
                     self.players[v].tuition.times_filed_complaints += 1
         
@@ -422,6 +462,7 @@ class Turn:
                 pass
 
     def preprocessing(self):
+        self.log.log("Now preprocessing stuff like whether people being targeted actually can be targeted, and lists of who ppl are targeted by for things like pickpocketing.")
 
         for a in self.actions:
              # check that target(s) can be targeted 
@@ -531,7 +572,7 @@ class Turn:
                     
                     choice = random.choice(options)
                         
-
+            self.log.log("Block processing partly done and messy. Sigh.")
         return
 
 
@@ -700,11 +741,13 @@ class Turn:
         return nm_ret # i guess
         # todo TEST pls
 
-    def do_elevations2(self):
+    def do_elevations(self):
         pcE = [None] * 9 # test 
         npcE = [None] * 9 
+        finalE = [None] * 9
         newM = self.do_new_masters().values()
 
+        # preprocessing
         for f in self.fields:
             if f.master is not None:
                 if f.master.status.can_elevate: # processing?
@@ -719,55 +762,92 @@ class Turn:
                 npcE[f.name] = e
             
         # PC masters
+        print(pcE)
+
+        pc_choices = [None] * 9
+        for i,p in enumerate(pcE):
+            if p is not None:
+                pc_choices[i] = p
 
         
-        e1 = [i[0] for i in pcE] # hmm
-        dupes = self.get_dupes(e1) # make sure doesn't find None=None
+        #e1 = [i[0] for i in pcE if i is not None] # hmm
+        dupes = self.get_dupes(pc_choices) # make sure doesn't find None=None
 
         for d in dupes:
-            p = e1[d[0]]
+            p = pc_choices[d[0]]
             i = self.get_max([p.status.EP.vals[f] for f in d])
 
             for f in d:
                 if f != i:
                     pcE[f].remove(p) # should always work
         
-        finalE = e1
+        for i, p in enumerate(finalE):
+           
+            if pc_choices[i] is not None: 
+                finalE[i] = pc_choices[i]
+        #finalE = e1
 
-        for f in npcE:
-            f = [i for i in f if i not in finalE] # ?
+        print("finalE after PCs ", finalE)
+        print(npcE)
+
+        print(npcE[0])
+
+        npc_choices = [None] * 9
+        for idx,f in enumerate(npcE):
+            if f is not None:
+                # print(f, " not none")
+                npcE[idx] = [i for i in f if i not in finalE] # ?
+            else:
+                # print(f, " was none, now empty")
+                npcE[idx] = []
+            if len(npcE[idx]) > 0:
+                npc_choices[idx] = random.choice(npcE[idx])
+        # print(npcE)
         
-        npc_choices = [random.choice(l) for l in npcE if len(l) > 0]
+        # npc_choices = [random.choice(l) for l in npcE if len(l) > 0]
+        print("npc choices ", npc_choices)
         # remove anyone a PC already went for 
-        for i, p in npc_choices:
-            if p in pcE.values():
+        for i, p in enumerate(npc_choices):
+            if p in finalE:
                 npc_choices[i] = None
 
 
         dupes = self.get_dupes(npc_choices)
+        print("dupes are ", dupes)
 
+        for player, fields in dupes:
+            # dupes are {Player: f1, f2}
+            
+            winner = self.get_max([player.status.EP.vals[f] for f in fields])
 
-        for conflict in dupes:
-            p = npc_choices[conflict]
-            winner = self.get_max([p.status.EP.vals[f] for f in conflict])
-
-            for c in conflict:
+            for c in fields:
                 if c != winner:
                     npcE[c] = [i for i in npcE[c] if i != p]
                     npc_choices[c] = random.choice(npcE[c])
 
     
-        finalNPC = npc_choices 
+        print("after dupes ", npc_choices)
 
-        for i, p in finalE:
+        print(finalE)
+
+        for i, p in enumerate(finalE):
             # check for conflict w PC? (shouldn't happen)
             if npc_choices[i] is not None: 
                 finalE[i] = npc_choices[i]
         
+        print("after integration ", finalE)
         
-        for i, p in finalE:
+        
+        for i, p in enumerate(finalE):
             if p is not None:
                 p.elevate_in(FieldName(i)) #?
+        
+        print(finalE)
+        
+        self.log.log("Resulting elevations: ")
+
+        for i, p in enumerate(finalE):
+            self.log.log(f"{FIELDNAMES[i]}: {p.name if p is not None else 'none'}")
 
 
         return finalE
@@ -775,7 +855,7 @@ class Turn:
                 
 
 
-    def get_max(li: list[int]):
+    def get_max(self, li: list[int]):
         random.shuffle(li) # for tiebreakers 
         idx = 0
         val = 0
@@ -787,120 +867,18 @@ class Turn:
         return idx
 
     
-    def get_dupes(li): 
+    def get_dupes(self, li): 
         dupes = {} 
 
-        for i, val in li: 
-            if li.count(val) > 1:
+        for i, val in enumerate(li): 
+            if li.count(val) > 1 and val is not None:
                 if val in dupes: dupes[val].append(i)
                 else: dupes[val] = [i]
-        return dupes.values()
+        return dupes#.values()
     
     # todo TEST elevations2
 
     # todo somewhere: remember to account for fields being destroyed
-    # this is Yikes
-    # todo: PC masters take precedence; first tiebreaker is # of EP in field
-    def do_elevations(self):
-
-        to_elevate = {} # player: field
-        conflicts = {} # player: [field1, field2]
-        candidates = {} # field: [p1, p2, ...]
-        new_masters = self.do_new_masters()
-
-        for f in self.fields:
-
-            if f.master is not None: # PC master
-                m = f.master
-
-                if len(m.choices.to_elevate) > 0:
-                    if m.processing.can_elevate:
-                        pc_choice = m.choices.to_elevate[0]
-
-
-                        candidates[f] = m.choices.to_elevate
-
-                        if pc_choice in to_elevate:
-                            to_elevate[pc_choice].append(f)
-                            conflicts[pc_choice] = to_elevate[pc_choice]
-                        else:
-                            to_elevate[pc_choice] = [f]
-                            f.elevating = pc_choice
-                # else add tuition inflation 
-            
-            else: # NPC
-
-                # master is being elevated
-                if f in new_masters.keys():
-                    f.master = new_masters[f]
-                    continue
-
-                else: # pick someone to elevate
-
-                    elevation_candidates: list[Player] = f.get_EP_list()
-                    #self.log.log(f"NPC master {f.name} picking who to elevate among: {elevation_candidates}")
-                    random.shuffle(elevation_candidates)
-                    candidates[f] = elevation_candidates
-
-                    if len(elevation_candidates) > 0:
-                        npc_choice = random.choice(elevation_candidates)
-                        if npc_choice in to_elevate:
-                            to_elevate[npc_choice].append(f)
-                            conflicts[npc_choice] = to_elevate[npc_choice]
-                        else:
-                            to_elevate[npc_choice] = [f]
-                            f.elevating = npc_choice
-
-                        self.log.log(f"{f.name} tries to elevate {npc_choice}")
-                    
-                    else:
-                        # no one to elevate
-                        self.log.log(f"{f.name} has no one to elevate.")
-        
-        # test this recursion pls
-        while len(conflicts.keys()) > 0:
-            self.log.log("Conflicts exist.", conflicts)
-            for p, fields in conflicts.items():
-                # pick which field gets to elevate
-                roll = random.choice(fields)
-                to_elevate[p] = roll
-
-                fields.remove(roll)
-                for f in fields:
-                    # remove all other fields trying to elevate
-                    to_elevate[p].remove(f)
-
-                    # remove all instances of p
-                    candidates[f] = [cand for cand in candidates[f] if cand != p]
-
-                    if len(candidates[f]) > 0:
-                        next_cand = candidates[f][0]
-
-                        if next_cand in to_elevate:
-                            to_elevate[next_cand].append(f)
-                            conflicts[next_cand] = to_elevate[next_cand]
-                        else:
-                            to_elevate[next_cand] = [f]
-                            f.elevating = next_cand
-                    
-
-                        self.log.log(f"{f.name} tries to elevate {npc_choice}")
-                        
-                    else:
-                        # no one to elevate
-                        self.log.log(f"{f.name} has no one to elevate.")
-
-
-        for f in self.fields:
-            if f.elevating is not None:
-                self.log.log(f"Player {f.elevating.name} elevated in {f.name}")
-
-                f.elevate_player(f.elevating) # make sep for master or just add to this func? 
-                f.elevating.elevate_in(f.name)
-
-                
-
-        # todo LOG
 
     # check this over, hmm
     # also it's 1 IP per FOUR EP
@@ -957,21 +935,24 @@ class Turn:
             if not p.status.is_expelled and p.processing.can_file_EP:
                 # check that they aren't filing more than allowed
                 for e in p.choices.filing_EP:
-                    p.assign_EP(e)
+                    if e is not None:
+                        p.assign_EP(e)
 
-                    self.fields[e].add_EP(p)
+                        self.fields[e].add_EP(p)
 
 
     def process_mechanics(self):
-
+        self.log.add_section("Horns", "Processing Horns...")
         horns = Horns()
         horns.run_horns(self.players, self.fields, self.log)
         # todo NAHLROUT
 
         # elevations
+        self.log.add_section("Elevations", "Processing elevations...")
         self.do_elevations()
 
         # offset IP
+        self.log.add_section("EP", "Processing EP stuff & breakout roll...")
         self.offset_IP()
 
         # file EP
@@ -1220,9 +1201,10 @@ class Turn:
             
             if p.status.lodging == Lodging.Ankers and random.randrange(0,100) < 15:
                 # TODO check for in imre
-                action_blocked = random.choice(p.choices.actions)
-                action_blocked.blocked = True
-                action_blocked.block_reasoning += "Ankers"
+                if len(p.choices.actions) > 0:
+                    action_blocked = random.choice(p.choices.actions)
+                    action_blocked.blocked = True
+                    action_blocked.block_reasoning += "Ankers"
             elif p.status.lodging == Lodging.KingsDrab and random.randrange(0,100) < 5:
                 p.get_stolen_from()
                 # log? 
@@ -1238,6 +1220,8 @@ class Turn:
         self.process_blocks(self.actions)
 
         self.log.log("All blocks processed!")
+        success_actions = [a for a in self.actions if a.successful]
+        #self.log.log("Actions marked as succeeding: ", [str(a) for a in success_actions])
 
         self.log.add_section("Standard Actions", "Starting to process standard actions...")
         # preprocessing? 

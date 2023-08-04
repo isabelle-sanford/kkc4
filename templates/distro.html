@@ -51,22 +51,22 @@
     <div class="col-md-5 pt-3">
       <label for="socialclass" class="form-label">Social Class</label>
       <select class="form-select" id="socialclass" name="socialclass">
-        <option value="Vintish-Nobleman">Vintish Nobleman</option>
-        <option value="Aturan-Nobleman">Aturan Nobleman</option>
-        <option value="Yllish-Commoner">Yllish Commoner</option>
-        <option value="Cealdish-Commoner">Cealdish Commoner</option>
-        <option value="Edema-Ruh">Edema Ruh</option>
+        <option value="0">Vintish Nobleman</option>
+        <option value="1">Aturan Nobleman</option>
+        <option value="2">Yllish Commoner</option>
+        <option value="3">Cealdish Commoner</option>
+        <option value="4">Edema Ruh</option>
       </select>
     </div>
     <div class="col-md-5 pt-3">
       <label for="lodging" class="form-label">Lodging</label>
       <select class="form-select" id="lodging" name="lodging">
-        <option value="Anker's">Anker's</option>
-        <option value="King's-Drab">The King's Drab</option>
-        <option value="Golden-Pony">The Golden Pony</option>
-        <option value="Windy-Tower">The Windy Tower</option>
-        <option value="Horse-and-Four">The Horse and Four</option>
-        <option value="Spindle-and-Draft">The Spindle and Draft</option>
+        <option value="3">Anker's</option>
+        <option value="4">The King's Drab</option>
+        <option value="6">The Golden Pony</option>
+        <option value="7">The Windy Tower</option>
+        <option value="8">The Horse and Four</option>
+        <option value="10">The Spindle and Draft</option>
       </select>
     </div>
     <div
@@ -118,23 +118,6 @@
           style="color: #9fc8e9; background: #023864"
           >EP and Field</span
         >
-        <input
-          type="Number"
-          class="form-control input-group-text ep-input"
-          name="ep2"
-          value="{{ request.form['ep2'] }}"
-        />
-        <select class="form-select" id="fieldep2" name="field2">
-          <option value="0">Linguistics</option>
-          <option value="1">Arithmetics</option>
-          <option value="2">Rhetoric/Logic</option>
-          <option value="3">Archives</option>
-          <option value="4">Sympathy</option>
-          <option value="5">Phsysicking</option>
-          <option value="6">Alchemy</option>
-          <option value="7">Artificery</option>
-          <option value="8">Naming</option>
-        </select>
       </div>
     </div>
     <div class="col-md-2 mb-3" style="text-align: center">

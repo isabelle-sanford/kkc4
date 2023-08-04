@@ -16,7 +16,9 @@ players: "list[Player]" = []
 
 living_players = [] # seems useful, idk
 
-g = Game()
+curr_input = {}
+
+g = Game(shortcut_distro=True)
 
 
 # main public game page
@@ -35,12 +37,10 @@ def distro():
         musical = request.form['musical']
         ep1 = request.form['ep1']
         fieldep1 = request.form['field1']
-        ep2 = request.form['ep2']
-        fieldep2 = request.form['field2']
+
         inventory = request.form['inventory']
 
-        if ep2 == "":
-            ep2 = 0
+
 
         alignment = True if skindancer == "skindancer" else False
 
@@ -53,7 +53,6 @@ def distro():
             "lodging": lodging,
             "musical_stat": musical,
             "ep1": [int(fieldep1), int(ep1)],
-            "ep2": [int(fieldep2), int(ep2)]
         }
 
         # TODO error check for missing info
@@ -73,14 +72,16 @@ def player_login():
 # PLAYER PAGES
 @app.route("/player/<name>", methods=['GET', 'POST'])
 def player(name):
-    player = g.player_list[name]
+    with open('gamenow.pickle', 'rb') as f:
+        curr_game = pickle.load(f)
+    player = curr_game.player_list[name]
     if request.method == 'POST':
         print(request.form)
-        g.update_player_choices(request.form, player)
+        curr_game.update_player_choices(request.form, player)
     # todo POST method for choice submissions
     
-    print(player.status.accessible_actions)
-    return render_template('player_page.html', player=player, playerlist=g.players, actions=ActionType, items=ItemType)
+    print(player.status)
+    return render_template('player_page.html', player=player, playerlist=curr_game.players, actions=ActionType, items=ItemType)
 
 @app.route("/gm/start")
 def start_game():
@@ -97,7 +98,9 @@ def gm_fields():
 @app.route("/gm/players")
 def gm_players():
     print(g.players)
-    return render_template('gm-players.html', players=g.players)
+    with open('gamenow.pickle', 'rb') as f:
+        curr_game = pickle.load(f)
+    return render_template('gm-players.html', players=curr_game.players)
 
 @app.route("/gm/imre")
 def gm_imre():
@@ -118,7 +121,7 @@ def process_turn():
         # TODO gm inputs for RP etc
         process_log = curr_game.new_turn()
 
-    return render_template('processing.html', game=curr_game, actions=curr_game.curr_turn.actions, log=process_log)
+    return render_template('gm-processing.html', game=curr_game, actions=curr_game.curr_turn.actions, log=process_log)
 # TODO: page post-processing to reset 'g' to new thingy
 
 @app.route("/rules/game-basics")
@@ -142,9 +145,37 @@ def rules_imre():
     return render_template('rules-imre.html')
 
 
-@app.route("/gm/input")
+@app.route("/gm/input", methods=['GET', 'POST'])
 def turn_input():
-    return render_template('gm-input.html', players=g.players)
+    with open('gamenow.pickle', 'rb') as f:
+        curr_game = pickle.load(f)
+    if request.method == 'POST':
+        print(request.form)
+        curr_input = request.form
+
+        complaints = [[] for i in range(len(curr_game.players))] # ???
+        for p in curr_game.players:
+            #print("looking for complaints from player ", p.id)
+            if curr_input["complaint0p" + str(p.id)] != "None":
+                #print("player ", str(p.id), " complained on player ", curr_input["complaint0p"+str(p.id)])
+                complaints[p.id].append(curr_input["complaint0p" + str(p.id)])
+            if curr_input["complaint1p" + str(p.id)] != "None":
+                complaints[p.id].append(curr_input["complaint1p" + str(p.id)])
+            if curr_input["complaint2p" + str(p.id)] != "None":
+                complaints[p.id].append(curr_input["complaint2p" + str(p.id)])
+            if curr_input["complaint3p" + str(p.id)] != "None":
+                complaints[p.id].append(curr_input["complaint3p" + str(p.id)])
+            p.choices.complaints = [curr_game.players[int(i)] for i in complaints[p.id]]
+            #print("got complaints: ", complaints[p.id])
+        
+        curr_game.curr_gm_input = {}
+        curr_game.curr_gm_input["complaints"] = complaints
+        print(complaints)
+        # todo pickle/load
+        
+        with open('gamenow.pickle', 'wb') as f:
+            pickle.dump(curr_game, f)
+    return render_template('gm-input.html', players=curr_game.players)
 
 if __name__ == "__main__":
     app.run(debug=True)

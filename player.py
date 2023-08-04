@@ -124,6 +124,16 @@ class PlayerStatus:
 
         self.action_periods = [FieldName.GENERAL] # this is when NOT in imre
 
+    def __repr__(self) -> str:
+        ret = [str(self.info)]
+        ret.append(self.short_status())
+
+        ret.append(f"Month {self.month} || Rank: {self.rank}, Elevations in {[FIELDNAMES[f] for f in self.elevations]}")
+        ret.append(f"Available action periods: {self.action_periods}")
+        ret.append(f"Accessible actions: {self.accessible_actions}")
+        ret.append(f"Lodging: {self.lodging} Money: {self.money} Inventory: {self.inventory}") # still dubious
+
+        return " ===== ".join(ret)
 
     # input from GM distribution 
     @classmethod
@@ -359,16 +369,16 @@ class PlayerChoices:
     def __repr__(self) -> str:
         # TODO
 
-        ret = f"{self.player_static.name}: complaints {self.complaints}\n"
+        ret = f"{self.player_static.name}: complaints {[c.name for c in self.complaints]}"
         if self.month % 3 == 2:
-            ret += f"Lodging {self.next_lodging}, enroll next {self.enroll_next}\n"
+            ret += f"Lodging {self.next_lodging}, enroll next {self.enroll_next}\t"
         if self.pay_giles > 0:
-            ret += f"Pay giles {self.pay_giles}\n"
+            ret += f"Pay giles {self.pay_giles}\t"
         if self.pay_devi > 0:
-            ret += f"Pay devi {self.pay_devi}\n"
-        ret += f"Imre next? {self.imre_next}\n"
-        ret += f"Actions: {self.actions}"
-        ret += f"EP filing: {self.filing_EP}\n"
+            ret += f"Pay devi {self.pay_devi}\t"
+        ret += f"Imre next? {self.imre_next}\t"
+        ret += f"Actions: {self.actions}\t"
+        ret += f"EP filing: {self.filing_EP}\t"
         # TODO master stuff
         if self.status.in_Imre:
             ret += self.IMRE_CHOICES #?
@@ -633,7 +643,7 @@ class Player:
                     print(f"{self.name} backed out of {field}")
                     return
         
-        self.status.rank = self.status.rank.get_next()
+        self.status.rank += 1
         self.status.available_EP -= 1
 
         curr_rank = self.status.rank
@@ -646,7 +656,7 @@ class Player:
         if field == FieldName.LINGUISTICS or field == FieldName.RHETORICLOGIC or field == FieldName.ARCHIVES:
             # need to add just the ability at that elevation level
             for ability in FIELDS[field].info.abilities:
-                if ability.field_ability.min_rank == curr_rank:
+                if ability.info.field_ability.min_rank == curr_rank:
                     self.status.accessible_actions.add(ability)
         elif field == FieldName.ARITHMETICS or field == FieldName.SYMPATHY or field == FieldName.PHYSICKING:
             # all ranks have access to all abilities 
@@ -671,8 +681,8 @@ class Player:
         
         # if get an action period at that level, add it
         num_elevs = self.levels_in(field) 
-        if FIELDS[field].info[num_elevs - 1] is not None:
-            self.status.action_periods.append(FIELDS[field].info[num_elevs - 1])
+        if FIELDS[field].info.APbylevel[num_elevs - 1] is not None:
+            self.status.action_periods.append(FIELDS[field].info.APbylevel[num_elevs - 1])
 
 
         # anything else? 
@@ -770,6 +780,7 @@ class Player:
         # maybe do this in choices?
     
     def expel(self, fields):
+        self.status.is_enrolled = False
         self.status.is_expelled = True
         self.status.can_file_EP = True
         self.status.can_be_elevated = False

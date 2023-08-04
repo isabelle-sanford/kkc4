@@ -2,14 +2,23 @@
 
 <div class="container pt-2" style="font-family: Luminari">
   <div class="my-2">
-    <h1 class="h1-imre">Imre</h1>
+    <h1 class="h1-imre">Turn Processing - Month {{game.curr_turn.month}}</h1>
   </div>
 
-  <div class="row">{{game.curr_turn.get_log()}}</div>
+  <div class="row">
+    {% for s in game.curr_turn.log.sections %}
+    {{game.curr_turn.log.sections[s]}}
+    <hr />
+    {% endfor %}
+  </div>
 
   <div class="row">
-    Player final statuses: {% for p in game.players %} {{p.status}} {% endfor %}
+    <h3>Player final statuses:</h3>
+    <br />
+    {% for p in game.players %} {{p.status}}
+    <hr />
+    {% endfor %}
   </div>
 </div>
 
-{% endblock}
+{% endblock %}

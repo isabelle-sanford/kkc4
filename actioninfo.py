@@ -28,7 +28,7 @@ class Target(Enum):
 
 
 @dataclass
-class Ability2():
+class FieldAbility():
     field: FieldName
     min_rank: Rank = Rank.ELIR
     has_level_effects: bool = False
@@ -45,58 +45,58 @@ class ActionInfo:
     is_positive: bool = False
     is_negative: bool = False
     insanity_bonus: int = 0
-    field_ability: Ability2 = None
+    field_ability: FieldAbility = None
     is_passive: bool = False # only for field abilities tbh
 
 
 
-hd_ability = Ability2(FieldName.LINGUISTICS, Rank.ELIR, 1)
+hd_ability = FieldAbility(FieldName.LINGUISTICS, Rank.ELIR, 1)
 hand_delivery = ActionInfo(1, "Hand Delivery", ActionCategory.OTHER, field_ability=hd_ability, is_passive=True)
 
-myst_bulletins = ActionInfo(2, "Mysterious Bulletins", ActionCategory.OTHER, Target.NONE, field_ability=Ability2(FieldName.LINGUISTICS, Rank.RELAR))
-bribe_messenger = ActionInfo(3, "Bribe the Messenger", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.ELTHE))
-linguistic_analysis = ActionInfo(4, "Linguistic Analysis", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.LINGUISTICS, Rank.MASTER))
+myst_bulletins = ActionInfo(2, "Mysterious Bulletins", ActionCategory.OTHER, Target.NONE, field_ability=FieldAbility(FieldName.LINGUISTICS, Rank.RELAR))
+bribe_messenger = ActionInfo(3, "Bribe the Messenger", ActionCategory.OTHER, Target.PLAYER, field_ability=FieldAbility(FieldName.LINGUISTICS, Rank.ELTHE))
+linguistic_analysis = ActionInfo(4, "Linguistic Analysis", ActionCategory.OTHER, Target.PLAYER, field_ability=FieldAbility(FieldName.LINGUISTICS, Rank.MASTER))
 
-reduced_interest = ActionInfo(33, "Reduced Interest", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR,True), is_passive=True)
-pickpocket = ActionInfo(5, "Pickpocket", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True)) 
-great_deals = ActionInfo(34, "Great Deals", ActionCategory.OTHER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
-decreased_tuition = ActionInfo(35, "Decreased Tuition", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
+reduced_interest = ActionInfo(33, "Reduced Interest", ActionCategory.OTHER, field_ability=FieldAbility(FieldName.ARITHMETICS, Rank.ELIR,True), is_passive=True)
+pickpocket = ActionInfo(5, "Pickpocket", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=FieldAbility(FieldName.ARITHMETICS, Rank.ELIR, True)) 
+great_deals = ActionInfo(34, "Great Deals", ActionCategory.OTHER, field_ability=FieldAbility(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
+decreased_tuition = ActionInfo(35, "Decreased Tuition", ActionCategory.OTHER, Target.PLAYER, field_ability=FieldAbility(FieldName.ARITHMETICS, Rank.ELIR, True), is_passive=True)
 
-argumentum_ad_nauseam = ActionInfo(6, "Argumentum Ad Nauseam", ActionCategory.OTHER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELIR), is_negative=True) # IS NEGATIVE
-proficient_in_hyperbole = ActionInfo(7, "Proficient In Hyperbole", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.RELAR))
-persuasive_arguments = ActionInfo(8, "Persuasive Arguments", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.ELTHE))
-law_of_contraposition = ActionInfo(9, "Law of Contraposition", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=Ability2(FieldName.RHETORICLOGIC, Rank.MASTER))
+argumentum_ad_nauseam = ActionInfo(6, "Argumentum Ad Nauseam", ActionCategory.OTHER, field_ability=FieldAbility(FieldName.RHETORICLOGIC, Rank.ELIR), is_negative=True) # IS NEGATIVE
+proficient_in_hyperbole = ActionInfo(7, "Proficient In Hyperbole", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=FieldAbility(FieldName.RHETORICLOGIC, Rank.RELAR))
+persuasive_arguments = ActionInfo(8, "Persuasive Arguments", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=FieldAbility(FieldName.RHETORICLOGIC, Rank.ELTHE))
+law_of_contraposition = ActionInfo(9, "Law of Contraposition", ActionCategory.OTHER, Target.PLAYER, Target.PLAYER, field_ability=FieldAbility(FieldName.RHETORICLOGIC, Rank.MASTER))
 
-omen_recognition = ActionInfo(19, "Omen Recognition", ActionCategory.OTHER, Target.EVENT, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELIR))
-school_records = ActionInfo(11, "School Records", ActionCategory.OTHER, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.RELAR))
-banned_books = ActionInfo(12, "Banned Books", ActionCategory.OTHER, Target.FIELD, Target.ABILITY, field_ability=Ability2(FieldName.ARCHIVES, Rank.ELTHE, True))
-fae_lore = ActionInfo(13, "Fae Lore", ActionCategory.BLOCKETC, Target.PLAYER, field_ability=Ability2(FieldName.ARCHIVES, Rank.MASTER))
+omen_recognition = ActionInfo(19, "Omen Recognition", ActionCategory.OTHER, Target.EVENT, field_ability=FieldAbility(FieldName.ARCHIVES, Rank.ELIR))
+school_records = ActionInfo(11, "School Records", ActionCategory.OTHER, Target.PLAYER, field_ability=FieldAbility(FieldName.ARCHIVES, Rank.RELAR))
+banned_books = ActionInfo(12, "Banned Books", ActionCategory.OTHER, Target.FIELD, Target.ABILITY, field_ability=FieldAbility(FieldName.ARCHIVES, Rank.ELTHE, True))
+fae_lore = ActionInfo(13, "Fae Lore", ActionCategory.BLOCKETC, Target.PLAYER, field_ability=FieldAbility(FieldName.ARCHIVES, Rank.MASTER))
 
-mommet_making = ActionInfo(14, "Mommet Making", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=Ability2(FieldName.SYMPATHY, Rank.ELIR, True)) # IB per level
-malfeasance_protection = ActionInfo(15, "Mommet Protection", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=Ability2(FieldName.SYMPATHY, Rank.ELIR, True)) # SOMETIMES negative; IB is per level
+mommet_making = ActionInfo(14, "Mommet Making", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=FieldAbility(FieldName.SYMPATHY, Rank.ELIR, True)) # IB per level
+malfeasance_protection = ActionInfo(15, "Mommet Protection", ActionCategory.CREATEITEM, Target.PLAYER, field_ability=FieldAbility(FieldName.SYMPATHY, Rank.ELIR, True)) # SOMETIMES negative; IB is per level
 
 
-medica_emergency = ActionInfo(16, "Medica Emergency", ActionCategory.OTHER, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
-medica_detainment = ActionInfo(17, "Medica Detainment", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
-psych_counselling = ActionInfo(18, "Psychological Counselling", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=Ability2(FieldName.PHYSICKING, Rank.ELIR, True))
-cheating_death = ActionInfo(19, "Cheating Death", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=Ability2(FieldName.PHYSICKING,Rank.ELIR, True))
+medica_emergency = ActionInfo(16, "Medica Emergency", ActionCategory.OTHER, field_ability=FieldAbility(FieldName.PHYSICKING, Rank.ELIR, True))
+medica_detainment = ActionInfo(17, "Medica Detainment", ActionCategory.BLOCKETC, Target.PLAYER, is_negative=True, field_ability=FieldAbility(FieldName.PHYSICKING, Rank.ELIR, True))
+psych_counselling = ActionInfo(18, "Psychological Counselling", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=FieldAbility(FieldName.PHYSICKING, Rank.ELIR, True))
+cheating_death = ActionInfo(19, "Cheating Death", ActionCategory.OTHER, Target.PLAYER, is_positive=True, field_ability=FieldAbility(FieldName.PHYSICKING,Rank.ELIR, True))
 
 # Alchemy
-create_tenaculum = ActionInfo(36, "Create Tenaculum", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=1)
-create_firestop = ActionInfo(37, "Create Firestop", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.RELAR, True), insanity_bonus=2)
-create_plumbob = ActionInfo(38, "Create Plumbob", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=3)
-create_bonetar = ActionInfo(39, "Create Bonetar", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ALCHEMY, Rank.ELTHE, True), insanity_bonus=3)
+create_tenaculum = ActionInfo(36, "Create Tenaculum", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=1)
+create_firestop = ActionInfo(37, "Create Firestop", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.RELAR, True), insanity_bonus=2)
+create_plumbob = ActionInfo(38, "Create Plumbob", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=3)
+create_bonetar = ActionInfo(39, "Create Bonetar", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELTHE, True), insanity_bonus=3)
 
 # Artificery
-create_ward = ActionInfo(40, "Create Ward", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.ELIR, True), insanity_bonus=1)
-create_bloodless = ActionInfo(41, "Create Bloodless", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.RELAR, True), insanity_bonus=2)
-create_thieveslamp = ActionInfo(42, "Create Thieves Lamp", ActionCategory.CREATEITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.RELAR, True), insanity_bonus=2)
-create_gram = ActionInfo(43, "Create Gram", ActionCategory.CREATEITEM, Target.ITEM, field_ability=Ability2(FieldName.ARTIFICERY, Rank.ELTHE, True), insanity_bonus=3)
+create_ward = ActionInfo(40, "Create Ward", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ARTIFICERY, Rank.ELIR, True), insanity_bonus=1)
+create_bloodless = ActionInfo(41, "Create Bloodless", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ARTIFICERY, Rank.RELAR, True), insanity_bonus=2)
+create_thieveslamp = ActionInfo(42, "Create Thieves Lamp", ActionCategory.CREATEITEM, field_ability=FieldAbility(FieldName.ARTIFICERY, Rank.RELAR, True), insanity_bonus=2)
+create_gram = ActionInfo(43, "Create Gram", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ARTIFICERY, Rank.ELTHE, True), insanity_bonus=3)
 
 create_item = ActionInfo(20, "Create Item", ActionCategory.CREATEITEM, Target.ITEM)
 create_half_item = ActionInfo(21, "Create Half Item", ActionCategory.CREATEITEM, Target.ITEM)
 
-use_name = ActionInfo(22, "Use Name", ActionCategory.OTHER, field_ability=Ability2(FieldName.NAMING))
+use_name = ActionInfo(22, "Use Name", ActionCategory.OTHER, field_ability=FieldAbility(FieldName.NAMING))
 
 use_mommet = ActionInfo(23, "Use Mommet", ActionCategory.BLOCKETC, is_negative=True) # IB 
 use_tenaculum_item = ActionInfo(24, "Use Tenaculum (Item)", ActionCategory.BLOCKETC, Target.ITEM, is_negative=True)
@@ -161,14 +161,14 @@ class ActionType(Enum):
     DecreasedTuition = 35, decreased_tuition
 
     # kinda need for accessible abilities stuff
-    CreateTenaculum = 36, create_item # !
-    CreateFirestop = 37, create_item
-    CreatePlumbob = 38, create_item
-    CreateBonetar = 39, create_item
-    CreateWard = 40, create_item
-    CreateBloodless = 41, create_item
-    CreateThievesLamp = 42, create_item
-    CreateGram = 43, create_item
+    CreateTenaculum = 36, create_tenaculum # !
+    CreateFirestop = 37, create_firestop
+    CreatePlumbob = 38, create_plumbob
+    CreateBonetar = 39, create_bonetar
+    CreateWard = 40, create_ward
+    CreateBloodless = 41, create_bloodless
+    CreateThievesLamp = 42, create_thieveslamp
+    CreateGram = 43, create_gram
 
 
     def __new__(cls, value, info):

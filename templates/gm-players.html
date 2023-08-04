@@ -3,6 +3,8 @@
 <div class="container pt-2" style="font-family: Luminari">
   <div class="row">
     <h1 class="h1-player-info">KKC4 Player Information</h1>
+    <br />
+    <h2>Month {{players[0].month}}</h2>
   </div>
 
   {% for p in players %}
@@ -19,14 +21,16 @@
         <li class="list-group-item">{{p.info.social_class.fullname}}</li>
       </ul>
       <ul class="list-group my-2">
-        <li class="list-group-item musical">{{p.status.musical_stat}}</li>
+        <li class="list-group-item musical">
+          Musical stat: {{p.status.musical_stat}}
+        </li>
         <!-- ? -->
         <li class="list-group-item insanity-modifier">
-          {{p.processing.insanity_bonus}}
+          Insanity bonus: {{p.processing.insanity_bonus}}
         </li>
       </ul>
       <ul class="list-group my-2">
-        <li class="list-group-item">{{p.status.lodging.fullname}}</li>
+        <li class="list-group-item">{{p.status.lodging.name}}</li>
         <li class="list-group-item">{{p.status.money}}</li>
       </ul>
     </div>

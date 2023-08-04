@@ -27,6 +27,7 @@ class ProcessLog:
         self.section_list.append(name)
 
     def log(self, logstring: str, section: str = None) -> None:
+        print(logstring)
         if section is None:
             section = self.curr_section
         
@@ -34,13 +35,13 @@ class ProcessLog:
     
     def get_log(self, section = None):
         if section is not None: # printing specific section 
-            return "\n".join(self.sections[section])
+            return "--||--".join(self.sections[section])
         
         ret = ""
 
         for sect in self.section_list:
-            ret += f"\n----{sect}----\n"
-            ret += "\n\t".join(self.sections[sect])
+            ret += f"----{sect}----"
+            ret += " || ".join(self.sections[sect])
         
         return ret
 

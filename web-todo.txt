@@ -6,3 +6,7 @@
 - security stuff (eventually)
 - download bootstrap? 
 - gm input needs submit button
+
+todo III:
+request form processing actions into Action  for input
+more processlog everywhere

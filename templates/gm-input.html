@@ -6,104 +6,120 @@
   </div>
   <hr />
 
-  {% for p in players %}
+  <form method="post">
+    {% for p in players %}
 
-  <div class="row">
-    <div class="col-2 my-2">
-      <div class="row">
-        <h2 class="h2-input">{{p.info.name}}</h2>
-      </div>
-    </div>
-    <div class="col-4 my-2">
-      <div class="row">
-        <h3 class="h3-input">Votes</h3>
-      </div>
-      <div class="row">
-        {% for i in range(4) %}
-        <div class="input-group">
-          <select class="form-select" id="Vote" name="Players">
-            <option value="None">None</option>
-            <!-- sane players only? TODO -->
-            {% for player in players %}
-            <option value="{{player}}">{{player}}</option>
-            {% endfor %}
-          </select>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-    <div class="col-5 my-2">
-      <div class="row">
-        <h3 class="h3-input">PM/Posts</h3>
-      </div>
-      <div class="row">
-        <div class="col-6">
-          <span>PM Count:</span>
-        </div>
-        <div class="col-6">
-          <input
-            type="Number"
-            class="form-control input-group-text PM-input"
-            name="PMInput"
-          />
+    <div class="row">
+      <div class="col-2 my-2">
+        <div class="row">
+          <h2 class="h2-input">{{p.info.name}}</h2>
         </div>
       </div>
-      <div class="row">
-        <div class="col-6">
-          <span>Post Count:</span>
+      <div class="col-4 my-2">
+        <div class="row">
+          <h3 class="h3-input">Votes</h3>
         </div>
-        <div class="col-6">
-          <input
-            type="Number"
-            class="form-control input-group-text PM-input"
-            name="PMInput"
-          />
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-6">
-          <span>QRP WC:</span>
-        </div>
-        <div class="col-6">
-          <input
-            type="Number"
-            class="form-control input-group-text PM-input"
-            name="PMInput"
-          />
+        <div class="row">
+          {% for i in range(4) %}
+          <div class="input-group">
+            <select
+              class="form-select"
+              id="complaint{{i}}p{{p.id}}"
+              name="complaint{{i}}p{{p.id}}"
+            >
+              <option value="None">None</option>
+              <!-- sane players only? TODO -->
+              {% for player in players %}
+              <option value="{{player.id}}">{{player.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endfor %}
         </div>
       </div>
-      <div class="row">
-        <div class="col-6">
-          <span>QPost WC:</span>
+      <div class="col-5 my-2">
+        <div class="row">
+          <h3 class="h3-input">PM/Posts</h3>
         </div>
-        <div class="col-6">
-          <input
-            type="Number"
-            class="form-control input-group-text PM-input"
-            name="PMInput"
-          />
-        </div>
-      </div>
-      <div class="row my-3">
-        <div class="col-6">
-          <span>RP Apology:</span>
-        </div>
-        <div class="col-6">
-          <div class="form-check">
+        <div class="row">
+          <div class="col-6">
+            <span>PM Count:</span>
+          </div>
+          <div class="col-6">
             <input
-              class="form-check-input"
-              type="checkbox"
-              value=""
-              id="RPApology"
+              type="Number"
+              class="form-control input-group-text PM-input"
+              name="PMInputp{{p.id}}"
             />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <span>Post Count:</span>
+          </div>
+          <div class="col-6">
+            <input
+              type="Number"
+              class="form-control input-group-text PM-input"
+              name="p{{p.id}}PostCount"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <span>QRP WC:</span>
+          </div>
+          <div class="col-6">
+            <input
+              type="Number"
+              class="form-control input-group-text PM-input"
+              name="p{{p.id}}QRPWC"
+            />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6">
+            <span>QPost WC:</span>
+          </div>
+          <div class="col-6">
+            <input
+              type="Number"
+              class="form-control input-group-text PM-input"
+              name="p{{p.id}}QPostWC"
+            />
+          </div>
+        </div>
+        <div class="row my-3">
+          <div class="col-6">
+            <span>RP Apology:</span>
+          </div>
+          <div class="col-6">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value=""
+                id="p{{p.id}}RPApology"
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <hr />
+    <hr />
 
-  {% endfor %}
+    {% endfor %}
+    <div class="col-12 my-3">
+      <button
+        type="submit"
+        class="btn submit"
+        id="submitGMInput"
+        name="submitGMInput"
+      >
+        Submit Input
+      </button>
+    </div>
+  </form>
 </div>
 
 {% endblock %}
