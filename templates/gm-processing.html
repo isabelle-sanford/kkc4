@@ -6,8 +6,9 @@
   </div>
 
   <div class="row">
-    {% for s in game.curr_turn.log.sections %}
-    {{game.curr_turn.log.sections[s]}}
+    {% for s in game.curr_turn.log.sections %} {% for part in
+    game.curr_turn.log.sections[s] %} {{part}}<br />
+    {% endfor %}
     <hr />
     {% endfor %}
   </div>
@@ -15,8 +16,30 @@
   <div class="row">
     <h3>Player final statuses:</h3>
     <br />
-    {% for p in game.players %} {{p.status}}
+    {% for p in game.players %} {{p.status}} <br />
+    {{p.processing}}
     <hr />
+    {% endfor %}
+  </div>
+
+  <div class="row">
+    <h3>Public results stuff</h3>
+    {% for r in game.curr_turn.log.public_results %} {{r}} <br />
+    {% endfor %}
+  </div>
+
+  <div class="row">
+    <h3>Player PMs stuff</h3>
+    {% for p in game.players %} {% for m in p.processing.player_message %} {{m}}
+    <br />
+    {% endfor %}
+    <hr />
+    {% endfor %}
+  </div>
+
+  <div class="row">
+    <h3>GM ToDo Things</h3>
+    {% for m in game.curr_turn.log.results.gm_todo %} {{m}} <br />
     {% endfor %}
   </div>
 </div>

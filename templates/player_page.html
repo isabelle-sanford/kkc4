@@ -7,7 +7,7 @@
     </div>
     <div class="col-2 cycle">
       <h4 style="text-align: center">Term {{player.month // 3 + 1}}</h4>
-      <h4 style="text-align: center">Month {{player.month + 1}}</h4>
+      <h4 style="text-align: center">Month {{player.month + 2}}</h4>
     </div>
   </div>
   <div class="row">
@@ -19,9 +19,10 @@
         </strong>
         currently {% if player.status.is_enrolled %}enrolled at the University.
         {% elif player.status.is_expelled %}expelled from the University. {%
-        else %}unenrolled at the University. {% endif %}You have [TODO] of
-        elevation(s) in {{player.status.elevations}}. You are staying in
-        {{player.status.lodging.fullname}}.<br />
+        else %}unenrolled at the University. {% endif %}You have rank
+        {{ranknames[player.status.rank]}} of elevation(s) in [{% for f in
+        player.status.elevations %} {{fieldnames[f]}}, {% endfor %}]. You are
+        staying in {{player.status.lodging.fullname}}.<br />
         Your stipend is {{ player.status.stipend }} talents and your tuition
         this term was {{player.status.current_tuition}}.
       </p>
@@ -108,7 +109,7 @@
             <div class="form-check">
               <input
                 class="form-check-input"
-                type="radio"
+                type="checkbox"
                 name="nextterm"
                 id="enroll"
                 value="enroll"
@@ -122,7 +123,7 @@
             <div class="form-check">
               <input
                 class="form-check-input"
-                type="radio"
+                type="checkbox"
                 name="imre_next"
                 id="imre_next"
                 value="imre_next"
@@ -201,36 +202,47 @@
     </form>
   </div>
   {% if player.status.in_imre %} {% block imre %} {% endblock %} {% else %}
-  <form class="col-6 mt-2" method="post">
+  <!-- ! temp col-12 bc targets aren't filtered yet -->
+  <form class="col-12 mt-2" method="post">
     <div>
       ACTIONS
       <!-- TODO only show if NOT in imre -->
       <fieldset class="fieldset-uni">
         <!-- TODO CHECK IF ROLEBLOCKED IN STATUS -->
         <legend align="center" class="legend-uni">Actions</legend>
-        {% for ap in player.status.action_periods %}
+        {% for i,ap in action_periods.items() %}
         <div class="input-group">
           <!-- TODO only show possible # of action periods etc -->
           <span class="input-group-text actions">{{ap}}</span>
           <select class="form-select" id="action{{i}}" name="action{{i}}">
             <option value="None">--</option>
             {% for a in player.status.accessible_actions %}
-            <option value="{{a}}">{{a.info.name}}</option>
+            <option value="{{a.name}}">{{a.info.name}}</option>
             {% endfor %}
           </select>
 
           <!-- VARIOUS TARGET TYPES -->
-          <select class="form-select" id="targetplayer" name="targetplayer">
+          <select
+            class="form-select"
+            id="a{{i}}targetplayer"
+            name="a{{i}}targetplayer"
+          >
+            <option value="None">--</option>
             <!-- TODO only living players -->
             {% for p in playerlist %}
-            <option value="{{p.name}}">{{p.name}}</option>
+            <option value="{{p.id}}">{{p.name}}</option>
             {% endfor %}
           </select>
 
           <!-- ? consider diff list for this? -->
-          <select class="form-select" id="targetaction" name="targetaction">
+          <select
+            class="form-select"
+            id="a{{i}}targetaction"
+            name="a{{i}}targetaction"
+          >
+            <option value="None">--</option>
             {% for at in ActionType %}
-            <option value="{{at.info.name}}">{{at.info.name}}</option>
+            <option value="{{at.value}}">{{at.info.name}}</option>
             {% endfor %}
           </select>
 
@@ -247,13 +259,23 @@
             <option value="9" style="color: #c30b7f">The Pearl of Imre</option>
           </select> -->
 
-          <select class="form-select" id="targetitem" name="targetitem">
+          <select
+            class="form-select"
+            id="a{{i}}targetitem"
+            name="a{{i}}targetitem"
+          >
             {% for it in items %}
+            <option value="None">--</option>
             <option value="{{it.value}}">{{it.name}}</option>
             {% endfor %}
           </select>
 
-          <select class="form-select" id="targetfield" name="targetfield">
+          <select
+            class="form-select"
+            id="a{{i}}targetfield"
+            name="a{{i}}targetfield"
+          >
+            <option value="None">--</option>
             <option value="0">Linguistics</option>
             <option value="1">Arithmetics</option>
             <option value="2">Rhetoric/Logic</option>
@@ -268,15 +290,24 @@
           <!-- TODO events, other, Names -->
 
           <!-- SECONDARY TARGET --><!-- TODO only living players -->
-          <!-- <select class="form-select" id="targetplayer2" name="targetplayer2">
-            
+          <select
+            class="form-select"
+            id="a{{i}}targetplayer2"
+            name="a{{i}}targetplayer2"
+          >
+            <option value="None">--</option>
             {% for p in playerlist %}
             <option value="{{p.id}}">{{p.name}}</option>
             {% endfor %}
-          </select> -->
+          </select>
 
           <!-- ? consider diff list for this? -->
-          <select class="form-select" id="targetaction2" name="targetaction2">
+          <select
+            class="form-select"
+            id="a{{i}}targetaction2"
+            name="targetaction2"
+          >
+            <option value="None">--</option>
             {% for at in ActionType %}
             <option value="{{at.value}}">{{at.info.name}}</option>
             {% endfor %}

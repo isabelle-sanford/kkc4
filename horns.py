@@ -120,7 +120,8 @@ class Charges:
 
 
 class Horns:
-    def __init__(self) -> None:
+    def __init__(self, log: ProcessLog = None) -> None:
+        self.log = log
         pass
 
     def run_complaints(self, player_list: "list[Player]" = None):
@@ -157,6 +158,8 @@ class Horns:
 
                 out += ", ".join([c.info.name for c in p.processing.complaints_received])
 
+                self.log.log("Vote count: " + out)
+                self.log.results.public_results.append(out)
                 print(out)
 
         # What do complaints do? 
@@ -221,11 +224,11 @@ class Horns:
         for field in all_fields:
             if field.master is not None: # pc master
                 for d in field.master.choices.assigned_DP:
-                    d.assign_DP(master_of=field.master.status.master_of)
+                    d.assign_DP(field)
             else: # npc master
                 for count in range(5):
                     if len(complaints) > 0:
-                        complaints[random.randrange(0,len(complaints))].assign_DP(master_of=field.name)
+                        complaints[random.randrange(0,len(complaints))].assign_DP(field)
         # TODO LOG
         log.log("DP assigned.")
 

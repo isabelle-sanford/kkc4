@@ -6,7 +6,7 @@ from actioninfo import ActionInfo
 
 from statics import Background, Lodging, FieldName, Rank, FIELDNAMES
 from actions import ActionType, Action
-from field import FieldStatus, FIELDS
+from field import ActionPeriod, FieldStatus, FIELDS
 from items import ItemType, Item
 
 class BaseStat(Enum):
@@ -122,7 +122,7 @@ class PlayerStatus:
         }
         self.has_talent_pipes = False # todo
 
-        self.action_periods = [FieldName.GENERAL] # this is when NOT in imre
+        self.action_periods = [ActionPeriod.GENERAL] # this is when NOT in imre
 
     def __repr__(self) -> str:
         ret = [str(self.info)]
@@ -190,8 +190,8 @@ class PlayerStatus:
     # yes this is redundant no I am not happy about it
     def levels_in(self, field: FieldName):
         # error check?
-        count = self.status.elevations.count(field)
-        if self.status.master_of == field:
+        count = self.elevations.count(field)
+        if self.master_of == field:
             count = 4
         return count
     
@@ -290,10 +290,14 @@ class PlayerChoices:
         self.pay_giles = 0
         self.pay_devi = 0
 
+        self.enroll_next = False if self.status.is_expelled else True 
+        self.next_lodging: Lodging = Lodging.Streets
+
         if self.month % 3 == 2: # make lodging choice in month BEFORE term start
-            self.next_lodging: Lodging = Lodging.Streets
+            
             if not self.status.is_expelled:
                 self.enroll_next = True # check expulsion etc 
+            else: self.enroll_next = False
             
             if self.status.IMRE_INFO["DEVI_amt_owed"] > 0:
                 arit_reduction = self.status.levels_in(FieldName.ARITHMETICS) * 10 + 10
@@ -320,9 +324,9 @@ class PlayerChoices:
 
         # List of complaints made (NOT including PiH)
         # remember cannot vote if expelled
-        self.complaints: list[Player] = []
+        self.complaints: list[int] = [] # just pids
 
-        self.actions: list[Action] = []
+        self.actions: list[Action] = [None] * 4
 
         self.filing_EP: list[FieldName] = [None] * self.status.available_EP
 
@@ -369,7 +373,7 @@ class PlayerChoices:
     def __repr__(self) -> str:
         # TODO
 
-        ret = f"{self.player_static.name}: complaints {[c.name for c in self.complaints]}"
+        ret = f"{self.player_static.name}: complaints {[c for c in self.complaints]}"
         if self.month % 3 == 2:
             ret += f"Lodging {self.next_lodging}, enroll next {self.enroll_next}\t"
         if self.pay_giles > 0:
@@ -437,9 +441,16 @@ class Tuition:
         
         inflations = 0
         # todo: care div by 0 probably
-        m1_ratio = self.num_pms_m1 / (self.num_pms_m1 + self.num_posts_m1)
-        m2_ratio = self.num_pms_m2 / (self.num_pms_m2 + self.num_posts_m2)
-        m3_ratio = self.num_pms_m3 / (self.num_pms_m3 + self.num_posts_m3)
+        if self.num_pms_m1 + self.num_posts_m1 > 0:
+            m1_ratio = self.num_pms_m1 / (self.num_pms_m1 + self.num_posts_m1)
+        else: m1_ratio = 0
+        if self.num_pms_m2 + self.num_posts_m2 > 0:
+            m2_ratio = self.num_pms_m2 / (self.num_pms_m2 + self.num_posts_m2)
+        else: m2_ratio = 0
+        if self.num_pms_m3 + self.num_posts_m3 > 0:
+            m3_ratio = self.num_pms_m3 / (self.num_pms_m3 + self.num_posts_m3)
+        else: m3_ratio = 0
+
         for ratio in [m1_ratio, m2_ratio, m3_ratio]:
             if ratio >= 0.75:
                 inflations += 1
@@ -513,21 +524,21 @@ class Player:
 
         self.history = [] # [(status m0, choices, processing), (status m1, choices, processing), ...]
 
-    def __str__(self):
+    def __repr__(self):
 
         ret = f"{self.info.name}\n"
 
         return ret
     
-    def __repr__(self):
-        # todo not this
-        ret = f"{self.info.name} ({self.info.social_class} "
-        ret += "Skindancer" if self.info.is_evil else "Student"
-        ret += f" {self.status.rank})"
-        return ret
+    # def __repr__(self):
+    #     # todo not this
+    #     ret = f"{self.info.name} ({self.info.social_class} "
+    #     ret += "Skindancer" if self.info.is_evil else "Student"
+    #     ret += f" {self.status.rank})"
+    #     return ret
     
     def calc_lodging(self, lodging: Lodging):
-        curr_price = lodging.price
+        curr_price = Lodging(lodging).price
         if self.info.social_class == Background.Ruh:
             curr_price /= 2
         if self.status.master_of is not None:
@@ -537,6 +548,7 @@ class Player:
         
     # i.e. process an attack on you
     def get_attacked(self, attack: Action):
+        print(attack)
         # sabotage, bonetar, assassin, mommet, ??
         if self.processing.can_be_targeted == False: 
             attack.successful = False
@@ -742,12 +754,12 @@ class Player:
         if self.status.rank is not Rank.NONE:
             self.status.rank -=1
         
-            abilities_to_lose = [a for a in self.status.accessible_abilities if a.info.field_ability is not None]
+            abilities_to_lose = [a for a in self.status.accessible_actions if a.info.field_ability is not None]
             if len(abilities_to_lose) > 0:
                 lost = random.choice(abilities_to_lose)
                 self.processing.player_message.append(f"You lost a rank and access to the ability {lost.info.name}.")
             
-                self.status.accessible_abilities.discard(lost)
+                self.status.accessible_actions.discard(lost)
 
         
         return 
@@ -766,7 +778,7 @@ class Player:
             f.remove_player(self)
         self.status.EP = None
 
-        self.processing.player_message("Sorry, you died!") # todo: add dead doc link
+        self.processing.player_message.append("Sorry, you died!") # todo: add dead doc link
         
         # TODO ??
     
@@ -1060,20 +1072,22 @@ class Player:
         return None  
 
     # changed this slightly bc I wasn't clear what it was doing / if it was right
-    def assign_DP(self, total = 1, master_of:FieldName = None):
-        if master_of is not None:
-            #print(f"Master {master_of.name} assigning DP to {self.info.name}, with {self.status.EP.vals[master_of]} ep in {master_of.name}")
+    def assign_DP(self, total = 1, field:FieldStatus = None):
+        if field is not None:
+            #print(f"Master {field.name} assigning DP to {self.info.name}, with {self.status.EP.vals[field]} ep in {field.name}")
             
-            num_EP = self.status.EP.vals[master_of]
+            num_EP = self.status.EP.vals[field.name]
             
             if num_EP > 0:
                 diff = num_EP - total
                 if diff >= 0: # at least as much EP as DP
-                    self.status.EP.vals[master_of] -= total # or = diff
+                    self.status.EP.vals[field.name] -= total # or = diff
                     total = 0
                 else:
                     total -= num_EP # or = -diff
-                    self.status.EP.vals[master_of] = 0
+                    self.status.EP.vals[field.name] = 0
+                
+                field.EP[self] = self.status.EP.vals[field.name]
             
             self.processing.DP += total
             

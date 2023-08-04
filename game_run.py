@@ -139,24 +139,24 @@ class Game:
 
 
     # ...should this be in Turn? not sure
-    def add_action(self, player_id, action):
-        p = self.players[player_id]
+    def add_action(self, p, action, idx):
 
         if not p.status.can_take_actions:
             print("Player cannot take actions!") # log, and better
-        elif action["action_type"].info not in p.status.accessible_abilities:
+            self.log.log(f"{p.name} can't take actions so {action} fails")
+        elif action["action_type"] not in p.status.accessible_actions:
             # log, not print
-            print(f"Player {p.name} cannot take action {action}!")
+            self.log.log(f"Player {p.name} cannot take action {action} because it's not accessible to them.")
         # anything else?
 
         # this bit can probably be much better (get func maybe?)
-        t2 = None
-        if "target_two" in action:
-            t2 = action["target_two"]
+        # t2 = None
+        # if "target_two" in action:
+        #     t2 = action["target_two"]
         
-        a = Action(p, action["action_type"], action["target"], t2)
+        a = Action(p, action["action_type"], action["target"], action["target_two"])
 
-        p.take_action(a)
+        p.choices.actions[idx] = a
 
     def update_player_choices(self, choice, player):
         c = player
@@ -176,11 +176,39 @@ class Game:
                     c.choices.filing_EP[i] = int(choice[s])
 
         for i in range(4):
-            if ("action" + str(i)) in choice:
-                a_info = choice["action"+str(i)]
-                # TODO
+            s = "action" + str(i)
+            if s in choice and choice[s] != "None":
+                atype = ActionType[choice[s]]
+                print(atype)
 
-                self.add_action(c.id, a_info)
+                # target 1
+                atarget = None
+                s2 = f"a{i}target"
+                if (s2 + "player") in choice and choice[s2 + "player"] != "None":
+                    atarget = self.players[int(choice[s2 + "player"])]
+                if (s2 + "item") in choice and choice[s2 + "item"] != "None":
+                    atarget = choice[s2 + "item"]
+                if (s2 + "action") in choice and choice[s2 + "action"] != "None":
+                    atarget = ActionType(int(choice[s2 + "action"]))
+                if (s2 + "field") in choice and choice[s2 + "field"] != "None":
+                    atarget = FieldName(int(choice[s2 + "field"]))
+                
+                # target 2
+                atarget2 = None
+                if (s2 + "player2") in choice and choice[s2 + "player2"] != "None":
+                    atarget2 = self.players[int(choice[s2 + "player2"])]
+                if (s2 + "action2") in choice and choice[s2 + "action2"] != "None":
+                    atarget2 = choice[s2 + "action2"]
+
+                a_info = {
+                    "action_type": atype,
+                    "target": atarget,
+                    "target_two": atarget2
+                }
+
+                # TODO add level if applicable
+
+                self.add_action(c, a_info, i)
         # what about updating an action? do we just clear all actions before this func? 
         
         # todo other choices
@@ -263,8 +291,8 @@ class Turn:
                     self.sane_players.append(p.id)
             
             for a in p.choices.actions:
-
-                self.actions.append(a)
+                if a is not None:
+                    self.actions.append(a)
             
             if p.choices.imre_next: # is this good?
                 self.imre_players.append(p.id)
@@ -367,7 +395,7 @@ class Turn:
             # if currently enrolled, calculate tuition for next term
             # (otherwise keep the value of whatever the previous one was)
             if p.status.is_enrolled and not p.status.is_expelled:
-                tuition = p.tuition.calculate_tuition(p.status) 
+                tuition = p.tuition.calc_tuition(p.status) 
                 p.status.current_tuition = tuition
                 p.tuition = Tuition(pid) # new obj for next term
 
@@ -634,7 +662,8 @@ class Turn:
         print("\n")
         for p in self.players:
             for a in p.choices.actions:
-                print(f"{a.player.info.name}'s {a.type} action is blocked = {a.blocked}")
+                if a is not None:
+                    self.log.log(f"{a.player.info.name}'s {a.type.name} action is blocked = {a.blocked}")
 
     def preprocessing_standard(self):
 
@@ -661,24 +690,28 @@ class Turn:
     def process_standard_actions(self):
         # todo: check streets pos actions
         for a in self.actions:
-            if a.type.category == ActionCategory.OTHER or a.type.category == ActionCategory.CREATEITEM:
+            self.log.log("Processing action: " + str(a))
+            if a.type.info.category == ActionCategory.OTHER or a.type.info.category == ActionCategory.CREATEITEM:
+                
                 if a.successful:
                     # not sure if these checks are already done in block processing
-                    if a.type.t1type == Target.PLAYER:
+                    if a.type.info.target1 == Target.PLAYER:
                         if not a.target.status.can_be_targeted:
                             a.successful = False
                             continue # ??
                     
                     # probs gotta check for target None
                     # bc sometimes player target is optional
-                    if a.type.t2type == Target.PLAYER and not a.target_two.status.can_be_targeted:
+                    if a.type.info.target2 == Target.PLAYER and not a.target_two.status.can_be_targeted:
                         a.successful = False
                         continue
-
+                    
+                    self.log.log("Action successful")
                     # todo more checks probably
                     a.perform(log=self.log)
 
-            elif a.type.category == ActionCategory.OFFENSIVE:
+            elif a.type.info.category == ActionCategory.OFFENSIVE:
+                self.log.log(f"Action {a} marked as offensive")
                 self.offensive_actions.append(a)
         return
 
@@ -762,7 +795,7 @@ class Turn:
                 npcE[f.name] = e
             
         # PC masters
-        print(pcE)
+        #print(pcE)
 
         pc_choices = [None] * 9
         for i,p in enumerate(pcE):
@@ -787,10 +820,10 @@ class Turn:
                 finalE[i] = pc_choices[i]
         #finalE = e1
 
-        print("finalE after PCs ", finalE)
-        print(npcE)
+        # print("finalE after PCs ", finalE)
+        # print(npcE)
 
-        print(npcE[0])
+        #print(npcE[0])
 
         npc_choices = [None] * 9
         for idx,f in enumerate(npcE):
@@ -804,45 +837,53 @@ class Turn:
                 npc_choices[idx] = random.choice(npcE[idx])
         # print(npcE)
         
-        # npc_choices = [random.choice(l) for l in npcE if len(l) > 0]
-        print("npc choices ", npc_choices)
-        # remove anyone a PC already went for 
+        self.log.log(f"Initial NPC choices are {npc_choices}")
         for i, p in enumerate(npc_choices):
             if p in finalE:
                 npc_choices[i] = None
 
 
         dupes = self.get_dupes(npc_choices)
-        print("dupes are ", dupes)
+        if len(dupes.keys()) > 0:
+            self.log.log(f"Duplicates exist! {dupes}")
 
-        for player, fields in dupes:
-            # dupes are {Player: f1, f2}
+        for player, fields in dupes.items():
+            self.log.log(f"Player {player.name} cannot be elevated in multiple fields. ")
+            #self.log.log(f"Dupes are ")
+            # dupes are {Player: [f1, f2]}
             
+            print("player curr EP", player.status.EP)
             winner = self.get_max([player.status.EP.vals[f] for f in fields])
 
-            for c in fields:
-                if c != winner:
-                    npcE[c] = [i for i in npcE[c] if i != p]
-                    npc_choices[c] = random.choice(npcE[c])
+            for j,c in enumerate(fields):
+                if j != winner:
+                    npcE[c] = [i for i in npcE[c] if i != player]
+                    if len(npcE[c]) > 0:
+                        npc_choices[c] = random.choice(npcE[c])
+                    else:
+                        npc_choices[c] = None
+            
+            self.log.log(f"They will be elevated in {FIELDNAMES[fields[winner]]}")
 
     
-        print("after dupes ", npc_choices)
+        # print("after dupes ", npc_choices)
 
-        print(finalE)
+        # print(finalE)
 
         for i, p in enumerate(finalE):
             # check for conflict w PC? (shouldn't happen)
             if npc_choices[i] is not None: 
                 finalE[i] = npc_choices[i]
         
-        print("after integration ", finalE)
+        #print("after integration ", finalE)
         
         
         for i, p in enumerate(finalE):
             if p is not None:
                 p.elevate_in(FieldName(i)) #?
+                self.fields[i].EP[p] = p.status.EP.vals[FieldName(i)]
         
-        print(finalE)
+       # print(finalE)
         
         self.log.log("Resulting elevations: ")
 
@@ -856,14 +897,24 @@ class Turn:
 
 
     def get_max(self, li: list[int]):
-        random.shuffle(li) # for tiebreakers 
+        # random.shuffle(li) # for tiebreakers 
         idx = 0
-        val = 0
+        val = -1
 
-        for i, n in li:
+        eq = None
+
+        for i, n in enumerate(li):
             if n > val:
                 idx = i
                 val = n
+                eq = [i]
+            if n == val:
+                eq.append(i)
+        
+        if len(eq) > 1:
+            idx = random.choice(eq)
+            print("Multiple with same EP", eq, " winner is ", idx)
+
         return idx
 
     
@@ -962,11 +1013,11 @@ class Turn:
         for p in self.players:
             if not p.initial_status.is_sane and p.initial_status.is_alive:
                 roll = random.randint(1,20)
-                if len(p.known_names) >= 5:
+                if len(p.status.known_names) >= 5:
                     roll = random.randint(1,10)
                 
                 if roll == 1:
-                    print(f"{p.name} broke out !!!")
+                    self.log.log(f"{p.name} broke out !!!")
                     p.status.is_sane = True 
                     # todo break_out() func 
 
@@ -986,12 +1037,13 @@ class Turn:
 
                 if roll == 1:
                     # todo probs not this
-                    attacks.append(("Streets", self.players[p]))
-            
+                    #attacks.append(("Streets", self.players[p]))
+                    pass
             if self.players[p].processing.insanity_bonus > 0:
                 could_go_insane.append(self.players[p])
 
         for a in self.offensive_actions:
+            self.log.log(f"Processing offensive action {a}")
             # check if blocked? 
             # if a.target.status.lodging == Lodging.HorseAndFour:
             #     roll = random.randint(1,2)
@@ -1021,10 +1073,10 @@ class Turn:
                     #         a.successful = True # bc not blocked
                     #         sabotagee = None
                     
-            
-            if a.type == ActionType.UseAssassin and a.successful:
-                if a.target.processing.can_be_targeted:
-                    attacks.append((a, a.target))
+            # TODO assassins (not an action)
+            # if a.type == ActionType.UseAssassin and a.successful:
+            #     if a.target.processing.can_be_targeted:
+            #         attacks.append((a, a.target))
 
             
             # todo bonetar 
@@ -1036,7 +1088,7 @@ class Turn:
                 results = a.perform(log=self.log, at_lodging=at_lodging)
 
                 for d in results["dead"]:
-                    being_attacked.append(d)
+                    attacks.append((a,d))
                 
                 # todo put survivors on the streets
 
@@ -1049,11 +1101,12 @@ class Turn:
             result = attacked[1].get_attacked(attacked[0])
 
             if result: # person dies
-                dying.append(attacked[1])
-                self.log.log(f"{attacked[1].name} dying to {attacked[0].name}")
+                dying.add(attacked[1])
+                self.log.log(f"{attacked[1].name} dying to {attacked[0].type.info.name}")
                 self.log.results.public_results.append(f"{attacked[1].name} was killed!") # ?add alignment?
+            
             else: # person is protected
-                self.log.log(f"{attacked[1].name} was attacked by {attacked[0]} but survived") # due to?
+                self.log.log(f"{attacked[1].name} was attacked by {attacked[0].type.info.name} but survived") # due to?
                 self.log.results.public_results.append(f"{attacked[1].name} was attacked, but survived!")
         
         if sabotagee is not None: # if sabotage was attack, this is none
@@ -1061,6 +1114,7 @@ class Turn:
             if was_sabotaged:
                 self.log.log(f"{sabotagee[1]} successfully sabotaged")
                 self.log.results.public_results.append(f"{sabotagee[1]} went insane!")
+                sabotagee[1].go_insane(self.fields)
             else:
                 self.log.log(f"{sabotagee[1].name} was sabotaged but survived") # due to?
                 self.log.results.public_results.append(f"{sabotagee[1].name} was attacked, but survived!")
@@ -1081,12 +1135,12 @@ class Turn:
             roll = random.randint(1,10)
 
             if roll + p.processing.insanity_bonus >= 12:
-                p.go_insane()
+                p.go_insane(self.fields)
                 self.log.log(f"{p.name} went insane normally")
-                self.log.results.public_results(f"{p.name} went insane!") # todo: check against already-insane ppl
+                self.log.results.public_results.append(f"{p.name} went insane!") # todo: check against already-insane ppl
 
-        # for a in still_attacked:
-        #     a.die()
+        for d in dying:
+            d.die(self.fields)
 
         # TODO LOGGING / RESULTS
         return
@@ -1201,8 +1255,9 @@ class Turn:
             
             if p.status.lodging == Lodging.Ankers and random.randrange(0,100) < 15:
                 # TODO check for in imre
-                if len(p.choices.actions) > 0:
-                    action_blocked = random.choice(p.choices.actions)
+                counting_actions = [a for a in p.choices.actions if a is not None]
+                if len(counting_actions) > 0:
+                    action_blocked = random.choice(counting_actions)
                     action_blocked.blocked = True
                     action_blocked.block_reasoning += "Ankers"
             elif p.status.lodging == Lodging.KingsDrab and random.randrange(0,100) < 5:
@@ -1211,17 +1266,24 @@ class Turn:
 
             # TODO log
         
+        self.log.log(f"{len(self.actions)} actions to process.")
+
         # TODO process if actions by expelled students work
         # can only target expelled ppl or ppl in imre
         self.preprocessing()
         
         self.log.log("Passive roleblocks processed...")
 
-        self.process_blocks(self.actions)
+        print("actions before log", self.actions)
+
+        a = self.actions.copy()
+        self.process_blocks(a)
 
         self.log.log("All blocks processed!")
+        print("actions post blocks", self.actions)
         success_actions = [a for a in self.actions if a.successful]
-        #self.log.log("Actions marked as succeeding: ", [str(a) for a in success_actions])
+        self.log.log("Actions marked as succeeding: " + "; ".join([str(a) for a in success_actions]))
+        self.log.log("Actions marked as failed: " + "; ".join([str(a) for a in self.actions if not a.successful]))
 
         self.log.add_section("Standard Actions", "Starting to process standard actions...")
         # preprocessing? 

@@ -84,7 +84,7 @@ cheating_death = ActionInfo(19, "Cheating Death", ActionCategory.OTHER, Target.P
 # Alchemy
 create_tenaculum = ActionInfo(36, "Create Tenaculum", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=1)
 create_firestop = ActionInfo(37, "Create Firestop", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.RELAR, True), insanity_bonus=2)
-create_plumbob = ActionInfo(38, "Create Plumbob", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELIR, True), insanity_bonus=3)
+create_plumbob = ActionInfo(38, "Create Plumbob", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELTHE, True), insanity_bonus=3)
 create_bonetar = ActionInfo(39, "Create Bonetar", ActionCategory.CREATEITEM, Target.ITEM, field_ability=FieldAbility(FieldName.ALCHEMY, Rank.ELTHE, True), insanity_bonus=3)
 
 # Artificery

@@ -12,7 +12,7 @@ class FieldName(IntEnum):
     ARTIFICERY = 7
     NAMING = 8
     GENERAL = 9  # ? # gotta remember this when iterating thru
-FIELDNAMES = ["Linguistics", "Arithmetics", "Rhetoric & Logic", "Archives", "Sympathy", "Physicking", "Alchemy", "Artificery", "Naming"]
+FIELDNAMES = ["Linguistics", "Arithmetics", "Rhetoric & Logic", "Archives", "Sympathy", "Physicking", "Alchemy", "Artificery", "Naming", "General"]
 
 class Rank(IntEnum):
     NONE = 0
@@ -32,7 +32,7 @@ class Rank(IntEnum):
         if self.ELTHE:
             return self.MASTER
 
-
+RANKNAMES = ["None", "E'lir", "Re'lar", "El'the", "Master"]
 
 
 class Lodging(Enum):

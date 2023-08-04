@@ -41,6 +41,16 @@ class Action:
         self.blocked_by_action: list[Action] = []
         self.in_block_cycle: bool = False
         self.block_reasoning = "" # for GM results
+    
+    def __repr__(self) -> str:
+        ret = f"Action of type {self.type.info.name} performed by {self.player.name} on target(s) {self.target} and {self.target_two}, marked as {'successful' if self.successful else 'failed'}. "
+        if self.level is not None:
+            ret += f"Level {self.level}. "
+        if self.message is not None:
+            ret += f"Message to player: {self.message} "
+
+
+        return ret
 
     def __str__(self):
         # assumes action-taker is known 
@@ -67,7 +77,7 @@ class Action:
     
     def perform(self, log: ProcessLog=None, **kwargs):
         if log is None:
-            log = ProcessLog() # temp that gets destroyed at the end 
+            log = ProcessLog(self.player.month) # temp that gets destroyed at the end 
 
         if self.blocked and not self.in_block_cycle:
             # log it
@@ -142,6 +152,8 @@ class Action:
                 #     print("todo")
 
             self.player.add_item(item)
+
+            log.log(f"player {self.player.name} made item {item} and it has been added to their inventory.")
                 
             return 
         
@@ -191,6 +203,7 @@ class Action:
             case ActionType.ArgumentumAdNauseam:
                 self.target.processing.complaints_blocked = True
                 self.target.processing.processed_complaints = []
+                log.log(f"The complaints of player {self.target.name} were successfully cancelled")
             case ActionType.PersuasiveArguments:
                 complaints = self.target.processing.processed_complaints
                 if len(complaints) == 1:
@@ -203,15 +216,18 @@ class Action:
             # TODO FAE LORE
             case ActionType.OmenRecognition:
                 print("omen recog")
+                log.results.gm_todo(f"Player {self.player} used omen recognition on something ({self.target}) and needs to be told the results. Good luck!")
                 # notify GM
             case ActionType.SchoolRecords:
                 if self.player.status.is_enrolled:
                     elevs = self.target.status.elevations
                     self.message = elevs # ig, idk
+                    self.processing.player_message.append(f"School Records results on {self.target}: {elevs}")
                     # log 
+                    log.log(f"{self.player} used School Records on {self.target} and got told {elevs}")
             case ActionType.BannedBooks:
                 # todo roll chance of being caught
-                
+                log.log(f"{self.player} used Banned Books, currently unimplemented. Fix pls")
                 if self.player.levels_in(self.target):
                     if self.target_two is not None and self.target_two not in self.player.status.accessible_actions:
                         # ie you already studied in the field, you picked an ability to learn, and you don't have it yet
@@ -223,11 +239,14 @@ class Action:
             # SYMPATHY
             # mommet-making handled above
             # TODO malfeasance protection (sigh)
+            case ActionType.MalfeasanceProtection:
+                log.log(f"{self.player} used Malfeasance Protection. Deal with it, and good luck.")
             # don't forget insanity bonuses
 
             # PHYSICKING
             case ActionType.MedicaEmergency:
                 self.player.status.last_medica_emergency = self.player.status.month # i guess? 
+                log.log(f"{self.player.name} used Medica Emergency and is untargetable for the next month.")
 
             # TODO medica detainment
             case ActionType.PsychologicalCounselling:
@@ -239,6 +258,7 @@ class Action:
 
             # NAMING
             case ActionType.UseName:
+                log.log(f"{self.player} used a Name. Hopefully it doesn't break too much.")
                 # TODO 
                 # log 
                 # remember insanity bonuses
@@ -369,8 +389,8 @@ class Action:
             # TODO ActionType.GiveItem
                 # and check for talent pipes shenanigans
 
-    def __str__(self) -> str:
-        return f"{self.player.info.name}: {self.type} "
+    # def __str__(self) -> str:
+    #     return f"{self.player.name}: {self.type} "
     
     
     # Actions are set up to be similar to doubly linked lists - 

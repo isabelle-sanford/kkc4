@@ -1,10 +1,13 @@
-from field import FieldStatus
+
+from statics import FIELDNAMES, RANKNAMES
+from field import ActionPeriod, FieldStatus
 from game_run import Game, Turn
 from items import ItemType
 from player import Player
 from flask import Flask, render_template, request, url_for, flash, redirect
 from actioninfo import ActionType
 import pickle
+
 # sql connection goes here
 
 app = Flask(__name__)
@@ -81,7 +84,9 @@ def player(name):
     # todo POST method for choice submissions
     
     print(player.status)
-    return render_template('player_page.html', player=player, playerlist=curr_game.players, actions=ActionType, items=ItemType)
+    action_periods={i:a.name for i, a in enumerate(player.status.action_periods)}
+    print("action periods: ", action_periods)
+    return render_template('player_page.html', player=player, playerlist=curr_game.players, actions=ActionType, items=ItemType, fieldnames=FIELDNAMES, ranknames=RANKNAMES, action_periods=action_periods)
 
 @app.route("/gm/start")
 def start_game():
@@ -165,7 +170,7 @@ def turn_input():
                 complaints[p.id].append(curr_input["complaint2p" + str(p.id)])
             if curr_input["complaint3p" + str(p.id)] != "None":
                 complaints[p.id].append(curr_input["complaint3p" + str(p.id)])
-            p.choices.complaints = [curr_game.players[int(i)] for i in complaints[p.id]]
+            p.choices.complaints = [int(i) for i in complaints[p.id]]
             #print("got complaints: ", complaints[p.id])
         
         curr_game.curr_gm_input = {}

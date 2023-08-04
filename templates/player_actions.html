@@ -12,7 +12,7 @@
         <span class="input-group-text actions">{{ap}}</span>
         <select class="form-select" id="action{{i}}" name="action{{i}}">
           <option value="None">--</option>
-          {% for a in player.status.accessible_abilities %}
+          {% for a in player.status.accessible_actions %}
           <option value="{{a}}">{{a.info.name}}</option>
           {% endfor %}
         </select>
