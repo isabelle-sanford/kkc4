@@ -27,6 +27,14 @@
               id="complaint{{i}}p{{p.id}}"
               name="complaint{{i}}p{{p.id}}"
             >
+              {% if p.choices.complaints[i] != Undefined %}
+              <option
+                selected
+                value="{{ players[p.choices.complaints[i]].id }}"
+              >
+                {{ players[p.choices.complaints[i]].name }}
+              </option>
+              {% endif %}
               <option value="None">None</option>
               <!-- sane players only? TODO -->
               {% for player in players %}
@@ -46,11 +54,9 @@
             <span>PM Count:</span>
           </div>
           <div class="col-6">
-            <input
-              type="Number"
-              class="form-control input-group-text PM-input"
-              name="PMInputp{{p.id}}"
-            />
+            <input type="Number" class="form-control input-group-text PM-input"
+            name="p{{p.id}}PMInput" placeholder="0" {% if 'PMs' in previnput %}
+            value="{{ previnput.PMs[p.id] }}" {% endif %} />
           </div>
         </div>
         <div class="row">
@@ -58,11 +64,9 @@
             <span>Post Count:</span>
           </div>
           <div class="col-6">
-            <input
-              type="Number"
-              class="form-control input-group-text PM-input"
-              name="p{{p.id}}PostCount"
-            />
+            <input type="Number" class="form-control input-group-text PM-input"
+            name="p{{p.id}}PostCount" placeholder="0" {% if 'posts' in previnput
+            %} value="{{ previnput.posts[p.id] }}" {% endif %} />
           </div>
         </div>
         <div class="row">
@@ -70,11 +74,9 @@
             <span>QRP WC:</span>
           </div>
           <div class="col-6">
-            <input
-              type="Number"
-              class="form-control input-group-text PM-input"
-              name="p{{p.id}}QRPWC"
-            />
+            <input type="Number" class="form-control input-group-text PM-input"
+            name="p{{p.id}}QRP" placeholder="0" {% if 'QRP' in previnput %}
+            value="{{ previnput.QRP[p.id] }}" {% endif %} />
           </div>
         </div>
         <div class="row">
@@ -82,11 +84,9 @@
             <span>QPost WC:</span>
           </div>
           <div class="col-6">
-            <input
-              type="Number"
-              class="form-control input-group-text PM-input"
-              name="p{{p.id}}QPostWC"
-            />
+            <input type="Number" class="form-control input-group-text PM-input"
+            name="p{{p.id}}QPostWC" placeholder="0" {% if 'qpostwc' in previnput
+            %} value="{{ previnput.qpostwc[p.id] }}" {% endif %} />
           </div>
         </div>
         <div class="row my-3">

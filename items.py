@@ -103,7 +103,7 @@ class Item:
                 self.attacks += 1
                 # return false? 
 
-        if self.uses > 1:
+        if self.uses is not None and self.uses > 1:
             self.uses -= 1
 
         return # maybe bool of whether still exists? 
@@ -113,7 +113,7 @@ class Item:
         if self.target is not None:
             # mommet only
             ret += f" on {self.target} "
-        if self.uses > 1:
+        if self.uses is not None and self.uses > 1:
             ret += f" ({self.uses} use(s))"
         
         return ret
@@ -124,7 +124,7 @@ class Item:
         if self.target is not None:
             # mommet only
             ret += f" on {self.target} "
-        if self.uses > 1:
+        if self.uses is not None and self.uses > 1:
             ret += f" ({self.uses} use(s))"
         
         return ret

@@ -63,10 +63,7 @@
           <p>You have [] contracts</p>
           <ul>
             {% for item in player.status.inventory %}
-            <li>
-              {{item.name}} {% if item.uses > 0 %} - {{item.uses}} use(s) {%
-              endif %}
-            </li>
+            <li>{{item.name}} - {{item.uses}} use(s)</li>
             {% endfor %}
           </ul>
         </div>
@@ -84,6 +81,9 @@
               >Lodging:</span
             >
             <select class="form-select" id="lodging" name="lodging">
+              <option selected value="{{player.choices.next_lodging.value}}">
+                {{ player.choices.next_lodging.fullname }}
+              </option>
               <option value="0">On the Streets</option>
               {% if player.status.broke_out %}
               <option value="1">The Underthing</option>
@@ -113,6 +113,14 @@
                 name="nextterm"
                 id="enroll"
                 value="enroll"
+                {%
+                if
+                player.choices.enroll_next
+                %}
+                checked
+                {%
+                endif
+                %}
               />
               <label class="form-check-label" for="enroll">
                 Enroll at University
@@ -127,6 +135,14 @@
                 name="imre_next"
                 id="imre_next"
                 value="imre_next"
+                {%
+                if
+                player.choices.imre_next
+                %}
+                checked
+                {%
+                endif
+                %}
               />
               <label class="form-check-label" for="imre_next">
                 Go to Imre
@@ -158,6 +174,13 @@
               <!-- TODO show in dropdown your prev selections -->
               <div class="input-group">
                 <select class="form-select" id="fieldep{{n}}" name="field{{n}}">
+                  <option
+                    selected
+                    value="{{player.choices.filing_EP[n].value}}"
+                  >
+                    {{ fieldnames[player.choices.filing_EP[n]] }}
+                  </option>
+
                   <option value="None">--</option>
                   <option value="0">Linguistics</option>
                   <option value="1">Arithmetics</option>
@@ -205,7 +228,6 @@
   <!-- ! temp col-12 bc targets aren't filtered yet -->
   <form class="col-12 mt-2" method="post">
     <div>
-      ACTIONS
       <!-- TODO only show if NOT in imre -->
       <fieldset class="fieldset-uni">
         <!-- TODO CHECK IF ROLEBLOCKED IN STATUS -->
@@ -215,6 +237,11 @@
           <!-- TODO only show possible # of action periods etc -->
           <span class="input-group-text actions">{{ap}}</span>
           <select class="form-select" id="action{{i}}" name="action{{i}}">
+            {% if player.choices.actions[i] != None %}
+            <option selected value="{{ player.choices.actions[i].name }}">
+              {{ player.choices.actions[i].type.info.name }}
+            </option>
+            {% endif %}
             <option value="None">--</option>
             {% for a in player.status.accessible_actions %}
             <option value="{{a.name}}">{{a.info.name}}</option>
@@ -341,7 +368,7 @@ Notes</textarea
     </div>
   </form>
   {% endif %}
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-12 mt-2">
       <fieldset class="fieldset-uni">
         <legend align="center" class="legend-uni">Elevations</legend>
@@ -353,7 +380,7 @@ Notes</textarea
         </div>
       </fieldset>
     </div>
-  </div>
+  </div> -->
 
   {% if player.status.master_of %}
   <!-- TODO -->
@@ -430,7 +457,7 @@ Notes</textarea
 
   <!-- TODO add paying giles / devi with big red thing for next term interest thingy -->
 
-  <div class="row">
+  <!-- <div class="row">
     <div class="col-12 my-2">
       <fieldset>
         <legend align="center">History</legend>
@@ -439,7 +466,7 @@ Notes</textarea
         </div>
       </fieldset>
     </div>
-  </div>
+  </div> -->
 </div>
 
 <script src="../static/playerpage.js"></script>

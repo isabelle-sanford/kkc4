@@ -216,7 +216,7 @@ class Action:
             # TODO FAE LORE
             case ActionType.OmenRecognition:
                 print("omen recog")
-                log.results.gm_todo(f"Player {self.player} used omen recognition on something ({self.target}) and needs to be told the results. Good luck!")
+                log.results.gm_todo.append(f"Player {self.player} used omen recognition on something ({self.target}) and needs to be told the results. Good luck!")
                 # notify GM
             case ActionType.SchoolRecords:
                 if self.player.status.is_enrolled:
@@ -279,7 +279,7 @@ class Action:
 
             case ActionType.UsePlumbob:
                 alc_levels = self.player.status.elevations.count(FieldName.ALCHEMY)
-                log.results.gm_todo(f"{alc_levels} level plum bob used by {self.player} on {self.target}.")
+                log.results.gm_todo.append(f"{alc_levels} level plum bob used by {self.player} on {self.target}.")
                 pass
             case ActionType.UseBonetar:
                 # OFFENSIVE

@@ -122,6 +122,8 @@ class PlayerStatus:
         }
         self.has_talent_pipes = False # todo
 
+        self.inventory = []
+
         self.action_periods = [ActionPeriod.GENERAL] # this is when NOT in imre
 
     def __repr__(self) -> str:
@@ -311,15 +313,13 @@ class PlayerChoices:
                 
                 self.pay_giles = interest_owed
 
+        self.imre_next = False
+        if self.status.lodging is not None:
 
+            # change up being in Imre or not
+            if self.status.lodging == Lodging.GreyMan or self.status.lodging == Lodging.PearlOfImre:
+                self.imre_next = True
 
-
-        # change up being in Imre or not
-        if self.status.lodging == Lodging.GreyMan or self.status.lodging == Lodging.PearlOfImre:
-            self.imre_next = True
-        else:
-            # updated later when processing choices, if person wants to go
-            self.imre_next = False
 
 
         # List of complaints made (NOT including PiH)
@@ -393,31 +393,29 @@ class PlayerChoices:
 @dataclass
 class Tuition:
     pid: int
-    quality_thread = 0.0 # 0.1 per post, ish
+    quality_thread = 0 # word count
     quality_rp = 0 # 0.5 per post
     times_filed_EP = 0 # .5 per turn # done
-    times_filed_complaints = 0 # 0.3 per turn
+    times_filed_complaints = 0 # 0.3 per turn 
     items_sold = 0 # 0.05 per item
     apothecary_items = [] # depends on item 
     contracts_placed = [] # depends on contract amt
-    tried_for_pipes: bool = False
+    tried_for_pipes: bool = False # !
     filled_contracts = 0.0 # .5 per contract
-    num_posts_m1 = 0
-    num_pms_m1 = 0
-    num_posts_m2 = 0
-    num_pms_m2 = 0
-    num_posts_m3 = 0
-    num_pms_m3 = 0
-    num_complaints_received = 0 # post manip
-    times_on_horns = 0
+    num_posts = {"0": 0, "1": 0, "2": 0} # "0": n1, "1": n2, etc
+    num_pms = {"0": 0, "1": 0, "2": 0}
+    num_complaints_received = 0 # post manip 
+    times_on_horns = 0 
     no_public_apology = 0
     master_didnt_elevate = 0 # per turn
     master_didnt_act: bool = False # todo
 
     def calc_tuition(self, player: PlayerStatus):
+        
+
         t = 5 if player.rank == Rank.MASTER else 10
         
-        reductions = self.quality_thread + self.quality_rp * 0.5 # should already be calculated on entry
+        reductions = self.quality_thread * 0.1 + self.quality_rp * 0.5 # should already be calculated on entry
         reductions += self.times_filed_EP * 0.5
         reductions += self.times_filed_complaints * 0.3
         reductions += self.items_sold * 0.05
@@ -425,30 +423,29 @@ class Tuition:
         reductions += self.filled_contracts * 0.5
         reductions += 1 if self.tried_for_pipes else 0
          
-        if self.num_posts_m1 > 0:
+        if self.num_posts["0"] > 0:
             reductions += 0.5
-        if self.num_posts_m2 > 0:
+        if self.num_posts["1"] > 0:
             reductions += 0.5
-        if self.num_posts_m3 > 0:
+        if "2" in self.num_posts and self.num_posts["2"] > 0:
             reductions += 0.5
         
-        if self.num_pms_m1 > 0:
+        if self.num_pms["0"] > 0:
             reductions += 0.3
-        if self.num_pms_m2 > 0:
+        if self.num_pms["1"] > 0:
             reductions += 0.3
-        if self.num_pms_m3 > 0:
+        if self.num_pms["2"] > 0:
             reductions += 0.3
         
         inflations = 0
-        # todo: care div by 0 probably
-        if self.num_pms_m1 + self.num_posts_m1 > 0:
-            m1_ratio = self.num_pms_m1 / (self.num_pms_m1 + self.num_posts_m1)
+        if self.num_pms["0"] + self.num_posts["0"] > 0:
+            m1_ratio = self.num_pms["0"] / (self.num_pms["0"] + self.num_posts["0"])
         else: m1_ratio = 0
-        if self.num_pms_m2 + self.num_posts_m2 > 0:
-            m2_ratio = self.num_pms_m2 / (self.num_pms_m2 + self.num_posts_m2)
+        if self.num_pms["1"] + self.num_posts["1"] > 0:
+            m2_ratio = self.num_pms["1"] / (self.num_pms["1"] + self.num_posts["1"])
         else: m2_ratio = 0
-        if self.num_pms_m3 + self.num_posts_m3 > 0:
-            m3_ratio = self.num_pms_m3 / (self.num_pms_m3 + self.num_posts_m3)
+        if self.num_pms["2"] + self.num_posts["2"] > 0:
+            m3_ratio = self.num_pms["2"] / (self.num_pms["2"] + self.num_posts["2"])
         else: m3_ratio = 0
 
         for ratio in [m1_ratio, m2_ratio, m3_ratio]:
@@ -467,12 +464,13 @@ class Tuition:
         inflations += 0.5 if player.rank == Rank.RELAR else 0
         inflations += 1 if player.rank == Rank.ELTHE else 0
 
+        # note: if master happens partway thru turn this kinda breaks
         if player.rank == Rank.MASTER:
-            if self.num_posts_m1 == 0:
+            if self.num_posts["0"] == 0:
                 inflations += 3
-            if self.num_posts_m2 == 0:
+            if self.num_posts["1"] == 0:
                 inflations += 3
-            if self.num_posts_m3 == 0:
+            if self.num_posts["2"] == 0:
                 inflations += 3
             
             inflations += self.master_didnt_elevate * 1

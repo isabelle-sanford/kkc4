@@ -50,7 +50,7 @@ distro_shortcut = [
 
 class Game:
 
-    def __init__(self, shortcut_distro = False):
+    def __init__(self, shortcut_distro = False, shortcut_players = None):
 
 
         self.num_players = 0
@@ -61,17 +61,32 @@ class Game:
 
         self.apothecary = Apothecary()
         self.blackmarket = BlackMarket()
-        self.fields = FIELDS
+        self.fields = FIELDS # !
         self.player_list = {}
         self.month = 0
 
-        self.curr_gm_input = {}
+        self.curr_gm_input = {
+            "complaints": None,
+            "posts": None
+        }
 
         if shortcut_distro:
             for p in distro_shortcut:
                 self.add_player(p)
             
             self.start_game()
+        
+        if shortcut_players is not None:
+            self.players = shortcut_players
+            self.num_players = len(shortcut_players)
+            self.month = 5 # !
+
+            self.player_list = {p.name: p for p in shortcut_players}
+
+            self.curr_turn = Turn({}, 5, self)
+
+            with open('gamenow.pickle', 'wb') as f:
+                pickle.dump(self, f)
 
         
 
@@ -163,21 +178,24 @@ class Game:
 
         # term start things
         if "lodging" in choice:
-            c.choices.next_lodging = int(choice["lodging"])
+            c.choices.next_lodging = Lodging(int(choice["lodging"]))
 
 
         if "imre_next" in choice: c.choices.imre_next = True
+
+        if "nextterm" in choice: c.choices.enroll_next = True
+        else: c.choices.enroll_next = False
 
         for i in range(6):
             s = "field" + str(i)
             if s in choice and choice[s] is not None:
                 print("filing EP #" + str(i) + " in field " + choice[s])
                 if choice[s] != "None":
-                    c.choices.filing_EP[i] = int(choice[s])
+                    c.choices.filing_EP[i] = FieldName(int(choice[s]))
 
         for i in range(4):
             s = "action" + str(i)
-            if s in choice and choice[s] != "None":
+            if s in choice and choice[s] != "None" and choice[s] != "":
                 atype = ActionType[choice[s]]
                 print(atype)
 
@@ -304,15 +322,60 @@ class Turn:
 
             
 
-        # other lists? imre? 
+        # other lists? imre?
+        
+        # for pid in range(len(self.players)):
+        #     if "complaints" in gm_input and gm_input["complaints"] is not None:
+        #         self.players[pid].choices.complaints = [int(i) for i in gm_input["complaints"][pid]]
+
 
         if "complaints" in gm_input and gm_input["complaints"] is not None:
             for v in range(len(gm_input["complaints"])):
                 # accessing id here is a little dubious but ok
-                self.players[v].choices.complaints = [int(i) for i in gm_input["complaints"][v]] # might need to intify
+                self.players[v].choices.complaints = [int(i) for i in gm_input["complaints"][v]] 
                 if len(gm_input["complaints"][v]) > 0:
                     self.players[v].tuition.times_filed_complaints += 1
         
+        which_month = str(self.month % 3)
+
+        for pid in range(len(self.players)):
+            x = 0
+            if "posts" in gm_input and gm_input["posts"] is not None:
+                x = gm_input["posts"][pid]
+                if x == "": x = 0
+            self.players[pid].tuition.num_posts[which_month] = int(x)
+        
+            y = 0
+            if "PMs" in gm_input and gm_input["PMs"] is not None:
+                y = gm_input["PMs"][pid]
+                if y == "": y = 0
+            self.players[pid].tuition.num_pms[which_month] = int(y)
+
+
+
+        # if "posts" in gm_input and gm_input["posts"] is not None:
+        #     for id in range(len(gm_input["posts"])): # should always be same as players?
+        #         p = gm_input["posts"][id]
+        #         if p == "": p = 0
+        #         self.players[id].tuition.num_posts[which_month] = int(p)
+        # if "PMs" in gm_input and gm_input["PMs"] is not None:
+        #     for id in range(len(gm_input["PMs"])): # should always be same as players?
+        #         p = gm_input["PMs"][id]
+        #         if p == "": p = 0
+        #         self.players[id].tuition.num_pms[which_month] = int(p)
+        if "QRP" in gm_input and gm_input["QRP"] is not None:
+            for id in range(len(gm_input["QRP"])): # should always be same as players?
+                p = gm_input["QRP"][id]
+                if p == "": p = 0
+                self.players[id].tuition.quality_rp += int(p) # ints?
+        if "qpostwc" in gm_input and gm_input["qpostwc"] is not None:
+            for id in range(len(gm_input["qpostwc"])): # should always be same as players?
+                p = gm_input["qpostwc"][id]
+                if p == "": p = 0
+                self.players[id].tuition.quality_thread += int(p)
+                
+
+
         # TODO: other tuition stuff from GM input
             # public apology
             # num posts
@@ -417,8 +480,8 @@ class Turn:
                 p.choices.next_lodging = Lodging.KingsDrab
 
 
-        # DO LODGING STUFF
-        # remember to check price for masters, ruh
+            # DO LODGING STUFF
+            # remember to check price for masters, ruh
             # ordering on these?
             lodging_price = p.calc_lodging(p.choices.next_lodging)
 
@@ -428,16 +491,18 @@ class Turn:
             else:
                 self.log.log(f"Player {p.name} could not afford to stay at {p.choices.next_lodging} after tuition.")
                 # TODO imre lodgings
-                if p.choices.next_lodging == Lodging.PearlOfImre:
-                    new_lodging = Lodging.GreyMan
-                    new_lodging_price = p.calc_lodging(Lodging.GreyMan)
+                if p.choices.next_lodging == Lodging.PearlOfImre.value:
+                    self.log.log("they're at the pearlll")
+                    new_lodging = Lodging.GreyMan.value
+                    lodging_price = p.calc_lodging(Lodging.GreyMan)
 
+                    p.choices.next_lodging = Lodging.GreyMan
 
-                    if p.status.money >= new_lodging_price:
-                        p.status.lodging = Lodging.GreyMan
-                        p.status.money -= new_lodging_price
-                
-                if p.choices.next_lodging == Lodging.GreyMan:
+                    
+                self.log.log(f"price {lodging_price} vs money {p.status.money}")
+                if lodging_price <= p.status.money:
+                    self.log.log("pearl to grey man")
+                elif p.choices.next_lodging == Lodging.GreyMan.value and lodging_price > p.status.money: # second part is just for Pearl
                     i = NONIMRE_LODGINGS.index(Lodging.GoldenPony)
                 else: 
                 # this isn't hacky at all shhh
@@ -600,7 +665,7 @@ class Turn:
                     
                     choice = random.choice(options)
                         
-            self.log.log("Block processing partly done and messy. Sigh.")
+            #self.log.log("Block processing partly done and messy. Sigh.")
         return
 
 
@@ -695,14 +760,14 @@ class Turn:
                 
                 if a.successful:
                     # not sure if these checks are already done in block processing
-                    if a.type.info.target1 == Target.PLAYER:
+                    if a.type.info.target1 == Target.PLAYER and a.target is not None:
                         if not a.target.status.can_be_targeted:
                             a.successful = False
                             continue # ??
                     
                     # probs gotta check for target None
                     # bc sometimes player target is optional
-                    if a.type.info.target2 == Target.PLAYER and not a.target_two.status.can_be_targeted:
+                    if a.type.info.target2 == Target.PLAYER and a.target_two is not None and not a.target_two.status.can_be_targeted:
                         a.successful = False
                         continue
                     
@@ -774,7 +839,7 @@ class Turn:
         return nm_ret # i guess
         # todo TEST pls
 
-    def do_elevations(self):
+    def do_elevations(self, custominput = None):
         pcE = [None] * 9 # test 
         npcE = [None] * 9 
         finalE = [None] * 9
@@ -869,6 +934,8 @@ class Turn:
         # print("after dupes ", npc_choices)
 
         # print(finalE)
+        if custominput is not None:
+            finalE = custominput
 
         for i, p in enumerate(finalE):
             # check for conflict w PC? (shouldn't happen)
@@ -994,7 +1061,8 @@ class Turn:
 
     def process_mechanics(self):
         self.log.add_section("Horns", "Processing Horns...")
-        horns = Horns()
+        
+        horns = Horns(self.log)
         horns.run_horns(self.players, self.fields, self.log)
         # todo NAHLROUT
 
@@ -1210,7 +1278,8 @@ class Turn:
                 for item in p.processing.items_received:
                     p.status.inventory.append(item)
 
-    def PROCESS_TURN(self):
+    def PROCESS_TURN(self, custom = None):
+        # custom = {"elevations": [], "breakouts": []}
         # update field statuses to new month (?)
 
         # setup
@@ -1224,9 +1293,7 @@ class Turn:
             p.month += 1
 
         # term beginning -----
-        if self.month % 3 == 0 and self.month != 0:
-            self.start_term()
-        
+
         # lodging effects / IB
         for pid in self.sane_players:
             p = self.players[pid]
@@ -1301,6 +1368,11 @@ class Turn:
         self.log.add_section("Offensive Actions", "Processing offensive actions...")
         self.process_offensive_actions()
         self.log.log("Offensive actions processed!")
+
+        # ! term beginning (moved down here, which might break stuff?)
+        if self.month % 3 == 0 and self.month != 0:
+            self.start_term()
+        
 
         # give players any items they received
         self.postprocessing()

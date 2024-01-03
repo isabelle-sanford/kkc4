@@ -150,7 +150,7 @@ class Horns:
         for p in all_players:
             for c in p.processing.processed_complaints:
                 # Notify all players of complaints received.
-                c.processing.complaints_received.append(p)
+                all_players[c].processing.complaints_received.append(p)
 
         for p in all_players:
             if len(p.processing.complaints_received) > 0:
@@ -174,6 +174,7 @@ class Horns:
 
     def run_horns(self, player_list: "list[Player]" = None, field_list: "list[FieldStatus]" = None, log: ProcessLog = None):
         log.log("RunHorns()......")
+        self.log.log(f"Players currently: {player_list}")
         all_players: list[Player] = []
         if player_list is not None:
             all_players = player_list
@@ -199,7 +200,7 @@ class Horns:
 
                 # Notify all players of complaints received.
                 if player_list is None:
-                    c.processing.complaints_received.append(p)
+                    player_list[c].processing.complaints_received.append(p)
 
         # Deal with Golden Pony buff
         for p in at_pony:
@@ -211,7 +212,7 @@ class Horns:
 
         # TODO dissolve complaints on masters
 
-        log.log("Complaints handled.")
+        log.log(f"Complaints handled: {complaints}")
 
         # add complaints on players to tuition as inflations
         for c in complaints:
@@ -242,10 +243,12 @@ class Horns:
                 players_on_the_horns.add(p)
 
         log.log("Determining charges...")
+        log.log(f"Players on the horns are: {[p.name for p in players_on_the_horns]}")
         charges = Charges(log, all_fields)
         for p in players_on_the_horns:
             p.tuition.times_on_horns += 1
             charges.determine_punishment(p)
+
 
         # for i in Weightings.tier_weights:
         #     print(i)

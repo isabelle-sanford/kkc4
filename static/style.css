@@ -1,13 +1,3 @@
-/* TEMP FOR MY EYES IN THE DARK */
-body {
-  background-color: black;
-}
-
-.container {
-  background-color: black;
-  color: white;
-}
-
 fieldset {
   border: 3px solid #000;
   padding-left: 10px;
@@ -79,8 +69,7 @@ legend {
 
 .distro-form {
   box-sizing: border-box;
-  /* TEMP FOR CONVENIENCE */
-  background-color: darkslategrey;
+  background-color: #f3f9f8;
   border: 4px solid #015149;
 }
 

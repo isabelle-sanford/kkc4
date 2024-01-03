@@ -1,6 +1,9 @@
 # maybe?
 .pem 
 
+custom_players.py
+*.pickle
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
